@@ -1,9 +1,9 @@
+using System;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
 {
     private static Managers _instance;
-
     private static Managers Instance
     {
         get
@@ -15,6 +15,14 @@ public class Managers : MonoBehaviour
 
             return _instance;
         }
+    }
+
+    private InputManager input = new InputManager();
+    public static InputManager Input => Instance?.input;
+
+    private void Update()
+    {
+        Input.OnUpdate();
     }
 
     private static void Init()
