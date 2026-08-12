@@ -28,8 +28,9 @@ public class InputManager
     /// <summary> 마우스의 축 값을 업데이트 </summary>
     private void SetMouseAxis()
     {
-        MouseAxisX = Input.GetAxis("Mouse X");
-        MouseAxisY = Input.GetAxis("Mouse Y");
+        // TODO 민감도
+        MouseAxisX = Input.GetAxis("Mouse X") * 0.5f;
+        MouseAxisY = Input.GetAxis("Mouse Y") * 0.5f;
     }
 
     /// <summary> 키보드의 축 값을 업데이트 </summary>
@@ -92,6 +93,20 @@ public class InputManager
         if (!isPress)
         {
             KeyAxisY = Mathf.MoveTowards(KeyAxisY, 0, Time.deltaTime * AxisRecogSpd * 2f);
+        }
+    }
+    
+    public void SetCursorLock(bool isLock)
+    {
+        if (isLock)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 }

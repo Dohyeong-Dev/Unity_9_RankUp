@@ -5,7 +5,7 @@ using Vector3 = UnityEngine.Vector3;
 
 public class CamCtrl : MonoBehaviour
 {
-    [SerializeField] private Transform _target;
+    private Transform _target;
 
     /// <summary> 타겟 초점 좌표 </summary>
     private Vector3 _targetFocusPos;
@@ -55,6 +55,11 @@ public class CamCtrl : MonoBehaviour
         _eulerY = _target.eulerAngles.y;
     }
 
+    public void SetTarget(Transform target)
+    {
+        _target = target;
+    }
+    
     private void UpdateTargetFocusPos()
     {
         CapsuleCollider capsule = _target.GetComponent<CapsuleCollider>();
@@ -94,8 +99,7 @@ public class CamCtrl : MonoBehaviour
         Vector3 shoulderOffset = Vector3.right * _camOffset.x;
         Vector3 heightOffset = Vector3.up * _camOffset.y;
         
-        Vector3 desiredPos = _targetFocusPos + camYRotation * shoulderOffset + camYRotation * heightOffset
-                             + aimRotation * distanceOffset;
+        Vector3 desiredPos = _targetFocusPos + camYRotation * shoulderOffset + heightOffset + aimRotation * distanceOffset;
 
         // 충돌 검사 후 안전한 카메라 위치 계산
         Vector3 safePos = GetSafeCamPos(desiredPos);
