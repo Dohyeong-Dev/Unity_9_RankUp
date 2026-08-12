@@ -231,7 +231,7 @@ Material:
     - _Is_ViewShift: 0
     - _LightDirection_MaskOn: 0
     - _MatCap: 0
-    - _Metallic: 0
+    - _Metallic: 0.35
     - _Mode: 0
     - _Nearest_Distance: 0.5
     - _OUTLINE: 0
@@ -254,7 +254,7 @@ Material:
     - _Scroll_EmissiveV: 0
     - _Set_SystemShadowsToBase: 1
     - _ShadeColor_Step: 0
-    - _Smoothness: 0.5
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

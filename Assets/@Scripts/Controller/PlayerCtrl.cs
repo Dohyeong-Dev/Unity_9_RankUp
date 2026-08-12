@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerCtrl : MonoBehaviour
 {
     private void Start()
     {
@@ -11,6 +11,5 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        
     }
 }

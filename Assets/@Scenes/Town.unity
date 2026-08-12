@@ -1662,14 +1662,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4503221328954912507, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-      propertyPath: m_Avatar
-      value: 
-      objectReference: {fileID: 9000000, guid: dd4802cc7972ecb4699ed0b29916793f, type: 3}
-    - target: {fileID: 4503221328954912507, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: f51fe57762cd547fab6e850d41a6f94e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10090,6 +10082,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -10215,6 +10208,25 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d4b86597693c4707807d83b84961899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 1524453188}
+  _horizontalSpeed: 20
+  _verticalSpeed: 3
+  _sharpness: 10
+  _limitUpAngle: 60
+  _limitDownAngle: 30
+  _camOffset: {x: 0, y: 0, z: -7}
 --- !u!1001 &985941432
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14616,6 +14628,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 6871645649303424136, guid: 93745b33df81f43e88ddaf0fac11e6c3, type: 3}
   m_PrefabInstance: {fileID: 1511780654}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1524453188 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4503221328954912502, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
+  m_PrefabInstance: {fileID: 104117613}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1541092231
 PrefabInstance:
