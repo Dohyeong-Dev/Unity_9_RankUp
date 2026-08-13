@@ -109,7 +109,8 @@ public class CamCtrl : MonoBehaviour
 
         // 최종 카메라 위치 (보간이동)
         float positionT = 1f - Mathf.Exp(-_sharpness * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, safePos, positionT);
+        //transform.position = Vector3.Lerp(transform.position, safePos, positionT);
+        transform.position = safePos;
     }
 
     // 타겟과 카메라 사이의 충돌을 검사하고 충돌하면 카메라를 타겟 방향으로 당긴다.
