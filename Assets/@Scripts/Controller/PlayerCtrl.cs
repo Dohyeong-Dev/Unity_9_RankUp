@@ -235,8 +235,7 @@ public class PlayerCtrl : MonoBehaviour
 
     #region Wall
 
-    /// <summary> 충돌체의 법선벡터로 기울기를 이용하여 바닥인지 판단 후 벽인경우에는 true 반환 
-    /// </summary>
+    /// <summary> 충돌면의 법선 벡터와 이동 방향을 비교하여 벽을 향해 이동 중인지 판단한다. </summary>
     private bool IsMovingIntoWall(Collision collision)
     {
         Vector3 moveDir = GetMoveDir();
@@ -248,16 +247,14 @@ public class PlayerCtrl : MonoBehaviour
         foreach (ContactPoint contact in collision.contacts)
         {
             Vector3 wallNormal = contact.normal;
-            // 바닥이나 천장은 벽으로 취급하지 않는다.
             if (Mathf.Abs(wallNormal.y) > 0.5f)
             {
                 continue;
             }
 
-            // 이동 방향과 벽을 향하는 방향의 내적을 구한다.
-            // 두 벡터가 정규화되어 있으므로 내적값은 두 벡터 사이각의 cos값이다.
-            // 임계값 이상이면 벽을 향해 이동 중인 것으로 판단한다.
-            // 이동 방향이 벽을 향하는 방향과 60°(Threshold 이내라면 벽에 정면으로 부딪히는 것
+            wallNormal = wallNormal.normalized;
+
+            // 이동 방향과 벽을 향하는 방향의 내적값을 이용해 벽을 정면으로 향하고 있는지 판단한다.
             wallNormal.Normalize();
             float dot = Vector3.Dot(moveDir, -wallNormal);
             if (dot >= _wallBlockThreshold)
