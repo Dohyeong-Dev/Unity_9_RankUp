@@ -8,6 +8,7 @@ public abstract class LayerKey
         public const int Floor = 3;
         public const int Water = 4;
         public const int UI = 5;
+        public const int Wall = 6;
     }
 
     public static class Mask
@@ -18,5 +19,6 @@ public abstract class LayerKey
         public const int Floor = 1 << Idx.Floor;
         public const int Water = 1 << Idx.Water;
         public const int UI = 1 << Idx.UI;
+        public const int Wall = 1 << Idx.Wall;
     }
 }
