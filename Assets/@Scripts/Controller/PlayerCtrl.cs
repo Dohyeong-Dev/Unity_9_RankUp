@@ -8,6 +8,11 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField] private float _runSpeed = 8f;
     [SerializeField] private float _rotateSpeed = 720f;
 
+    [Header("Ground")]
+    [SerializeField] private LayerMask _groundMask;
+    private CapsuleCollider _capsuleCollider;
+    private bool _isGround;
+    
     private Rigidbody _rigidbody;
     private Animator _animator;
 
@@ -18,6 +23,12 @@ public class PlayerCtrl : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
+        
+        _capsuleCollider = GetComponent<CapsuleCollider>();
+        if (_capsuleCollider == null)
+        {
+            CPrint.Error("CapsuleCollider is null!");
+        }
     }
 
     public void SetCamera(Camera cam)
@@ -29,6 +40,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         _inputVec.x = Managers.Input.KeyAxisX;
         _inputVec.y = Managers.Input.KeyAxisY;
+        
+        _isGround = CheckGround();
         
         UpdateAnimation();
     }
@@ -97,5 +110,12 @@ public class PlayerCtrl : MonoBehaviour
         {
             _animator.SetFloat(AnimatorKey.Hash.Speed, 0f);
         }
+    }
+    
+    private bool CheckGround()
+    {
+        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
+        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
+        return Physics.SphereCast(ray, radius, out _, radius + 0.1f, _groundMask);
     }
 }
