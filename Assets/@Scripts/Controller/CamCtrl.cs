@@ -6,7 +6,8 @@ using Vector3 = UnityEngine.Vector3;
 public class CamCtrl : MonoBehaviour
 {
     private Transform _target;
-
+    private CapsuleCollider _targetCol;
+    
     /// <summary> 타겟 초점 좌표 </summary>
     private Vector3 _targetFocusPos;
 
@@ -39,6 +40,7 @@ public class CamCtrl : MonoBehaviour
             CPrint.Error("타겟 세팅이 필요합니다.");
             return;
         }
+        _targetCol = GetComponent<CapsuleCollider>();
 
         UpdateTargetFocusPos();
 
@@ -62,11 +64,9 @@ public class CamCtrl : MonoBehaviour
     
     private void UpdateTargetFocusPos()
     {
-        CapsuleCollider capsule = _target.GetComponent<CapsuleCollider>();
-
-        if (capsule != null)
+        if (_targetCol != null)
         {
-            _targetFocusPos = _target.position + Vector3.up * capsule.height * 0.8f;
+            _targetFocusPos = _target.position + Vector3.up * _targetCol.height * 0.8f;
         }
         else
         {
@@ -108,7 +108,7 @@ public class CamCtrl : MonoBehaviour
         transform.rotation = aimRotation;
 
         // 최종 카메라 위치 (보간이동)
-        float positionT = 1f - Mathf.Exp(-_sharpness * Time.deltaTime);
+        //float positionT = 1f - Mathf.Exp(-_sharpness * Time.deltaTime);
         //transform.position = Vector3.Lerp(transform.position, safePos, positionT);
         transform.position = safePos;
     }
