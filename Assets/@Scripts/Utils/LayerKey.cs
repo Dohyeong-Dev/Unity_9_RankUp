@@ -1,6 +1,6 @@
 public abstract class LayerKey
 {
-    public abstract class Idx
+    public static class Idx
     {
         public const int Default = 0;
         public const int TransprentFX = 1;
@@ -10,7 +10,7 @@ public abstract class LayerKey
         public const int UI = 5;
     }
 
-    public abstract class Mask
+    public static class Mask
     {
         public const int Default = 1 << Idx.Default;
         public const int TransprentFX = 1 << Idx.TransprentFX;

@@ -1,32 +1,36 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody)), RequireComponent(typeof(Animator))]
 public class PlayerCtrl : MonoBehaviour
 {
     [Header("Move")]
     [SerializeField] private float _moveSpeed = 5f;
+    [SerializeField] private float _runSpeed = 8f;
     [SerializeField] private float _rotateSpeed = 720f;
 
     private Rigidbody _rigidbody;
-    
+    private Animator _animator;
+
     private Camera _camera;
-    
     private Vector2 _inputVec;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
     }
 
     public void SetCamera(Camera cam)
     {
         _camera = cam;
     }
-    
+
     private void Update()
     {
         _inputVec.x = Managers.Input.KeyAxisX;
         _inputVec.y = Managers.Input.KeyAxisY;
+        
+        UpdateAnimation();
     }
 
     private void FixedUpdate()
@@ -54,9 +58,11 @@ public class PlayerCtrl : MonoBehaviour
 
     private void Move(Vector3 moveDir)
     {
-        Vector3 velocityVec = moveDir * _moveSpeed;
+        float moveSpeed = Managers.Input.Key_LeftShift ? _runSpeed : _moveSpeed;
+
+        Vector3 velocityVec = moveDir * moveSpeed;
+
         velocityVec.y = _rigidbody.velocity.y;
-        
         _rigidbody.velocity = velocityVec;
     }
 
@@ -70,6 +76,26 @@ public class PlayerCtrl : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(dirVec);
 
         _rigidbody.MoveRotation(Quaternion.RotateTowards(_rigidbody.rotation, targetRotation,
-                _rotateSpeed * Time.fixedDeltaTime));
+                _rotateSpeed * Time.fixedDeltaTime
+            )
+        );
+    }
+
+    private void UpdateAnimation()
+    {
+        bool isMoving = _inputVec.sqrMagnitude > 0.001f;
+        bool isRunning = Managers.Input.Key_LeftShift;
+        float speed = 0f;
+
+        if (isMoving)
+        {
+            speed = isRunning ? 1f : 0.5f;
+
+            _animator.SetFloat(AnimatorKey.Hash.Speed, speed, 0.15f, Time.deltaTime);
+        }
+        else
+        {
+            _animator.SetFloat(AnimatorKey.Hash.Speed, 0f);
+        }
     }
 }

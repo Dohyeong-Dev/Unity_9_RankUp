@@ -1750,14 +1750,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4503221328954912504, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-      propertyPath: m_Interpolate
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7009741289321616214, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-      propertyPath: _rigidbody
-      value: 
-      objectReference: {fileID: 1524453185}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15554,11 +15546,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &1524453185 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 4503221328954912504, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-  m_PrefabInstance: {fileID: 104117613}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1524453189 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7009741289321616214, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
