@@ -50,7 +50,7 @@ public class GameScene : BaseScene
             SetStart(false);
             _remainingTime = 0f;
             _hud.UpdateTimerText(_remainingTime);
-            Managers.UI.OpenScreen<EndScreen>()?.Open(true);
+            Managers.UI.OpenScreen<EndScreen>().Open(_hud.HpProgress <= 0);
 
             return;
         }

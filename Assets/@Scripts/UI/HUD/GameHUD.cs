@@ -13,6 +13,8 @@ public class GameHUD : BaseHUD
     {
         TimerTxt,
     }
+
+    public float HpProgress => Get<Slider>(Sliders.HpSlider)?.value ?? 0f;
     
     protected override void OnAwake()
     {
@@ -38,7 +40,7 @@ public class GameHUD : BaseHUD
                 if (Get<Slider>(Sliders.HpSlider).value <= 0)
                 {
                     gameScene.SetStart(false);
-                    Managers.UI.OpenScreen<EndScreen>().Open((Get<Slider>(Sliders.HpSlider).value <= 0));
+                    Managers.UI.OpenScreen<EndScreen>().Open(true);
                 }
             }
         }
