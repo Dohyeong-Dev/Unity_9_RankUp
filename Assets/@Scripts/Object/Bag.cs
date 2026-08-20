@@ -22,7 +22,6 @@ public class Bag : MonoBehaviour
             return;
         }
         
-        CPrint.Log(other.gameObject.name);
         if (!other.CompareTag(TagKey.Player))
         {
             return;
