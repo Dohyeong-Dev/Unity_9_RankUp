@@ -33,6 +33,8 @@ public class CamCtrl : MonoBehaviour
     private float _eulerY;
     private float _eulerX;
 
+    private bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
+    
     private void Start()
     {
         if (_target == null)
@@ -80,9 +82,13 @@ public class CamCtrl : MonoBehaviour
         {
             return;
         }
-
         UpdateTargetFocusPos();
 
+        if (!CanControl)
+        {
+            return;
+        }
+        
         // 마우스 입력
         _eulerY += Managers.Input.MouseAxisX * _horizontalSpeed;
         _eulerX += Managers.Input.MouseAxisY * _verticalSpeed;
@@ -118,14 +124,12 @@ public class CamCtrl : MonoBehaviour
     {
         Vector3 targetToCamVec = desiredPos - _targetFocusPos;
         float targetToCamDist = targetToCamVec.magnitude;
-
         if ( targetToCamDist < 0.1f)
         {
             return _targetFocusPos;
         }
 
         Vector3 targetToCamDir = targetToCamVec.normalized;
-
         if (Physics.SphereCast(_targetFocusPos, _collisionRadius, targetToCamDir, out RaycastHit hit,
              targetToCamDist, LayerKey.Mask.Floor))
         {
