@@ -81,7 +81,7 @@ public class Utils
         return null;
     }
 
-    public static void DestroyGo(GameObject go, float delay)
+    public static void DestroyGO(GameObject go, float delay)
     {
         UnityEngine.Object.Destroy(go, delay);
     }

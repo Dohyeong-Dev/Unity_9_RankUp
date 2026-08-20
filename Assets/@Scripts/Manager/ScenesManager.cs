@@ -3,13 +3,6 @@ using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
-    public enum SceneType
-    {
-        None,
-        LoadingScene,
-        GameScene,
-    }
-
     // 현재 씬
     private BaseScene _currentScene;
     public BaseScene CurrentScene => _currentScene;

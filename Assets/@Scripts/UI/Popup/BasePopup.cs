@@ -13,7 +13,6 @@ public abstract class BasePopup : BaseUI
         ContentsUp, // 컨텐츠가 살짝 올라옴
         BgUp,       // 배경이 살짝 올라옴
     }
-
     public AnimationType CurrentAnimation;
 
     private void Awake()

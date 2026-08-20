@@ -35,6 +35,8 @@ public class UIManager
 
     #endregion
 
+    #region Root
+    
     private GameObject _root;
 
     public GameObject Root
@@ -49,6 +51,23 @@ public class UIManager
             return _root;
         }
     }
+    
+    private GameObject _persistentRoot;
+    private GameObject PersistentRoot
+    {
+        get
+        {
+            if (_persistentRoot == null)
+            {
+                _persistentRoot = new GameObject("UI_PersistentRoot");
+                Object.DontDestroyOnLoad(_persistentRoot);
+            }
+
+            return _persistentRoot;
+        }
+    }
+    
+    #endregion
 
     public void OnUpdate()
     {
@@ -140,7 +159,7 @@ public class UIManager
 
         if (CurrentScreen != null)
         {
-            CurrentScreen.gameObject.Destroy();
+            CurrentScreen.gameObject.DestroyGO();
             CurrentScreen = null;
         }
     }
@@ -193,7 +212,7 @@ public class UIManager
         BasePopup popup = _popupStack.Pop();
         if (popup != null)
         {
-            popup.gameObject.Destroy();
+            popup.gameObject.DestroyGO();
         }
 
         _nextPopupSortingOrder--;
@@ -225,13 +244,16 @@ public class UIManager
         }
 
         string resourcePath = ResourceKey.Path.UI + ResourceKey.Name.LoaindgUI;
+
         GameObject uiObject = Managers.Resource.Spawn(resourcePath);
         if (uiObject == null)
         {
             CPrint.Error($"Loading UI를 찾을 수 없습니다. [{resourcePath}]");
             return;
         }
-        uiObject.transform.SetParent(Root.transform, worldPositionStays: false);
+
+        uiObject.transform.SetParent(PersistentRoot.transform, worldPositionStays: false);
+
         _loadingObject = uiObject;
 
         LoadingUI loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
@@ -248,7 +270,7 @@ public class UIManager
 
         if (fadeTime <= 0f)
         {
-            _loadingObject.Destroy();
+            _loadingObject.DestroyGO();
             _loadingObject = null;
             return;
         }
@@ -257,7 +279,7 @@ public class UIManager
         if (loadingUI == null)
         {
             CPrint.Error("LoadingUI 컴포넌트를 찾을 수 없습니다.");
-            _loadingObject.Destroy();
+            _loadingObject.DestroyGO();
             _loadingObject = null;
             return;
         }
@@ -267,7 +289,6 @@ public class UIManager
 
     public void Clear()
     {
-        CloseLoadingUI();
         CloseAll();
 
         CurrentHUD = null;

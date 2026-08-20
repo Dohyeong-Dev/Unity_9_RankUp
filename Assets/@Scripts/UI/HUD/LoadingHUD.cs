@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 public class LoadingHUD : BaseHUD
 {
-    public enum Sliders
+    private enum Sliders
     {
         LoadingSlider,
     }
 
-    public enum Texts
+    private enum Texts
     {
         AlertTxt,
     }
@@ -28,6 +28,7 @@ public class LoadingHUD : BaseHUD
 
     protected override void OnStart()
     {
+        Managers.Input.SetCursorLock(false);
     }
 
     protected override void OnUpdate()

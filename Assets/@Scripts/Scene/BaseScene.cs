@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public abstract class BaseScene : MonoBehaviour
 {
-    public ScenesManager.SceneType Type { get; private set; }
+    public SceneType Type { get; private set; }
 
     protected abstract void OnAwake();
 
@@ -14,6 +14,11 @@ public abstract class BaseScene : MonoBehaviour
 
         Managers.Scene.SetCurrentScene(this);
 
+        if (Managers.UI.IsLoading)
+        {
+            Managers.UI.CloseLoadingUI();
+        }
+        
         OnAwake();
     }
 
@@ -58,7 +63,7 @@ public abstract class BaseScene : MonoBehaviour
 
     private void InitializeSceneType()
     {
-        if (Utils.TryParseEnum(GetType().Name, out ScenesManager.SceneType sceneType))
+        if (Utils.TryParseEnum(GetType().Name, out SceneType sceneType))
         {
             Type = sceneType;
             return;

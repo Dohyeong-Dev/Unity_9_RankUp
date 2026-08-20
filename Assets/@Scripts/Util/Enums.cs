@@ -5,3 +5,10 @@ public enum PrintType : ushort
     Warning,
     Error
 }
+
+public enum SceneType : ushort
+{
+    None,
+    LoadingScene,
+    GameScene,
+}

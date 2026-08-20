@@ -34,8 +34,8 @@ public static class Extension
         return false;
     }
 
-    public static void Destroy(this GameObject go, float seconds = 0f)
+    public static void DestroyGO(this GameObject go, float seconds = 0f)
     {
-        Utils.DestroyGo(go, seconds);
+        Utils.DestroyGO(go, seconds);
     }
 }

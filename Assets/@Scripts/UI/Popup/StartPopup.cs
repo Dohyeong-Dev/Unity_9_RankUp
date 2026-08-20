@@ -22,5 +22,13 @@ public class StartPopup : BasePopup
 
     protected override void DestroyOverride()
     {
+        if (Managers.Scene.CurrentScene?.Type == SceneType.GameScene)
+        {
+            GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
+            if (gameScene != null)
+            {
+                gameScene.SetStart(true);
+            }
+        }
     }
 }
