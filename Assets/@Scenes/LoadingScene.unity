@@ -223,7 +223,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -319,7 +319,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -127}
+  m_AnchoredPosition: {x: 0, y: -195}
   m_SizeDelta: {x: 1700, y: 436.35596}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &384936830
@@ -343,7 +343,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "W,A,S,D - <color=yellow>\uC774\uB3D9</color>\nSHIFT - <color=yellow>\uB2EC\uB9AC\uAE30</color>\nSPACE
-    - <color=yellow>\uC810\uD504</color>"
+    - <color=yellow>\uC810\uD504</color>\n\uC67C\uCABD \uB9C8\uC6B0\uC2A4 \uD074\uB9AD
+    - <color=yellow>\uACF5\uACA9</color>\n\uC624\uB978\uCABD \uB9C8\uC6B0\uC2A4 \uD074\uB9AD
+    - <color=yellow>\uB300\uC2DC</color>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}
   m_sharedMaterial: {fileID: 2466781090815511830, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}
@@ -378,7 +380,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -454,8 +456,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 188.07}
-  m_SizeDelta: {x: 1700, y: 376.13}
+  m_AnchoredPosition: {x: 0, y: 193}
+  m_SizeDelta: {x: 1700, y: 230.9631}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &405112724
 MonoBehaviour:
@@ -477,8 +479,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=50>\uD074\uB9AC\uC5B4 \uC870\uAC74 </size>\n\n<color=red>\uC77C\uC815\uC2DC\uAC04</color>\uB3D9\uC548
-    <color=green>HP\uD3EC\uC158</color>\uB97C \uC2B5\uB4DD\uD558\uC5EC \uC0B4\uC544\uB0A8\uC544\uB77C"
+  m_text: "\uD0A4 \uC124\uBA85"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}
   m_sharedMaterial: {fileID: 2466781090815511830, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}
@@ -505,15 +506,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0

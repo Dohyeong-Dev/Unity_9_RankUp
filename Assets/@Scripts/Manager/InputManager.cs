@@ -7,14 +7,16 @@ public class InputManager
     public float MouseAxisY { get; private set; }
     
     public bool MouseDown_Left => Input.GetMouseButtonDown(0);
+    public bool MouseDown_Right => Input.GetMouseButtonDown(1);
     #endregion
 
     #region KEY
     // 키 민감도
-    private const float AxisSensitivity = 2f;
+    private const float AxisSensitivity = 1f;
     
     public float KeyAxisX { get; private set; }
     public float KeyAxisY { get; private set; }
+    public float KeyVecMagnitude => new Vector2(Managers.Input.KeyAxisX, Managers.Input.KeyAxisY).magnitude;
     
     public bool Key_LeftShift => Input.GetKey(KeyCode.LeftShift);
     

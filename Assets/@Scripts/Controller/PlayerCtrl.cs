@@ -1,380 +1,383 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(CapsuleCollider))]
 public class PlayerCtrl : MonoBehaviour
 {
-    #region Move
+    [Flags]
+    public enum PlayerState
+    {
+        Grounded = 1 << 0,
+        Dashing = 1 << 1,
+        Jumping = 1 << 2,
+        Colliding = 1 << 3,
+        Dead = 1 << 4,
+    }
 
-    [Header("Move")]
-    [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] private float _runSpeed = 8f;
-    [SerializeField] private float _rotateSpeed = 720f;
-
-    #endregion
-
-    #region Jump
-
-    [Header("Jump")]
-    [SerializeField] private float _jumpHeight = 2f;
-    [SerializeField] private float _wallFallSpeed = 2f;
-
-    #endregion
-
-    #region Wall
-
-    [Header("Wall")]
-    [Range(0f, 1f)]
-    [Tooltip("이동 방향과 벽을 향하는 방향의 내적 기준값. 1에 가까울수록 정면으로 벽을 향한다.")]
-    [SerializeField] private float _wallBlockThreshold = 0.5f;
-
-    #endregion
-
-    private CapsuleCollider _capsuleCollider;
-    private Rigidbody _rigidbody;
-    private Animator _animator;
     private Camera _camera;
+    public Camera Cam => _camera;
 
-    private Vector2 _inputVector;
+    public Transform Tr => transform;
 
-    private bool _jumpRequested;
-    private bool _isJumping;
-    private bool _isGrounded;
-    private bool _isWallBlocked;
+    private Animator _animator;
+    public Animator Animator => _animator;
+    private Rigidbody _rigid;
+    public Rigidbody Rigid => _rigid;
+    private CapsuleCollider _capsuleCollider;
+    public CapsuleCollider CapsuleCollider => _capsuleCollider;
+    
+    // 회전
+    [Header("회전")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _rotationSlerpFactor;
+    public float RotationSlerpFactor => _rotationSlerpFactor;
+    private Vector3 _lastDirection;
 
-    private bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
+    // 행동
+    private readonly List<BaseLocomotionBehaviour> _locomotions = new();
+    private int _defaultLocomotionBehaviourHash;
+    private int _currentLocomotionBehaviourHash;
+    public bool IsDefaultBehaviour => _currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash;
+
+    #region Stat
+    
+    [Header("HP")]
+    [SerializeField] private float _maxHp = 100f;
+    public float MaxHP => _maxHp;
+    private float _hp;
+    public float HP => _hp;
+    public event Action<float, float> OnHpChanged;
+    
+    [Header("SP")]
+    [SerializeField] private float _maxSp = 100f;
+    public float MaxSP => _maxSp;
+    private float _sp;
+    public float SP => _sp;
+    [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
+    [SerializeField] private float _spRecoveryThreshold = 10f;
+    [Tooltip("초당 SP 회복량")]
+    [SerializeField] private float _spRecoveryRate = 30f;
+    /// <summary> SP가 충분하여 스태미너를 사용하는 행동을 할 수 있는지 여부  </summary>
+    public bool CanUseStamina { get; private set; }
+    public event Action<float, float> OnSpChanged;
+    
+    #endregion
+    
+    #region State
+
+    private PlayerState _state;
+
+    public bool IsGrounded => HasState(PlayerState.Grounded);
+    public bool IsDashing => HasState(PlayerState.Dashing);
+    public bool IsJumping => HasState(PlayerState.Jumping);
+    public bool IsColliding => HasState(PlayerState.Colliding);
+    public bool IsDead => HasState(PlayerState.Dead); // IsAlive가 0이 되었을 때 True
+
+    public bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
+
+    public bool IsMoving
+    {
+        get
+        {
+            if (Managers.Input == null)
+            {
+                return false;
+            }
+
+            return Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
+        }
+    }
+
+    private bool _canDash;
+    public bool CanDash => _canDash;
+
+    #endregion
 
     private void Awake()
     {
-        _capsuleCollider = GetComponent<CapsuleCollider>();
-        _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
+        _rigid = GetComponent<Rigidbody>();
+        _capsuleCollider = GetComponent<CapsuleCollider>();
+
+        _camera = Camera.main;
+
+        InitializeStat();
     }
 
-    public void SetCamera(Camera camera)
+    private void InitializeStat()
     {
-        _camera = camera;
+        _hp = _maxHp;
+        _sp = _maxSp;
+
+        CanUseStamina = true;
     }
 
     private void Update()
     {
-        if (!CanControl)
-        {
-            ClearInput();
-            return;
-        }
+        _animator.SetBool(AnimatorKey.Hash.IsGround, CheckGroundStatus());
 
-        UpdateInput();
-        UpdateAnimation();
+        CheckDie();
+        RecoverSp();
     }
 
     private void FixedUpdate()
     {
-        if (!CanControl)
-        {
-            StopMovement();
-            return;
-        }
-
-        _isGrounded = CheckGround();
-
-        if (_isGrounded)
-        {
-            _isWallBlocked = false;
-        }
-
-        // 공중에서 벽에 부딪혔을 때는 이동을 막고 강제로 하강한다.
-        if (!_isGrounded && _isWallBlocked)
-        {
-            ForceWallFall();
-            return;
-        }
-
-        Vector3 moveDirection = GetMoveDirection();
-
-        Move(moveDirection);
-        Rotate(moveDirection);
-        Jump();
+        UpdateBehaviours();
     }
 
-    #region Input
+    #region Behaviour
 
-    private void UpdateInput()
+    private void UpdateBehaviours()
     {
-        _inputVector.x = Managers.Input.KeyAxisX;
-        _inputVector.y = Managers.Input.KeyAxisY;
-
-        if (Managers.Input.KeyDown_Space && !_isJumping)
-        {
-            _jumpRequested = true;
-        }
-    }
-
-    private void ClearInput()
-    {
-        _inputVector = Vector2.zero;
-        _jumpRequested = false;
-    }
-
-    private void StopMovement()
-    {
-        ClearInput();
-
-        Vector3 velocity = _rigidbody.velocity;
-        velocity.x = 0f;
-        velocity.z = 0f;
-
-        _rigidbody.velocity = velocity;
-    }
-
-    #endregion
-
-    #region Move
-
-    private Vector3 GetMoveDirection()
-    {
-        if (_camera == null)
-        {
-            return Vector3.zero;
-        }
-
-        Vector3 cameraForward = _camera.transform.forward;
-        cameraForward.y = 0f;
-        cameraForward.Normalize();
-
-        Vector3 cameraRight = _camera.transform.right;
-        cameraRight.y = 0f;
-        cameraRight.Normalize();
-
-        Vector3 moveDirection = cameraRight * _inputVector.x + cameraForward * _inputVector.y;
-
-        return moveDirection.sqrMagnitude > 1f ? moveDirection.normalized : moveDirection;
-    }
-
-    private void Move(Vector3 moveDirection)
-    {
-        bool isRunning = Managers.Input.Key_LeftShift;
-        float moveSpeed = isRunning ? _runSpeed : _moveSpeed;
-
-        Vector3 velocity = moveDirection * moveSpeed;
-        velocity.y = _rigidbody.velocity.y;
-
-        _rigidbody.velocity = velocity;
-    }
-
-    private void Rotate(Vector3 moveDirection)
-    {
-        if (moveDirection.sqrMagnitude < 0.001f)
+        if (IsDead)
         {
             return;
         }
 
-        Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-        Quaternion rotation = Quaternion.RotateTowards(_rigidbody.rotation, targetRotation,
-            _rotateSpeed * Time.fixedDeltaTime);
-        _rigidbody.MoveRotation(rotation);
-    }
+        bool isPlayingLocomotion = false;
 
-    #endregion
-
-    #region Jump
-
-    private void Jump()
-    {
-        if (!_jumpRequested)
+        for (int i = 0; i < _locomotions.Count; i++)
         {
-            return;
-        }
+            BaseLocomotionBehaviour locomotion = _locomotions[i];
 
-        _jumpRequested = false;
-
-        // 공중에서는 점프하지 않는다.
-        if (!_isGrounded || _isWallBlocked)
-        {
-            return;
-        }
-
-        // 1/2mv² = mgh
-        float jumpVelocity = Mathf.Sqrt(2f * -Physics.gravity.y * _jumpHeight);
-
-        Vector3 velocity = _rigidbody.velocity;
-        velocity.y = jumpVelocity;
-
-        _rigidbody.velocity = velocity;
-
-        _isJumping = true;
-
-        _animator.SetBool(AnimatorKey.Hash.IsGround, false);
-        _animator.SetBool(AnimatorKey.Hash.IsJump, true);
-        _animator.SetBool(AnimatorKey.Hash.IsFall, false);
-    }
-
-    private void ForceWallFall()
-    {
-        Vector3 velocity = _rigidbody.velocity;
-
-        // 벽을 향한 수평 이동 차단
-        velocity.x = 0f;
-        velocity.z = 0f;
-
-        // 일정한 속도로 강제 하강
-        velocity.y = -_wallFallSpeed;
-
-        _rigidbody.velocity = velocity;
-
-        _isJumping = false;
-
-        _animator.SetBool(AnimatorKey.Hash.IsGround, false);
-        _animator.SetBool(AnimatorKey.Hash.IsJump, false);
-        _animator.SetBool(AnimatorKey.Hash.IsFall, true);
-    }
-
-    #endregion
-
-    #region Animation
-
-    private void UpdateAnimation()
-    {
-        // 벽에 막힌 상태에서는 Fall을 우선한다.
-        if (_isWallBlocked)
-        {
-            SetJumpAnimation(false, true);
-            return;
-        }
-
-        bool isMoving = _inputVector.sqrMagnitude > 0.001f;
-        bool isRunning = Managers.Input.Key_LeftShift;
-
-        float animationSpeed = 0f;
-
-        if (isMoving)
-        {
-            animationSpeed = isRunning ? 1f : 0.5f;
-        }
-
-        float dampingTime = _isGrounded && isMoving ? 0.15f : 0f;
-
-        _animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, dampingTime, Time.deltaTime);
-        _animator.SetBool(AnimatorKey.Hash.IsGround, _isGrounded);
-
-        bool isFalling = !_isGrounded && _isJumping && _rigidbody.velocity.y < 0f;
-
-        _animator.SetBool(AnimatorKey.Hash.IsFall, isFalling);
-
-        // 착지
-        if (_isGrounded && _rigidbody.velocity.y <= 0f)
-        {
-            _isJumping = false;
-
-            SetJumpAnimation(false, false);
-        }
-    }
-
-    private void SetJumpAnimation(bool isJumping, bool isFalling)
-    {
-        _animator.SetBool(AnimatorKey.Hash.IsJump, isJumping);
-        _animator.SetBool(AnimatorKey.Hash.IsFall, isFalling);
-    }
-
-    #endregion
-
-    #region Ground
-
-    private bool CheckGround()
-    {
-        // CapsuleCollider의 반지름을 기준으로 Ground를 검사한다.
-        float radius = _capsuleCollider.bounds.extents.x;
-
-        Vector3 origin = transform.position + Vector3.up * radius * 2f;
-        Ray ray = new Ray(origin, Vector3.down);
-
-        if (!Physics.SphereCast(ray, radius, out RaycastHit hit, radius + 0.1f, LayerKey.Mask.Floor))
-        {
-            return false;
-        }
-
-        // 위쪽을 향하는 면만 지면으로 인정
-        return hit.normal.y > 0.5f;
-    }
-
-    #endregion
-
-    #region Wall
-
-    /// <summary> 충돌면의 법선 벡터와 이동 방향을 비교하여 벽을 향해 이동 중인지 판단한다. </summary>
-    private bool IsMovingIntoWall(Collision collision)
-    {
-        Vector3 moveDirection = GetMoveDirection();
-
-        if (moveDirection.sqrMagnitude < 0.001f)
-        {
-            return false;
-        }
-
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            Vector3 wallNormal = contact.normal;
-
-            // 수평면은 벽으로 취급하지 않는다.
-            if (Mathf.Abs(wallNormal.y) > 0.5f)
+            if (!locomotion.isActiveAndEnabled)
             {
                 continue;
             }
 
-            float dot = Vector3.Dot(moveDirection, -wallNormal);
-
-            if (dot >= _wallBlockThreshold)
+            if (_currentLocomotionBehaviourHash != locomotion.BehaviourHash)
             {
-                return true;
+                continue;
             }
+
+            isPlayingLocomotion = true;
+
+            locomotion.OnFixedUpdate();
+
+            break;
         }
 
-        return false;
+        if (!isPlayingLocomotion)
+        {
+            Reposit();
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    // 마지막으로 바라보던 방향으로 플레이어를 회전
+    private void Reposit()
     {
-        TryStartWallFall(collision);
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        TryStartWallFall(collision);
-    }
-
-    private void TryStartWallFall(Collision collision)
-    {
-        if (_isWallBlocked || !_isJumping)
+        if (_lastDirection == Vector3.zero)
         {
             return;
         }
 
-        if (IsMovingIntoWall(collision))
-        {
-            StartWallFall();
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (!_isWallBlocked)
+        Vector3 viewDir = _lastDirection;
+        viewDir.y = 0f;
+        if (viewDir.sqrMagnitude <= Mathf.Epsilon)
         {
             return;
         }
 
-        // 현재 접촉 중인 다른 벽이 있다면 OnCollisionStay에서 다시 판정한다.
-        _isWallBlocked = false;
+        Quaternion targetRotation = Quaternion.LookRotation(viewDir);
+        Quaternion viewRotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSlerpFactor);
+
+        _rigid.MoveRotation(viewRotation);
     }
 
-    private void StartWallFall()
-    {
-        _isWallBlocked = true;
-        _isJumping = false;
+    #endregion
 
-        _animator.SetBool(AnimatorKey.Hash.IsGround, false);
-        _animator.SetBool(AnimatorKey.Hash.IsJump, false);
-        _animator.SetBool(AnimatorKey.Hash.IsFall, true);
+    #region Damage
+
+    public void TakeDamage(int damage)
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        SetHp(-damage);
+
+        if (_hp <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        SetState(PlayerState.Dead);
+
+        _animator.SetTrigger(AnimatorKey.Hash.DoDie);
+    }
+
+    #endregion
+
+    #region LocomotionBehaviour
+
+    public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
+        _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+    }
+
+    public void SetCurLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        if (_currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash)
+        {
+            _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+        }
+    }
+
+    public void UnsetCurLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        if (_currentLocomotionBehaviourHash == locomotionBehaviourHash)
+        {
+            _currentLocomotionBehaviourHash = _defaultLocomotionBehaviourHash;
+        }
+    }
+
+    public void AddBehaviour(BaseLocomotionBehaviour locomotionBehaviour)
+    {
+        if (!_locomotions.Contains(locomotionBehaviour))
+        {
+            _locomotions.Add(locomotionBehaviour);
+        }
+    }
+
+    public bool IsCurrentBehaviour(int locomotionBehaviourHash)
+    {
+        return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
+    }
+
+    #endregion
+
+    #region Check
+
+    public bool CheckGroundStatus()
+    {
+        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
+
+        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
+
+        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, LayerKey.Mask.Floor);
+        if (isGrounded)
+        {
+            SetState(PlayerState.Grounded);
+        }
+        else
+        {
+            UnsetState(PlayerState.Grounded);
+        }
+
+        return isGrounded;
+    }
+
+    private void CheckDie()
+    {
+        if (_rigid.velocity.y < Mathf.Epsilon && transform.position.y < -10f && !IsDead)
+        {
+            Die();
+        }
+    }
+
+    #endregion
+
+    #region State
+
+    public void SetState(PlayerState state)
+    {
+        _state |= state;
+    }
+
+    public void UnsetState(PlayerState state)
+    {
+        _state &= ~state;
+    }
+
+    private bool HasState(PlayerState state)
+    {
+        return (_state & state) != 0;
+    }
+
+    #endregion
+
+    #region Stat
+
+    public void SetHp(float value)
+    {
+        float previousHp = _hp;
+
+        _hp = Mathf.Clamp(_hp + value, 0f, _maxHp);
+
+        if (!Mathf.Approximately(previousHp, _hp))
+        {
+            OnHpChanged?.Invoke(_hp, _maxHp);
+        }
+    }
+
+    public void SetSp(float value)
+    {
+        float previousSp = _sp;
+
+        _sp = Mathf.Clamp(_sp + value, 0f, _maxSp);
+
+        // SP가 모두 소진되면 스태미너 사용 행동 차단
+        if (_sp <= 0f)
+        {
+            CanUseStamina = false;
+        }
+        // 일정량 이상 회복되면 다시 사용 가능
+        else if (!CanUseStamina && _sp >= _spRecoveryThreshold)
+        {
+            CanUseStamina = true;
+        }
+
+        if (!Mathf.Approximately(previousSp, _sp))
+        {
+            OnSpChanged?.Invoke(_sp, _maxSp);
+        }
+    }
+
+    private void RecoverSp()
+    {
+        // 이미 최대 SP라면 회복할 필요 없음
+        if (_sp >= _maxSp)
+        {
+            return;
+        }
+
+        // 이동 중에는 SP를 회복하지 않음
+        if (IsMoving)
+        {
+            return;
+        }
+
+        SetSp(_spRecoveryRate * Time.deltaTime);
+    }
+
+    /// <summary> 특정 행동에 필요한 SP가 충분한지 확인  </summary>
+    public bool HasEnoughSp(float requiredSp)
+    {
+        return _sp >= requiredSp && CanUseStamina;
+    }
+
+    #endregion
+
+    #region Set
+
+    public void SetCamera(Camera cam)
+    {
+        _camera = cam;
+    }
+
+    public void SetCanDash(bool canDash)
+    {
+        _canDash = canDash;
+    }
+
+    public void SetLastDirection(Vector3 lastDirection)
+    {
+        _lastDirection = lastDirection;
     }
 
     #endregion
