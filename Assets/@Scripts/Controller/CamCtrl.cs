@@ -84,14 +84,12 @@ public class CamCtrl : MonoBehaviour
         }
         UpdateTargetFocusPos();
 
-        if (!CanControl)
+        if (CanControl)
         {
-            return;
+            // 마우스 입력
+            _eulerY += Managers.Input.MouseAxisX * _horizontalSpeed;
+            _eulerX += Managers.Input.MouseAxisY * _verticalSpeed;
         }
-        
-        // 마우스 입력
-        _eulerY += Managers.Input.MouseAxisX * _horizontalSpeed;
-        _eulerX += Managers.Input.MouseAxisY * _verticalSpeed;
 
         // 위 / 아래 회전 제한
         _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
@@ -105,18 +103,17 @@ public class CamCtrl : MonoBehaviour
         Vector3 shoulderOffset = Vector3.right * _camOffset.x;
         Vector3 heightOffset = Vector3.up * _camOffset.y;
         
-        Vector3 desiredPos = _targetFocusPos + camYRotation * shoulderOffset + heightOffset + aimRotation * distanceOffset;
+        Vector3 desiredPos = _targetFocusPos + camYRotation * distanceOffset + shoulderOffset + aimRotation * heightOffset;
 
         // 충돌 검사 후 안전한 카메라 위치 계산
         Vector3 safePos = GetSafeCamPos(desiredPos);
 
         // 최종 카메라 회전
         transform.rotation = aimRotation;
-
         // 최종 카메라 위치 (보간이동)
+        transform.position = safePos;
         //float positionT = 1f - Mathf.Exp(-_sharpness * Time.deltaTime);
         //transform.position = Vector3.Lerp(transform.position, safePos, positionT);
-        transform.position = safePos;
     }
 
     // 타겟과 카메라 사이의 충돌을 검사하고 충돌하면 카메라를 타겟 방향으로 당긴다.

@@ -33,34 +33,6 @@ public class GameScene : BaseScene
 
     protected override void OnUpdate()
     {
-        if (!_isStart)
-        {
-            return;
-        }
-        
-        UpdateTimer();
-    }
-
-    private void UpdateTimer()
-    {
-        _remainingTime -= Time.deltaTime;
-
-        if (_remainingTime <= 0f)
-        {
-            SetStart(false);
-            _remainingTime = 0f;
-            _hud.UpdateTimerText(_remainingTime);
-            Managers.UI.OpenScreen<EndScreen>().Open(_hud.HpProgress <= 0);
-
-            return;
-        }
-
-        int currentSecond = Mathf.CeilToInt(_remainingTime);
-        if (currentSecond != _lastDisplayedSecond)
-        {
-            _lastDisplayedSecond = currentSecond;
-            _hud.UpdateTimerText(_remainingTime);
-        }
     }
 
     public void SetStart(bool isStart)
