@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCtrl : MonoBehaviour
+public class PlayerCtrl : MonoBehaviour, IDamageable
 {
     [Flags]
     public enum PlayerState
@@ -72,7 +72,7 @@ public class PlayerCtrl : MonoBehaviour
     public bool IsJumping => HasState(PlayerState.Jumping);
     public bool IsColliding => HasState(PlayerState.Colliding);
     public bool IsDead => HasState(PlayerState.Dead); // IsAlive가 0이 되었을 때 True
-
+    
     public bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
 
     public bool IsMoving
@@ -188,7 +188,7 @@ public class PlayerCtrl : MonoBehaviour
 
     #region Damage
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         if (IsDead)
         {
@@ -196,6 +196,7 @@ public class PlayerCtrl : MonoBehaviour
         }
 
         SetHp(-damage);
+        Managers.UI.OpenHitEffect();
 
         if (_hp <= 0)
         {
@@ -203,13 +204,23 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
+        if (IsDead)
+        {
+            return;
+        }
+        
         SetState(PlayerState.Dead);
 
         _animator.SetTrigger(AnimatorKey.Hash.DoDie);
     }
 
+    public void OnDeathAnimationEnd()
+    {
+        Managers.UI.OpenScreen<EndScreen>()?.Open(true);
+    }
+    
     #endregion
 
     #region LocomotionBehaviour

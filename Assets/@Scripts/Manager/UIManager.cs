@@ -3,15 +3,6 @@ using UnityEngine;
 
 public class UIManager
 {
-    #region SortingOrder
-
-    private const int HudSortingOrder = 0;
-    private const int ScreenSortingOrder = 1;
-    private int _nextPopupSortingOrder = 2; // HUD(0), Screen(1) 이후부터 시작
-    private const int LoadingSortingOrder = 999;
-
-    #endregion
-
     #region CurrentSceneUI
 
     public BaseHUD CurrentHUD { get; private set; }
@@ -19,15 +10,21 @@ public class UIManager
     public BasePopup CurrentPopup => _popupStack.Count > 0 ? _popupStack.Peek() : null;
 
     #endregion
-
-
+    
     #region PopupUI
 
     private readonly Stack<BasePopup> _popupStack = new();
     public int PopupCount => _popupStack.Count;
-
+    private int _nextPopupSortingOrder = 2;
+    
     #endregion
 
+    #region Overlay
+    
+    private HitEffectUI _hitEffectUI;
+    
+    #endregion
+    
     #region LoadingUI
 
     private GameObject _loadingObject;
@@ -93,40 +90,35 @@ public class UIManager
         }
     }
 
-    // UI Canvas 초기 설정
+    /// <summary> UI Canvas 초기 설정 </summary>
     public void SetupCanvas(GameObject uiObject, BaseUI baseUI)
     {
         Canvas canvas = uiObject.GetOrAddComponent<Canvas>();
+
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
 
-        switch (baseUI)
+        if (baseUI is BaseHUD baseHUD)
         {
-            case BaseHUD hud:
-                CurrentHUD = hud;
-                canvas.sortingOrder = HudSortingOrder;
-                break;
-
-            case BaseScreen:
-                canvas.sortingOrder = ScreenSortingOrder;
-                break;
-
-            case BasePopup:
-                canvas.sortingOrder = _nextPopupSortingOrder++;
-                break;
-
-            case LoadingUI:
-                canvas.sortingOrder = LoadingSortingOrder;
-                break;
+            CurrentHUD = baseHUD;
         }
+        else if (baseUI is BasePopup)
+        {
+            canvas.sortingOrder = _nextPopupSortingOrder++;
+            return;
+        }
+
+        canvas.sortingOrder = baseUI.SortingOrder;
     }
 
-    // Screen UI 열기
+    #region Screen
+    
+    /// <summary> Screen UI 열기 </summary>
     public T OpenScreen<T>() where T : BaseScreen
     {
         if (CurrentScreen is T)
         {
-            CPrint.Error($"이미 동일한 Screen UI가 열려있습니다. [{typeof(T).Name}]");
+            // 이미 동일한 Screen UI가 열려있는 경우
             return null;
         }
 
@@ -151,29 +143,12 @@ public class UIManager
 
         return screen;
     }
-
-    // 현재 Screen과 모든 Popup 닫기
-    public void CloseAll()
-    {
-        CloseAllPopupUI();
-
-        if (CurrentScreen != null)
-        {
-            CurrentScreen.gameObject.DestroyGO();
-            CurrentScreen = null;
-        }
-    }
-
-    // 모든 Popup 닫기
-    public void CloseAllPopupUI()
-    {
-        while (_popupStack.Count > 0)
-        {
-            ClosePopupUI();
-        }
-    }
-
-    // Popup UI 열기
+    
+    #endregion
+    
+    #region Popup
+    
+    /// <summary> Popup UI 열기 </summary>
     public T OpenPopup<T>() where T : BasePopup
     {
         string resourceName = typeof(T).Name;
@@ -201,7 +176,7 @@ public class UIManager
         return popup;
     }
 
-    // 가장 최근에 열린 Popup 닫기
+    /// <summary> 가장 최근에 열린 Popup 닫기 </summary>
     public void ClosePopupUI()
     {
         if (_popupStack.Count == 0)
@@ -218,7 +193,7 @@ public class UIManager
         _nextPopupSortingOrder--;
     }
 
-    // 지정된 Popup이 가장 최근 Popup일 경우 닫기
+    /// <summary> 지정된 Popup이 가장 최근 Popup일 경우 닫기 </summary>
     public void ClosePopupUI(BasePopup popup)
     {
         if (_popupStack.Count == 0)
@@ -234,8 +209,65 @@ public class UIManager
 
         ClosePopupUI();
     }
+    
+    /// <summary> 모든 Popup 닫기 </summary>
+    public void CloseAllPopupUI()
+    {
+        while (_popupStack.Count > 0)
+        {
+            ClosePopupUI();
+        }
+    }
+    
+    #endregion
+    
+    #region Overlay
+    
+    public void OpenHitEffect()
+    {
+        if (_hitEffectUI == null)
+        {
+            GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.OverlayUI + nameof(HitEffectUI));
 
-    // Loading UI 열기
+            uiObject.transform.SetParent(PersistentRoot.transform, false);
+
+            _hitEffectUI = uiObject.GetOrAddComponent<HitEffectUI>();
+
+            SetupCanvas(uiObject, _hitEffectUI);
+        }
+
+        _hitEffectUI.Play();
+    }
+    
+    #endregion
+    
+    #region Clear
+
+    /// <summary> 현재 Screen과 모든 Popup 닫기 </summary>
+    public void CloseAll()
+    {
+        CloseAllPopupUI();
+
+        if (CurrentScreen != null)
+        {
+            CurrentScreen.gameObject.DestroyGO();
+            CurrentScreen = null;
+        }
+    }
+    
+    public void Clear()
+    {
+        CloseAll();
+
+        CurrentHUD = null;
+        _nextPopupSortingOrder = 2;
+    }
+
+    #endregion
+    
+    #region LoadingUI
+    
+    /// <summary> Loading UI 열기 </summary>
     public void OpenLoadingUI(float fadeTime = 0f)
     {
         if (_loadingObject != null)
@@ -260,7 +292,7 @@ public class UIManager
         loadingUI.FadeIn(fadeTime);
     }
 
-    // Loading UI 닫기
+    /// <summary> Loading UI 닫기 </summary>
     public void CloseLoadingUI(float fadeTime = 0f)
     {
         if (_loadingObject == null)
@@ -286,12 +318,6 @@ public class UIManager
         
         loadingUI.FadeOut(fadeTime);
     }
-
-    public void Clear()
-    {
-        CloseAll();
-
-        CurrentHUD = null;
-        _nextPopupSortingOrder = 2;
-    }
+    
+    #endregion
 }

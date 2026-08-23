@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseUI : MonoBehaviour
+public abstract class BaseUI : MonoBehaviour
 {
+    public virtual int SortingOrder => 0;
+    
     // Type : Button, Image, Text ...
     protected readonly Dictionary<Type, UnityEngine.Object[]> UIDictionary = new();
 

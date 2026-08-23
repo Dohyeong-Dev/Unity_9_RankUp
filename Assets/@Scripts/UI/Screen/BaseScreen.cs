@@ -2,6 +2,8 @@ using UnityEngine;
 
 public abstract class BaseScreen : BaseUI
 {
+    public override int SortingOrder => 1;
+    
     protected bool IsClosing;
 
     private void Awake()

@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class LoadingUI : BaseUI
 {
+    public override int SortingOrder => 999;
+    
     private enum Images
     {
         BG,

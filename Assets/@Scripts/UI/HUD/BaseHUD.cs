@@ -2,6 +2,8 @@ using UnityEngine;
 
 public abstract class BaseHUD : BaseUI
 {
+    public override int SortingOrder => 0;
+    
     private CanvasGroup _canvasGroup;
 
     public bool IsInputEnabled { get; private set; }

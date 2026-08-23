@@ -7,6 +7,7 @@ public abstract class ResourceKey
         public const string UI = "Prefab/UI/";
         public const string ScreenUI = UI + "ScreenUI/";
         public const string PopupUI = UI + "PopupUI/";
+        public const string OverlayUI = UI + "OverlayUI/";
     }
 
     public static class Name
@@ -14,6 +15,5 @@ public abstract class ResourceKey
         public const string Event = "EventSystem";
         
         public const string LoaindgUI = "LoadingUI";
-        public const string StartPopup = "StartPopup";
-    }
+        }
 }
