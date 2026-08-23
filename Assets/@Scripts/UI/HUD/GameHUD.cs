@@ -10,6 +10,8 @@ public class GameHUD : BaseHUD
         SpSlider,
     }
 
+    public RectTransform HpSliderTransform => Get<Slider>(Sliders.HpSlider).GetComponent<RectTransform>();
+    
     private PlayerCtrl _player;
 
     protected override void OnAwake()
