@@ -2476,6 +2476,7 @@ GameObject:
   - component: {fileID: 7009741289321616214}
   - component: {fileID: 706809239283613092}
   - component: {fileID: 7172856398739213193}
+  - component: {fileID: 3091948325922192370}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -2499,6 +2500,7 @@ Transform:
   - {fileID: 7745804564915847332}
   - {fileID: 1120221484385842502}
   - {fileID: 768951787838379279}
+  - {fileID: 4137796088204808275}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4503221328954912507
@@ -2589,6 +2591,7 @@ MonoBehaviour:
   _maxSp: 100
   _spRecoveryThreshold: 10
   _spRecoveryRate: 30
+  _str: 10
 --- !u!114 &706809239283613092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2624,6 +2627,24 @@ MonoBehaviour:
   _jumpHeight: 2
   _airMoveFactor: 20
   _fallGravityFactor: 2.5
+--- !u!114 &3091948325922192370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4503221328954912500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67b9ed0fa0b6419696ec96cbab0dc1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredSp: 5
+  _damageFactor: 1
+  _meleeAttackRange: {fileID: 6909126681705616494}
+  _meleeLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &4503221329154261057
 GameObject:
   m_ObjectHideFlags: 0
@@ -4977,6 +4998,38 @@ Transform:
   - {fileID: 3583367120042330943}
   m_Father: {fileID: 1061984312840357348}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8472278676433646843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4137796088204808275}
+  m_Layer: 8
+  m_Name: AttackRange
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4137796088204808275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8472278676433646843}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8785860335976876326}
+  m_Father: {fileID: 4503221328954912502}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8543164185553182880
 GameObject:
   m_ObjectHideFlags: 0
@@ -5768,6 +5821,52 @@ Transform:
   - {fileID: 1533915934795726591}
   m_Father: {fileID: 98587164175914972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &9215780265556994158
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8785860335976876326}
+  - component: {fileID: 6909126681705616494}
+  m_Layer: 8
+  m_Name: MeleeAttack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8785860335976876326
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9215780265556994158}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.92, z: 1.38}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4137796088204808275}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6909126681705616494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9215780265556994158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211e55c0a11a74ef58afa7ef4ac36e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boxSize: {x: 3, y: 1.98, z: 1.74}
+  color: {r: 1, g: 0, b: 0, a: 0.45490196}
 --- !u!1001 &6506641699328296714
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -16,12 +16,18 @@ public class PlayerDie : StateMachineBehaviour
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        if (_player == null)
+        {
+            CPrint.Error("No PlayerCtrl attached");
+            return;
+        }
+        
         if (_isFinished)
         {
             return;
         }
 
-        // 죽음 애니메이션이 끝났는지 확인
+        // 애니메이션이 끝났는지 확인
         if (stateInfo.normalizedTime >= 1f)
         {
             _isFinished = true;

@@ -12,7 +12,7 @@ public class JumpBehaviour : BaseLocomotionBehaviour
 
     private void Start()
     {
-        Player.AddBehaviour(this);
+        Player.AddLocomotionBehaviour(this);
     }
 
     public override void OnFixedUpdate()
@@ -28,7 +28,7 @@ public class JumpBehaviour : BaseLocomotionBehaviour
         }
 
         // 이미 점프 상태라면 상태 처리는 계속 유지
-        if (Player.IsCurrentBehaviour(BehaviourHash))
+        if (Player.IsCurLocomotionBehaviour(BehaviourHash))
         {
             Player.SetState(PlayerCtrl.PlayerState.Jumping);
         }

@@ -75,17 +75,17 @@ public class UIManager
 
         if (CurrentPopup != null)
         {
-            CurrentHUD?.SetInputEnabled(false);
+            Managers.Input.SetInputEnabled(false);
             CurrentPopup.OnInputKey();
         }
         else if (CurrentScreen != null)
         {
-            CurrentHUD?.SetInputEnabled(false);
+            Managers.Input.SetInputEnabled(false);
             CurrentScreen.OnInputKey();
         }
         else if (CurrentHUD != null)
         {
-            CurrentHUD.SetInputEnabled(true);
+            Managers.Input.SetInputEnabled(true);
             CurrentHUD.OnInputKey();
         }
     }

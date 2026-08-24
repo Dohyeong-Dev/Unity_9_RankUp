@@ -14,8 +14,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Dead = 1 << 4,
     }
 
-    private Camera _camera;
-    public Camera Cam => _camera;
+    private CamCtrl _cam;
+    public CamCtrl Cam => _cam;
 
     public Transform Tr => transform;
 
@@ -33,12 +33,20 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public float RotationSlerpFactor => _rotationSlerpFactor;
     private Vector3 _lastDirection;
 
-    // 행동
+    #region Behaviour
+    
+    // Locomotion
     private readonly List<BaseLocomotionBehaviour> _locomotions = new();
     private int _defaultLocomotionBehaviourHash;
     private int _currentLocomotionBehaviourHash;
     public bool IsDefaultBehaviour => _currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash;
-
+    
+    // Attack
+    private BaseAttackBehaviour _curAttack;
+    public bool IsAttacking => _curAttack != null;
+    
+    #endregion
+    
     #region Stat
     
     [Header("스탯")]
@@ -48,6 +56,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private float _hp;
     public float HP => _hp;
     public event Action<float, float> OnHpChanged;
+    
     // SP
     [SerializeField] private float _maxSp = 100f;
     public float MaxSP => _maxSp;
@@ -60,9 +69,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> SP가 충분하여 스태미너를 사용하는 행동을 할 수 있는지 여부  </summary>
     public bool CanUseStamina { get; private set; }
     public event Action<float, float> OnSpChanged;
+    
     // STR
     [SerializeField] private float _str = 10;
     public float STR => _str;
+    
     #endregion
     
     #region State
@@ -73,25 +84,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool IsDashing => HasState(PlayerState.Dashing);
     public bool IsJumping => HasState(PlayerState.Jumping);
     public bool IsColliding => HasState(PlayerState.Colliding);
-    public bool IsDead => HasState(PlayerState.Dead); // IsAlive가 0이 되었을 때 True
-    
-    public bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
+    public bool IsDead => HasState(PlayerState.Dead);
 
-    public bool IsMoving
-    {
-        get
-        {
-            if (Managers.Input == null)
-            {
-                return false;
-            }
-
-            return Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
-        }
-    }
-
-    private bool _canDash;
-    public bool CanDash => _canDash;
+    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
 
     #endregion
 
@@ -100,8 +95,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _animator = GetComponent<Animator>();
         _rigid = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
-
-        _camera = Camera.main;
 
         InitializeStat();
     }
@@ -137,29 +130,31 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         bool isPlayingLocomotion = false;
-
-        for (int i = 0; i < _locomotions.Count; i++)
+        if (_curAttack == null)
         {
-            BaseLocomotionBehaviour locomotion = _locomotions[i];
-
-            if (!locomotion.isActiveAndEnabled)
+            for (int i = 0; i < _locomotions.Count; i++)
             {
-                continue;
+                BaseLocomotionBehaviour locomotion = _locomotions[i];
+
+                if (!locomotion.isActiveAndEnabled)
+                {
+                    continue;
+                }
+
+                if (_currentLocomotionBehaviourHash != locomotion.BehaviourHash)
+                {
+                    continue;
+                }
+
+                isPlayingLocomotion = true;
+
+                locomotion.OnFixedUpdate();
+
+                break;
             }
-
-            if (_currentLocomotionBehaviourHash != locomotion.BehaviourHash)
-            {
-                continue;
-            }
-
-            isPlayingLocomotion = true;
-
-            locomotion.OnFixedUpdate();
-
-            break;
         }
 
-        if (!isPlayingLocomotion)
+        if (!isPlayingLocomotion && _curAttack == null)
         {
             Reposit();
         }
@@ -184,6 +179,90 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Quaternion viewRotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSlerpFactor);
 
         _rigid.MoveRotation(viewRotation);
+    }
+
+    #endregion
+
+    #region LocomotionBehaviour
+
+    public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
+        _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+    }
+
+    public void SetCurLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        if (_currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash)
+        {
+            _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+        }
+    }
+
+    public void UnsetCurLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        if (_currentLocomotionBehaviourHash == locomotionBehaviourHash)
+        {
+            _currentLocomotionBehaviourHash = _defaultLocomotionBehaviourHash;
+        }
+    }
+
+    public void AddLocomotionBehaviour(BaseLocomotionBehaviour locomotionBehaviour)
+    {
+        if (!_locomotions.Contains(locomotionBehaviour))
+        {
+            _locomotions.Add(locomotionBehaviour);
+        }
+    }
+
+    public bool IsCurLocomotionBehaviour(int locomotionBehaviourHash)
+    {
+        return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
+    }
+
+    #endregion
+
+    #region AttackBehaviour
+
+    public void SetCurAttack(BaseAttackBehaviour attackBehaviour)
+    {
+        _curAttack = attackBehaviour;
+    }
+
+    public void UnsetCurAttack()
+    {
+        _curAttack = null;
+    }
+    
+    #endregion
+    
+    #region Check
+
+    public bool CheckGroundStatus()
+    {
+        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
+
+        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
+
+        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, LayerKey.Mask.Floor);
+        if (isGrounded)
+        {
+            SetState(PlayerState.Grounded);
+        }
+        else
+        {
+            UnsetState(PlayerState.Grounded);
+        }
+
+        return isGrounded;
+    }
+
+    private void CheckDie()
+    {
+        if (_rigid.velocity.y < Mathf.Epsilon && transform.position.y < -10f && !IsDead)
+        {
+            Die();
+        }
     }
 
     #endregion
@@ -224,77 +303,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     }
     
     #endregion
-
-    #region LocomotionBehaviour
-
-    public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
-    {
-        _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
-        _currentLocomotionBehaviourHash = locomotionBehaviourHash;
-    }
-
-    public void SetCurLocomotionBehaviour(int locomotionBehaviourHash)
-    {
-        if (_currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash)
-        {
-            _currentLocomotionBehaviourHash = locomotionBehaviourHash;
-        }
-    }
-
-    public void UnsetCurLocomotionBehaviour(int locomotionBehaviourHash)
-    {
-        if (_currentLocomotionBehaviourHash == locomotionBehaviourHash)
-        {
-            _currentLocomotionBehaviourHash = _defaultLocomotionBehaviourHash;
-        }
-    }
-
-    public void AddBehaviour(BaseLocomotionBehaviour locomotionBehaviour)
-    {
-        if (!_locomotions.Contains(locomotionBehaviour))
-        {
-            _locomotions.Add(locomotionBehaviour);
-        }
-    }
-
-    public bool IsCurrentBehaviour(int locomotionBehaviourHash)
-    {
-        return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
-    }
-
-    #endregion
-
-    #region Check
-
-    public bool CheckGroundStatus()
-    {
-        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
-
-        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
-
-        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, LayerKey.Mask.Floor);
-        if (isGrounded)
-        {
-            SetState(PlayerState.Grounded);
-        }
-        else
-        {
-            UnsetState(PlayerState.Grounded);
-        }
-
-        return isGrounded;
-    }
-
-    private void CheckDie()
-    {
-        if (_rigid.velocity.y < Mathf.Epsilon && transform.position.y < -10f && !IsDead)
-        {
-            Die();
-        }
-    }
-
-    #endregion
-
+    
     #region State
 
     public void SetState(PlayerState state)
@@ -359,8 +368,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        // 이동 중에는 SP를 회복하지 않음
-        if (IsMoving)
+        // 이동 중 또는 공격중에는 SP를 회복하지 않음
+        if (IsMoving || IsAttacking)
         {
             return;
         }
@@ -378,14 +387,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #region Set
 
-    public void SetCamera(Camera cam)
+    public void SetCamera(CamCtrl cam)
     {
-        _camera = cam;
-    }
-
-    public void SetCanDash(bool canDash)
-    {
-        _canDash = canDash;
+        _cam = cam;
     }
 
     public void SetLastDirection(Vector3 lastDirection)

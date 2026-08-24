@@ -24,7 +24,7 @@ public class GameScene : BaseScene
         }
         Managers.UI.OpenPopup<StartPopup>();
 
-        _player.SetCamera(_camera.GetComponent<Camera>());
+        _player.SetCamera(_camera);
         _camera.SetTarget(_player.transform);
     }
 

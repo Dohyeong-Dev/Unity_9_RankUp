@@ -28,7 +28,7 @@ public abstract class AnimatorKey
         
         public const string DoIdleChange = "DoIdleChange";
         public const string DoDie = "DoDie";
-        
+
         #endregion
     }
 

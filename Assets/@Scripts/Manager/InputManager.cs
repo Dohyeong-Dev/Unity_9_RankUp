@@ -24,6 +24,8 @@ public class InputManager
     public bool KeyDown_Esc => Input.GetKeyDown(KeyCode.Escape);
     #endregion
     
+    public bool CanReceiveInput { get; private set; }
+    
     public void OnUpdate()
     {
         SetMouseAxis();
@@ -113,5 +115,10 @@ public class InputManager
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+    
+    public void SetInputEnabled(bool enabled)
+    {
+        CanReceiveInput = enabled;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerCtrl))]
 public abstract class BaseLocomotionBehaviour : MonoBehaviour
 {
+    // 1초에 소비되는 SP
     [SerializeField] private float _requiredSpRate;
     public float RequiredSpRate => _requiredSpRate;
     
@@ -14,6 +15,7 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     private void Awake()
     {
         Player = GetComponent<PlayerCtrl>();
+        
         BehaviourHash = GetType().GetHashCode();
     }
 
@@ -21,14 +23,9 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (Player == null)
-        {
-            return;
-        }
-        
         OnUpdateAlways();
         
-        if (!Player.CanControl)
+        if (!Managers.Input.CanReceiveInput)
         {
             return;
         }
@@ -42,8 +39,5 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     }
 
     /// <summary> 현재 행동이 활성 상태이고 플레이어 입력이 가능한 경우 실행됩니다. </summary>
-
-    protected virtual void OnUpdate()
-    {
-    }
+    protected abstract void OnUpdate();
 }

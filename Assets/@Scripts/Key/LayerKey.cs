@@ -9,7 +9,7 @@ public abstract class LayerKey
         public const int Water = 4;
         public const int UI = 5;
         public const int Wall = 6;
-        public const int Object = 7;
+        public const int Enemy = 7;
         public const int Player = 8;
     }
 
@@ -22,7 +22,7 @@ public abstract class LayerKey
         public const int Water = 1 << Idx.Water;
         public const int UI = 1 << Idx.UI;
         public const int Wall = 1 << Idx.Wall;
-        public const int Object = 1 << Idx.Object;
+        public const int Enemy = 1 << Idx.Enemy;
         public const int Player = 1 << Idx.Player;
     }
 }

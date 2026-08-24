@@ -11043,12 +11043,14 @@ MonoBehaviour:
   _limitUpAngle: 0
   _limitDownAngle: 30
   _camOffset: {x: 0, y: 2, z: -7}
-  _sharpness: 15
+  _shakeTime: 0.05
+  _shakeStrength: 0.5
   _collisionCheckLayerMask:
     serializedVersion: 2
     m_Bits: 136
   _collisionRadius: 0.2
-  _collisionOffset: 2
+  _collisionOffset: 0.1
+  _minCameraDistance: 1
 --- !u!1001 &985941432
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     [Tooltip("대시 시 기본 SP 소비량에 적용되는 배율")] 
     [SerializeField] private float _dashSpFactor = 5f;
     private Vector3 _dashDirection; // 대시 시작 순간에 결정되는 방향
+    private bool _canDash;
 
     [Header("달리기 설정")] 
     [Tooltip("달리기 시 기본 이동 속도에 적용되는 배율")] 
@@ -28,13 +29,13 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     {
         _dashCoolTimer = _dashCoolTime;
 
-        Player.AddBehaviour(this);
+        Player.AddLocomotionBehaviour(this);
         Player.SetDefLocomotionBehaviour(BehaviourHash);
     }
 
     public override void OnFixedUpdate()
     {
-        if (!Player.CanControl)
+        if (!Managers.Input.CanReceiveInput)
         {
             StopHorizontalMovement();
             return;
@@ -87,15 +88,16 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         {
             return;
         }
-
-        Camera camera = Player.Cam;
-        if (camera == null)
+        
+        if (Player.Cam == null)
         {
             return;
         }
 
+        Transform camTr = Player.Cam.transform;
+        
         // 카메라의 수평 방향만 사용
-        Vector3 forward = camera.transform.forward;
+        Vector3 forward = camTr.forward;
         forward.y = 0f;
         if (forward.sqrMagnitude <= Mathf.Epsilon)
         {
@@ -103,7 +105,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         }
         forward.Normalize();
 
-        Vector3 right = camera.transform.right;
+        Vector3 right = camTr.right;
         right.y = 0f;
         if (right.sqrMagnitude <= Mathf.Epsilon)
         {
@@ -216,7 +218,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private void TryDash()
     {
-        if (!Player.IsDefaultBehaviour || !Player.CanDash || !Player.IsGrounded)
+        if (!Player.IsDefaultBehaviour || !_canDash || !Player.IsGrounded)
         {
             return;
         }
@@ -239,7 +241,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         Player.SetSp(-requiredSp);
 
-        Player.SetCanDash(false);
+        _canDash = false;
 
         _dashCoolTimer = 0f;
 
@@ -251,18 +253,18 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         // 이동 입력이 있으면 카메라 기준 입력 방향으로 대시한다.
         if (Player.IsMoving)
         {
-            Camera camera = Player.Cam;
-
-            if (camera != null)
+            if (Player.Cam != null)
             {
-                Vector3 forward = camera.transform.forward;
+                Transform camTr = Player.Cam.transform;
+                
+                Vector3 forward = camTr.forward;
                 forward.y = 0f;
 
                 if (forward.sqrMagnitude > Mathf.Epsilon)
                 {
                     forward.Normalize();
 
-                    Vector3 right = camera.transform.right;
+                    Vector3 right = camTr.right;
                     right.y = 0f;
                     if (right.sqrMagnitude > Mathf.Epsilon)
                     {
@@ -293,7 +295,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     {
         if (_dashCoolTimer >= _dashCoolTime)
         {
-            Player.SetCanDash(true);
+            _canDash = true;
             return;
         }
 
@@ -301,7 +303,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         if (_dashCoolTimer >= _dashCoolTime)
         {
             _dashCoolTimer = _dashCoolTime;
-            Player.SetCanDash(true);
+            _canDash = true;
         }
     }
 

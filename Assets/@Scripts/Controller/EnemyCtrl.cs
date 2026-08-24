@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyCtrl : MonoBehaviour
+public class EnemyCtrl : MonoBehaviour, IDamageable
 {
     [SerializeField] private AttackRange _attackRange;
     [SerializeField] private float _attackDelay = 1;
-    [SerializeField] private float damage = 1;
+    [SerializeField] private float _damage = 1;
+
+    [SerializeField] private float _hp;
+    public bool IsDead => _hp <= 0;
     
     private void Start()
     {
@@ -31,7 +34,7 @@ public class EnemyCtrl : MonoBehaviour
             {
                 if (colliders[i].TryGetComponent<IDamageable>(out IDamageable damageable))
                 {
-                    damageable.TakeDamage(damage);
+                    damageable.TakeDamage(_damage);
                 }
             }
             yield return delay;
@@ -41,5 +44,13 @@ public class EnemyCtrl : MonoBehaviour
     private void OnDestroy()
     {
         StopAllCoroutines();
+    }
+    
+    public void TakeDamage(float damage)
+    {
+    }
+
+    public void Die()
+    {
     }
 }
