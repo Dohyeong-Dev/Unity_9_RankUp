@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerCtrl))]
@@ -18,7 +17,33 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
         BehaviourHash = GetType().GetHashCode();
     }
 
-    public virtual void OnFixedUpdate()
+    public abstract void OnFixedUpdate();
+
+    private void Update()
+    {
+        if (Player == null)
+        {
+            return;
+        }
+        
+        OnUpdateAlways();
+        
+        if (!Player.CanControl)
+        {
+            return;
+        }
+        
+        OnUpdate();
+    }
+    
+    /// <summary> UI 입력 상태나 현재 행동과 관계없이 항상 실행됩니다. </summary>
+    protected virtual void OnUpdateAlways()
+    {
+    }
+
+    /// <summary> 현재 행동이 활성 상태이고 플레이어 입력이 가능한 경우 실행됩니다. </summary>
+
+    protected virtual void OnUpdate()
     {
     }
 }

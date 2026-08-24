@@ -20,10 +20,9 @@ public class JumpBehaviour : BaseLocomotionBehaviour
         Jump();
     }
 
-    private void Update()
+    protected override void OnUpdate()
     {
-        // 새로운 점프 입력만 UI 상태에 따라 차단
-        if (Player.CanControl && Managers.Input.KeyDown_Space)
+        if (Managers.Input.KeyDown_Space)
         {
             TryJump();
         }

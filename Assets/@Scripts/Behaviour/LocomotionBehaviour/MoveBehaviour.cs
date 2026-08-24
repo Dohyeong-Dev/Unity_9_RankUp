@@ -64,23 +64,16 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Rigid.velocity = velocity;
     }
     
-    private void Update()
+    protected override void OnUpdateAlways()
     {
         CalculateDashCoolTime();
+    }
 
-        if (!Player.CanControl)
-        {
-            return;
-        }
-
+    protected override void OnUpdate()
+    {
         if (Managers.Input.MouseDown_Right)
         {
             TryDash();
-        }
-
-        if (Player.IsDashing || !Player.IsCurrentBehaviour(BehaviourHash))
-        {
-            return;
         }
 
         AdjustRunSpeed();
@@ -177,8 +170,8 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         moveDirection.Normalize();
 
-        // 일반 이동: 입력 크기에 따라 이동 속도 결정
-        // 대시: 입력이 없어도 항상 최대 대시 속도로 이동
+        // 일반 이동 : 입력 크기에 따라 이동 속도 결정
+        // 대시 : 입력이 없어도 항상 최대 대시 속도로 이동
         float movementInput = Player.IsDashing ? 1f : inputMagnitude;
         Vector3 horizontalVelocity = moveDirection * speed * movementInput;
         Player.Rigid.velocity = new Vector3(horizontalVelocity.x, Player.Rigid.velocity.y, horizontalVelocity.z);
