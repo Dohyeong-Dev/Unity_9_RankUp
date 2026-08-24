@@ -35,7 +35,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         {
             if (colliders[i].TryGetComponent(out IDamageable damageable))
             {
-                damageable.TakeDamage(Mathf.RoundToInt(GetRandomDamage()));
+                damageable.TakeDamage(GetRandomDamage());
             }
         }
     }
