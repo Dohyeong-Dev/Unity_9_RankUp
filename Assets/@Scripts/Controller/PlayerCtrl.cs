@@ -41,14 +41,14 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #region Stat
     
-    [Header("HP")]
+    [Header("스탯")]
+    // HP
     [SerializeField] private float _maxHp = 100f;
     public float MaxHP => _maxHp;
     private float _hp;
     public float HP => _hp;
     public event Action<float, float> OnHpChanged;
-    
-    [Header("SP")]
+    // SP
     [SerializeField] private float _maxSp = 100f;
     public float MaxSP => _maxSp;
     private float _sp;
@@ -60,7 +60,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> SP가 충분하여 스태미너를 사용하는 행동을 할 수 있는지 여부  </summary>
     public bool CanUseStamina { get; private set; }
     public event Action<float, float> OnSpChanged;
-    
+    // STR
+    [SerializeField] private float _str = 10;
+    public float STR => _str;
     #endregion
     
     #region State

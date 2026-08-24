@@ -8,27 +8,24 @@ public class CamCtrl : MonoBehaviour
     // 타겟 초점 좌표
     private Vector3 _targetFocusPos;
 
-    [Header("Camera Settings")]
+    [Header("카메라 세팅")]
     [SerializeField] private float _horizontalSpeed = 3f;
     [SerializeField] private float _verticalSpeed = 3f;
-
     [Tooltip("카메라 위로 보는 각도")]
     [SerializeField] private float _limitUpAngle = 60f;
-
     [Tooltip("카메라 아래로 보는 각도")]
     [SerializeField] private float _limitDownAngle = 30f;
-
     [Tooltip("X = 숄더 뷰, Y = 카메라 높이, Z = 카메라 거리")]
     [SerializeField]
     private Vector3 _camOffset = new(0f, 0f, -3f);
-
     [Tooltip("카메라의 보간 이동 속도 [클수록 1에 가까움]")]
     [SerializeField] private float _sharpness = 25f;
 
-    [Header("Camera Collision")]
+    [Header("카메라 충돌")]
+    [Tooltip("카메라 충돌 체크 레이어")] 
+    [SerializeField] private LayerMask _collisionCheckLayerMask;
     [Tooltip("카메라 충돌 검사 반지름")]
     [SerializeField] private float _collisionRadius = 0.2f;
-
     [Tooltip("충돌했을 때 카메라와 벽 사이에 유지할 거리")]
     [SerializeField] private float _collisionOffset = 0.1f;
 
@@ -36,7 +33,7 @@ public class CamCtrl : MonoBehaviour
     private float _eulerX;
 
     private bool CanControl => Managers.UI.CurrentHUD?.IsInputEnabled ?? false;
-
+    
     private void Start()
     {
         if (_target == null)
@@ -115,10 +112,9 @@ public class CamCtrl : MonoBehaviour
         Vector3 targetToCamDir = targetToCamVec.normalized;
 
         if (Physics.SphereCast(_targetFocusPos, _collisionRadius, targetToCamDir, out RaycastHit hit,
-                targetToCamDist, LayerKey.Mask.Floor))
+                targetToCamDist, _collisionCheckLayerMask))
         {
             float safeDistance = hit.distance - _collisionOffset;
-            safeDistance = Mathf.Max(0f, safeDistance);
 
             return _targetFocusPos + targetToCamDir * safeDistance;
         }
