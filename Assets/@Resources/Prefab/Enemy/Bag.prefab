@@ -19550,7 +19550,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRange: {fileID: 7671866076844822437}
   _attackDelay: 0.5
-  damage: 10
+  _damage: 15
+  _maxHp: 30
 --- !u!1 &5707357999544837258
 GameObject:
   m_ObjectHideFlags: 0
