@@ -6,6 +6,8 @@ public class InputManager
     public float MouseAxisX { get; private set; }
     public float MouseAxisY { get; private set; }
     
+    public float MouseWheel { get; private set; }
+    
     public bool MouseDown_Left => Input.GetMouseButtonDown(0);
     public bool MouseDown_Right => Input.GetMouseButtonDown(1);
     #endregion
@@ -38,6 +40,8 @@ public class InputManager
         // TODO 민감도
         MouseAxisX = Input.GetAxis("Mouse X") * 0.5f;
         MouseAxisY = Input.GetAxis("Mouse Y") * 0.5f;
+        
+        MouseWheel = Input.GetAxis("Mouse ScrollWheel");
     }
 
     /// <summary> 키보드의 축 값을 업데이트 </summary>

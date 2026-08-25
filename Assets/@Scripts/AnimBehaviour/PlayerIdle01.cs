@@ -5,8 +5,8 @@ public class PlayerIdle01 : StateMachineBehaviour
     private PlayerCtrl _player;
 
     [Header("Idle02 랜덤 전환")]
-    [SerializeField] private float _minTime = 3;
-    [SerializeField] private float _maxTime = 5;
+    [SerializeField] private float _randMinTime = 8;
+    [SerializeField] private float _randMaxTime = 15;
     private float _startTime;
     private float _randTime;
 
@@ -17,7 +17,7 @@ public class PlayerIdle01 : StateMachineBehaviour
             _player = animator.GetComponent<PlayerCtrl>();
         }
         
-        _randTime = Random.Range(_minTime, _maxTime);
+        _randTime = Random.Range(_randMinTime, _randMaxTime);
         _startTime = Time.time;
     }
 

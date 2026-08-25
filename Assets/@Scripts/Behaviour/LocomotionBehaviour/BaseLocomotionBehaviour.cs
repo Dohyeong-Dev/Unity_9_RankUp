@@ -25,7 +25,7 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     {
         OnUpdateAlways();
         
-        if (!Managers.Input.CanReceiveInput)
+        if (!Managers.Input.CanReceiveInput || Player.IsAttacking)
         {
             return;
         }

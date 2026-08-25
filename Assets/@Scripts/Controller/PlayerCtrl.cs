@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerCtrl : MonoBehaviour, IDamageable
 {
     [Flags]
@@ -29,7 +31,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     // 회전
     [Header("회전")]
     [Range(0f, 1f)]
-    [SerializeField] private float _rotationSlerpFactor;
+    [SerializeField] private float _rotationSlerpFactor = 0.6f;
     public float RotationSlerpFactor => _rotationSlerpFactor;
     private Vector3 _lastDirection;
 

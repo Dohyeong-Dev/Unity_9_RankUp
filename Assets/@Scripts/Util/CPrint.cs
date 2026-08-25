@@ -75,7 +75,7 @@ public static class CPrint
                 break;
 
             case PrintType.Warning:
-                Debug.LogWarning($"{indent}<color=#FFD54F>[WARNING]</color> {message}");
+                Debug.Log($"{indent}<color=#FFD54F>[WARNING]</color> {message}");
                 break;
 
             case PrintType.Error:
