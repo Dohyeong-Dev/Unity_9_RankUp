@@ -80,6 +80,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     
     #region State
 
+    [Header("상태")]
+    [SerializeField] LayerMask _groundMask;
+    
     private PlayerState _state;
 
     public bool IsGrounded => HasState(PlayerState.Grounded);
@@ -246,7 +249,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
 
-        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, LayerKey.Mask.Floor);
+        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, _groundMask);
         if (isGrounded)
         {
             SetState(PlayerState.Grounded);

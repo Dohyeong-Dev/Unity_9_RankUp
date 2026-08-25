@@ -11367,6 +11367,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 760915822911844537, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: _jumpHeight
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 1286639632634062274, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.817015
@@ -11410,6 +11414,10 @@ PrefabInstance:
     - target: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_Name
       value: KatanaGirl_FullBody
+      objectReference: {fileID: 0}
+    - target: {fileID: 2820019762182822522, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: _groundMask.m_Bits
+      value: 520
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
