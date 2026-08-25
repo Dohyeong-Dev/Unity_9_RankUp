@@ -4844,7 +4844,6 @@ GameObject:
   - component: {fileID: 1608267275392491559}
   - component: {fileID: 2820019762182822522}
   - component: {fileID: 9116578313329837819}
-  - component: {fileID: 760915822911844537}
   - component: {fileID: 739053194219700891}
   - component: {fileID: 4861278980064499775}
   - component: {fileID: 6487812208516868389}
@@ -4915,6 +4914,9 @@ MonoBehaviour:
   _spRecoveryThreshold: 10
   _spRecoveryRate: 30
   _str: 10
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 520
 --- !u!114 &9116578313329837819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4934,22 +4936,6 @@ MonoBehaviour:
   _dashSpFactor: 4
   _runFactor: 1.5
   _runSpFactor: 1.8
---- !u!114 &760915822911844537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914275313167630200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea044c9c8f5ab4ad5bd41b972011d0cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _requiredSpRate: 3
-  _jumpHeight: 2
-  _airMoveFactor: 20
-  _fallGravityFactor: 2.5
 --- !u!114 &739053194219700891
 MonoBehaviour:
   m_ObjectHideFlags: 0
