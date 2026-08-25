@@ -11407,10 +11407,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1608267275392491559, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 94027165efe214e05ac31a93003ba7f8, type: 2}
     - target: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_Name
       value: KatanaGirl_FullBody
@@ -11418,41 +11414,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 482429188}
-    - targetCorrespondingSourceObject: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      insertIndex: 4
-      addedObject: {fileID: 482429193}
-    - targetCorrespondingSourceObject: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      insertIndex: 5
-      addedObject: {fileID: 482429194}
-    - targetCorrespondingSourceObject: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 482429195}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
 --- !u!114 &304007975 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2820019762182822522, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
   m_PrefabInstance: {fileID: 304007974}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482429182}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aaff9895b4d8d4faa9549fa8a9ec21a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1773428102 &304007976 stripped
-ParentConstraint:
-  m_CorrespondingSourceObject: {fileID: 6567574066122253052, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-  m_PrefabInstance: {fileID: 304007974}
-  m_PrefabAsset: {fileID: 0}
---- !u!1773428102 &304007977 stripped
-ParentConstraint:
-  m_CorrespondingSourceObject: {fileID: 5966699596507878798, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-  m_PrefabInstance: {fileID: 304007974}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &310149294
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17881,113 +17855,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2496640218509504062, guid: 5cc1e44d740d85448a03f813736b2e2a, type: 3}
   m_PrefabInstance: {fileID: 481876190}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &482429182 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-  m_PrefabInstance: {fileID: 304007974}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &482429188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482429182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bfd7bd4672f843b487f069c82ef68e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _requiredSpRate: 2
-  _moveSpeed: 5
-  _dashSpeed: 8
-  _dashCoolTime: 0.7
-  _dashSpFactor: 4
-  _runFactor: 1.5
-  _runSpFactor: 2
---- !u!114 &482429193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482429182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea044c9c8f5ab4ad5bd41b972011d0cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _requiredSpRate: 3
-  _jumpHeight: 2
-  _airMoveFactor: 20
-  _fallGravityFactor: 2.5
---- !u!114 &482429194
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482429182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e67b9ed0fa0b6419696ec96cbab0dc1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _requiredSp: 5
-  _damageFactor: 1
-  _meleeAttackRange: {fileID: 6909126681705616494, guid: b669799d66e17e24a8d5bee89dad9fe9, type: 3}
-  _meleeLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
---- !u!114 &482429195
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 482429182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dabaf2f856c5ede49beb8a6f964f4422, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animEventFunctionName: SwitchSocket
-  defaultEventSetting:
-    enabled: 0
-    eventName: 
-    monitoredLayers: 010000
-  showDebugLog: 0
-  weaponSlots:
-  - name: Blade
-    weaponConstraint: {fileID: 304007976}
-    dropCommand: 
-    socketSettings:
-    - name: Katana_Close
-      eventStringName: To_Katana_Close-Blade
-      sourceIndex: 0
-    - name: Hand_R_Socket
-      eventStringName: To_Hand_R_Socket-Blade
-      sourceIndex: 1
-    - name: add_weapon_r
-      eventStringName: To_add_weapon_r-Blade
-      sourceIndex: 2
-    weaponRigidbody: {fileID: 0}
-  - name: Sheath
-    weaponConstraint: {fileID: 304007977}
-    dropCommand: Sheath_OFF
-    socketSettings:
-    - name: Hand_L_Socket
-      eventStringName: To_Hand_L_Socket-Sheath
-      sourceIndex: 0
-    - name: add_weapon_l
-      eventStringName: To_add_weapon_r-Sheath
-      sourceIndex: 1
-    - name: Put_Socket_Katana
-      eventStringName: To_Put_Socket_Katana-Sheath
-      sourceIndex: 2
-    weaponRigidbody: {fileID: 0}
-  supportIKSettings: []
-  propEvents: []
 --- !u!1001 &484260436
 PrefabInstance:
   m_ObjectHideFlags: 0
