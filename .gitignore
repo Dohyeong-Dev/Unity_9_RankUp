@@ -20,7 +20,6 @@
 *.blend1.meta
 
 # MemoryCaptures can get excessive in size.
-# They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
 
 # Recordings can get excessive in size
@@ -90,7 +89,6 @@ InitTestScene*.unity*
 /[Aa]ssets/Addressables_Temp*
 # By default, Addressables content builds will generate addressables_content_state.bin
 # files in platform-specific subfolders, for example:
-# /Assets/AddressableAssetsData/OSX/addressables_content_state.bin
 /[Aa]ssets/AddressableAssetsData/*/*.bin*
 
 # Visual Scripting auto-generated files
@@ -104,3 +102,12 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# ==================================================
+# Third-party assets
+# ==================================================
+# External assets that are not included in the public repository
+/[Aa]ssets/[Tt]hird[Pp]arty/*
+
+# Keep the ThirdParty folder structure
+!/[Aa]ssets/[Tt]hird[Pp]arty/README.md
