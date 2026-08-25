@@ -160,7 +160,7 @@ AnimatorState:
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Dash
   m_Speed: 4
-  m_CycleOffset: 0
+  m_CycleOffset: 0.2
   m_Transitions:
   - {fileID: -6637697037161435246}
   m_StateMachineBehaviours: []
