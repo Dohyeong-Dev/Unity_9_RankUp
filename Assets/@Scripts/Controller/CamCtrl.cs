@@ -5,12 +5,10 @@ public class CamCtrl : MonoBehaviour
 {
     private Transform _target;
     private CapsuleCollider _targetCol;
-
-    private Vector3 _targetFocusPos;
-    private Vector3 _zoomFocusPos;
     
     private float _eulerY;
     private float _eulerX;
+    
     
     #region ===== 카메라 세팅 =====
     
@@ -37,13 +35,16 @@ public class CamCtrl : MonoBehaviour
     
     #region ===== 카메라 초점 =====
     
-    [Header("카메라 초점")] // 1이 가까워질수록 플레이어의 콜라이더 위에 가까워진다.
+    [Header("카메라 초점")]
 
-    [Tooltip("일반 Orbit 카메라 초점 높이")]
+    private Vector3 _targetFocusPos;
+    private Vector3 _zoomFocusPos;
+    
+    [Tooltip("일반 Orbit 카메라 초점 높이")] // 1이 가까워질수록 플레이어의 콜라이더 위에 가까워진다.
     [SerializeField, Range(0f, 1f)]
     private float _orbitFocusHeightRatio = 0.65f;
 
-    [Tooltip("Zoom 시 사용하는 카메라 초점 높이")]
+    [Tooltip("Zoom 시 사용하는 카메라 초점 높이")] // 1이 가까워질수록 플레이어의 콜라이더 위에 가까워진다.
     [SerializeField, Range(0f, 1f)]
     private float _zoomFocusHeightRatio = 0.5f;
     

@@ -6,16 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerCtrl : MonoBehaviour, IDamageable
 {
-    [Flags]
-    public enum PlayerState
-    {
-        Grounded = 1 << 0,
-        Dashing = 1 << 1,
-        Jumping = 1 << 2,
-        Colliding = 1 << 3,
-        Dead = 1 << 4,
-    }
-
     private CamCtrl _cam;
     public CamCtrl Cam => _cam;
 
@@ -28,14 +18,45 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private CapsuleCollider _capsuleCollider;
     public CapsuleCollider CapsuleCollider => _capsuleCollider;
     
+    
     // 회전
     [Header("회전")]
-    [Range(0f, 1f)]
-    [SerializeField] private float _rotationSlerpFactor = 0.6f;
+    [SerializeField, Range(0f, 1f)]
+    private float _rotationSlerpFactor = 0.6f;
     public float RotationSlerpFactor => _rotationSlerpFactor;
+    
     private Vector3 _lastDirection;
+    
+    
+    #region ===== 상태 =====
 
-    #region Behaviour
+    [Flags]
+    public enum PlayerState
+    {
+        Grounded = 1 << 0,
+        Dashing = 1 << 1,
+        Jumping = 1 << 2,
+        Colliding = 1 << 3,
+        Dead = 1 << 4,
+    }
+    
+    [Header("상태")]
+    [SerializeField] LayerMask _groundMask;
+    
+    private PlayerState _state;
+
+    public bool IsGrounded => HasState(PlayerState.Grounded);
+    public bool IsDashing => HasState(PlayerState.Dashing);
+    public bool IsJumping => HasState(PlayerState.Jumping);
+    public bool IsColliding => HasState(PlayerState.Colliding);
+    public bool IsDead => HasState(PlayerState.Dead);
+
+    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
+
+    #endregion ===== 상태 =====
+
+    
+    #region ===== 행동 =====
     
     // Locomotion
     private readonly List<BaseLocomotionBehaviour> _locomotions = new();
@@ -47,9 +68,10 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private BaseAttackBehaviour _curAttack;
     public bool IsAttacking => _curAttack != null;
     
-    #endregion
+    #endregion ===== 행동 =====
     
-    #region Stat
+    
+    #region ===== 스탯 =====
     
     [Header("스탯")]
     // HP
@@ -76,25 +98,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [SerializeField] private float _str = 10;
     public float STR => _str;
     
-    #endregion
+    #endregion ===== 스탯 =====
     
-    #region State
-
-    [Header("상태")]
-    [SerializeField] LayerMask _groundMask;
     
-    private PlayerState _state;
-
-    public bool IsGrounded => HasState(PlayerState.Grounded);
-    public bool IsDashing => HasState(PlayerState.Dashing);
-    public bool IsJumping => HasState(PlayerState.Jumping);
-    public bool IsColliding => HasState(PlayerState.Colliding);
-    public bool IsDead => HasState(PlayerState.Dead);
-
-    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
-
-    #endregion
-
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -124,8 +130,37 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         UpdateBehaviours();
     }
+    
+    private bool CheckGroundStatus()
+    {
+        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
 
-    #region Behaviour
+        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
+
+        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, _groundMask);
+        if (isGrounded)
+        {
+            SetState(PlayerState.Grounded);
+        }
+        else
+        {
+            UnsetState(PlayerState.Grounded);
+        }
+
+        return isGrounded;
+    }
+
+    public void SetCamera(CamCtrl cam)
+    {
+        _cam = cam;
+    }
+
+    public void SetLastDirection(Vector3 lastDirection)
+    {
+        _lastDirection = lastDirection;
+    }
+    
+    #region ===== 행동 =====
 
     private void UpdateBehaviours()
     {
@@ -165,7 +200,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
     }
 
-    // 마지막으로 바라보던 방향으로 플레이어를 회전
+    /// <summary> 마지막으로 바라보던 방향으로 플레이어를 회전 </summary>
     private void Reposit()
     {
         if (_lastDirection == Vector3.zero)
@@ -186,9 +221,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _rigid.MoveRotation(viewRotation);
     }
 
-    #endregion
+    #endregion ===== 행동 =====
 
-    #region LocomotionBehaviour
+    #region ===== 로코모션 =====
 
     public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
     {
@@ -225,9 +260,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
     }
 
-    #endregion
+    #endregion ===== 로코모션 =====
 
-    #region AttackBehaviour
+    #region ===== 공격 =====
 
     public void SetCurAttack(BaseAttackBehaviour attackBehaviour)
     {
@@ -239,40 +274,10 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _curAttack = null;
     }
     
-    #endregion
+    #endregion ===== 공격 =====
     
-    #region Check
-
-    public bool CheckGroundStatus()
-    {
-        float radius = _capsuleCollider.bounds.extents.x * 0.5f;
-
-        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
-
-        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, _groundMask);
-        if (isGrounded)
-        {
-            SetState(PlayerState.Grounded);
-        }
-        else
-        {
-            UnsetState(PlayerState.Grounded);
-        }
-
-        return isGrounded;
-    }
-
-    private void CheckDie()
-    {
-        if (_rigid.velocity.y < Mathf.Epsilon && transform.position.y < -10f && !IsDead)
-        {
-            Die();
-        }
-    }
-
-    #endregion
-
-    #region Damage
+    
+    #region ===== 데미지/죽음 =====
 
     public void TakeDamage(float damage)
     {
@@ -290,6 +295,14 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
     }
 
+    private void CheckDie()
+    {
+        if (_rigid.velocity.y < Mathf.Epsilon && transform.position.y < -10f && !IsDead)
+        {
+            Die();
+        }
+    }
+    
     public void Die()
     {
         if (IsDead)
@@ -302,14 +315,15 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _animator.SetTrigger(AnimatorKey.Hash.DoDie);
     }
 
-    public void OnDeathAnimationEnd()
+    public void OnDeadAnimationEnd()
     {
         Managers.UI.OpenScreen<EndScreen>()?.Open(true);
     }
+
+    #endregion ===== 데미지/죽음 =====
+
     
-    #endregion
-    
-    #region State
+    #region ===== 상태 =====
 
     public void SetState(PlayerState state)
     {
@@ -326,9 +340,10 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         return (_state & state) != 0;
     }
 
-    #endregion
+    #endregion ===== 상태 =====
 
-    #region Stat
+    
+    #region ===== 스탯 =====
 
     public void SetHp(float value)
     {
@@ -388,19 +403,5 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         return _sp >= requiredSp && CanUseStamina;
     }
 
-    #endregion
-
-    #region Set
-
-    public void SetCamera(CamCtrl cam)
-    {
-        _cam = cam;
-    }
-
-    public void SetLastDirection(Vector3 lastDirection)
-    {
-        _lastDirection = lastDirection;
-    }
-
-    #endregion
+    #endregion ===== 스탯 =====
 }
