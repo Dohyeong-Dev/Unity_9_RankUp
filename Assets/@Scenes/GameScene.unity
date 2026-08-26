@@ -11411,6 +11411,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KatanaGirl_FullBody
       objectReference: {fileID: 0}
+    - target: {fileID: 9116578313329837819, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: _stepLayerMask.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -43482,7 +43486,7 @@ MonoBehaviour:
   _horizontalSpeed: 3
   _verticalSpeed: 2
   _initialXAngle: 20
-  _limitUpAngle: 60
+  _limitUpAngle: 15
   _limitDownAngle: 70
   _camOffset: {x: 0, y: 0, z: -4}
   _orbitFocusHeightRatio: 0.65

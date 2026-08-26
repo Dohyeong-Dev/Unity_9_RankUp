@@ -343,9 +343,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "W,A,S,D - <color=yellow>\uC774\uB3D9</color>\nSHIFT - <color=yellow>\uB2EC\uB9AC\uAE30</color>\nSPACE
-    - <color=yellow>\uC810\uD504</color>\n\uC67C\uCABD \uB9C8\uC6B0\uC2A4 \uD074\uB9AD
+    - <color=yellow>\uB300\uC2DC</color>\n\uC67C\uCABD \uB9C8\uC6B0\uC2A4 \uD074\uB9AD
     - <color=yellow>\uACF5\uACA9</color>\n\uC624\uB978\uCABD \uB9C8\uC6B0\uC2A4 \uD074\uB9AD
-    - <color=yellow>\uB300\uC2DC</color>"
+    - <color=yellow>\uB77D\uC628</color>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}
   m_sharedMaterial: {fileID: 2466781090815511830, guid: 33127c072fb294aabb1377fdc2e30f2c, type: 2}

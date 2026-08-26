@@ -28,7 +28,7 @@ public class PlayerIdle01 : StateMachineBehaviour
             return;
         }
         
-        if (_player.IsMoving)
+        if (_player.IsMoving || _player.IsAttacking)
         {
             _startTime = Time.time;
         }

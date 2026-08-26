@@ -19,7 +19,7 @@ public class PlayerIdle02 : StateMachineBehaviour
             return;
         }
         
-        if (_player.IsMoving || !_player.IsDefaultBehaviour)
+        if (!_player.IsDefaultBehaviour || _player.IsMoving || _player.IsAttacking)
         {
             animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
         }
