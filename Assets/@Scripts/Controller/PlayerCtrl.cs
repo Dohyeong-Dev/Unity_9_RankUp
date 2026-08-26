@@ -19,7 +19,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public CapsuleCollider CapsuleCollider => _capsuleCollider;
     
     
-    // 회전
     [Header("회전")]
     [SerializeField, Range(0f, 1f)]
     private float _rotationSlerpFactor = 0.6f;
@@ -27,6 +26,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     
     private Vector3 _lastDirection;
     
+    [Header("중력 설정")]
+    [SerializeField] private float _fallGravity = 400f;
     
     #region ===== 상태 =====
 
@@ -41,7 +42,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     }
     
     [Header("상태")]
-    [SerializeField] LayerMask _groundMask;
+    [SerializeField] private LayerMask _groundCheckLayer;
+    [SerializeField] private float _groundCheckDistance = 0.1f;
     
     private PlayerState _state;
 
@@ -128,6 +130,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
+        ApplyFallGravity();
         UpdateBehaviours();
     }
     
@@ -135,9 +138,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         float radius = _capsuleCollider.bounds.extents.x * 0.5f;
 
-        Ray ray = new Ray(transform.position + Vector3.up * radius * 2f, Vector3.down);
+        Ray ray = new Ray(transform.position + Vector3.up * radius * 2, Vector3.down);
 
-        bool isGrounded = Physics.SphereCast(ray, radius, radius + 0.1f, _groundMask);
+        bool isGrounded = Physics.SphereCast(ray, radius, radius + _groundCheckDistance, _groundCheckLayer);
         if (isGrounded)
         {
             SetState(PlayerState.Grounded);
@@ -150,6 +153,19 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         return isGrounded;
     }
 
+    private void ApplyFallGravity()
+    {
+        if (IsGrounded)
+        {
+            return;
+        }
+
+        Vector3 velocity = Rigid.velocity;
+        velocity.y -= _fallGravity * Time.fixedDeltaTime;
+
+        Rigid.velocity = velocity;
+    }
+    
     public void SetCamera(CamCtrl cam)
     {
         _cam = cam;
