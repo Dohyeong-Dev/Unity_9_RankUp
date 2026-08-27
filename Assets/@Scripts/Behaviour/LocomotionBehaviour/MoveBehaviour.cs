@@ -2,28 +2,35 @@
 
 public class MoveBehaviour : BaseLocomotionBehaviour
 {
-    [Header("이동 설정")] 
+    private const float DefaultMoveFactor = 1f;
+
+
+    [Header("이동")]
     [SerializeField] private float _moveSpeed = 5f;
 
-    [Header("대시 설정")] 
+
+    [Header("대시")]
     [SerializeField] private float _dashSpeed = 2f;
     [SerializeField] private float _dashCoolTime = 1f;
     private float _dashCoolTimer;
-    [Tooltip("대시 시 기본 SP 소비량에 적용되는 배율")] 
+
+    [Tooltip("대시 시 기본 SP 소비량에 적용되는 배율")]
     [SerializeField] private float _dashSpFactor = 5f;
-    private Vector3 _dashDirection; // 대시 시작 순간에 결정되는 방향
+
+    private Vector3 _dashDirection;
+
     private bool _canDash;
 
-    [Header("달리기 설정")] 
-    [Tooltip("달리기 시 기본 이동 속도에 적용되는 배율")] 
+
+    [Header("달리기 설정")]
+    private float _currentRunFactor = DefaultMoveFactor;
+
+    [Tooltip("달리기 시 기본 이동 속도에 적용되는 배율")]
     [SerializeField] private float _runFactor = 2f;
 
     [Tooltip("달리기 시 기본 SP 소비량에 적용되는 배율")]
     [SerializeField] private float _runSpFactor = 2f;
 
-    private const float DefaultMoveFactor = 1f;
-
-    private float _currentRunFactor = DefaultMoveFactor;
 
     private void Start()
     {
@@ -37,7 +44,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     {
         if (!Managers.Input.CanReceiveInput)
         {
-            StopHorizontalMovement();
+            RemoveHorizontalVelocity();
             return;
         }
 
@@ -54,7 +61,36 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         UpdateRotate();
         UpdateMove();
+        
         UpdateDash();
+    }
+
+    protected override void OnUpdateAlways()
+    {
+        if (Player.IsAttacking)
+        {
+            RemoveHorizontalVelocity();
+        }
+
+        CalculateDashCoolTime();
+    }
+
+    protected override void OnUpdate()
+    {
+        if (Managers.Input.KeyDown_Space)
+        {
+            TryDash();
+        }
+
+        AdjustRunSpeed();
+    }
+
+    private void RemoveHorizontalVelocity()
+    {
+        Vector3 velocity = Player.Rigid.velocity;
+        Player.Rigid.velocity = Vector3.up * velocity.y;
+
+        Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f, 0.01f, Time.fixedDeltaTime);
     }
 
     private void RemoveVerticalVelocity()
@@ -65,37 +101,20 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Rigid.velocity = velocity;
     }
     
-    protected override void OnUpdateAlways()
-    {
-        CalculateDashCoolTime();
-    }
-
-    protected override void OnUpdate()
-    {
-        if (Managers.Input.MouseDown_Right)
-        {
-            TryDash();
-        }
-
-        AdjustRunSpeed();
-    }
-
-    #region Rotate
-
     private void UpdateRotate()
     {
         if (!Player.IsMoving)
         {
             return;
         }
-        
+
         if (Player.Cam == null)
         {
             return;
         }
 
         Transform camTr = Player.Cam.transform;
-        
+
         // 카메라의 수평 방향만 사용
         Vector3 forward = camTr.forward;
         forward.y = 0f;
@@ -103,6 +122,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         {
             return;
         }
+
         forward.Normalize();
 
         Vector3 right = camTr.right;
@@ -111,6 +131,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         {
             return;
         }
+
         right.Normalize();
 
         Vector3 targetDirection = right * Managers.Input.KeyAxisX + forward * Managers.Input.KeyAxisY;
@@ -118,6 +139,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         {
             return;
         }
+
         targetDirection.Normalize();
 
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
@@ -126,19 +148,13 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Rigid.MoveRotation(viewRotation);
         Player.SetLastDirection(targetDirection);
     }
-
-    #endregion
-
-    #region Move
-
+    
     private void UpdateMove()
     {
-        float inputMagnitude = Managers.Input.KeyVecMagnitude;
-
         // 이동 입력도 없고 대시도 아니라면 정지
-        if (inputMagnitude <= Mathf.Epsilon && !Player.IsDashing)
+        if (Managers.Input.KeyVecMagnitude <= Mathf.Epsilon && !Player.IsDashing)
         {
-            StopHorizontalMovement();
+            RemoveHorizontalVelocity();
             return;
         }
 
@@ -150,8 +166,9 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         float speedFactor = Player.IsDashing ? _dashSpeed : _currentRunFactor;
         float speed = _moveSpeed * speedFactor;
-
+ 
         Vector3 moveDirection;
+        
         if (Player.IsDashing)
         {
             // 대시는 시작 순간에 결정한 방향을 사용한다.
@@ -166,7 +183,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         if (moveDirection.sqrMagnitude <= Mathf.Epsilon)
         {
-            StopHorizontalMovement();
+            RemoveHorizontalVelocity();
             return;
         }
 
@@ -174,7 +191,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         // 일반 이동 : 입력 크기에 따라 이동 속도 결정
         // 대시 : 입력이 없어도 항상 최대 대시 속도로 이동
-        float movementInput = Player.IsDashing ? 1f : inputMagnitude;
+        float movementInput = Player.IsDashing ? 1f : Managers.Input.KeyVecMagnitude;
         Vector3 horizontalVelocity = moveDirection * speed * movementInput;
         Player.Rigid.velocity = new Vector3(horizontalVelocity.x, Player.Rigid.velocity.y, horizontalVelocity.z);
 
@@ -185,36 +202,8 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         float animationSpeed = movementInput * speedFactor;
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, 0.01f, Time.fixedDeltaTime);
     }
-
-    private void StopHorizontalMovement()
-    {
-        Vector3 velocity = Player.Rigid.velocity;
-        Player.Rigid.velocity = Vector3.up * velocity.y;
-
-        Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f, 0.01f, Time.fixedDeltaTime);
-    }
-
-    private void ConsumeRunSp()
-    {
-        // 대시는 시작할 때 SP를 한 번 소비한다.
-        if (Player.IsDashing)
-        {
-            return;
-        }
-
-        // 걷기에서는 SP를 소비하지 않는다.
-        if (_currentRunFactor <= DefaultMoveFactor)
-        {
-            return;
-        }
-
-        float spCost = RequiredSpRate * _runSpFactor * Time.fixedDeltaTime;
-        Player.SetSp(-spCost);
-    }
-
-    #endregion
-
-    #region Dash
+    
+    #region =====DASH=====
 
     private void TryDash()
     {
@@ -247,7 +236,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         Player.SetState(PlayerCtrl.PlayerState.Dashing);
     }
-    
+
     private Vector3 GetDashDirection()
     {
         // 이동 입력이 있으면 카메라 기준 입력 방향으로 대시한다.
@@ -256,7 +245,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             if (Player.Cam != null)
             {
                 Transform camTr = Player.Cam.transform;
-                
+
                 Vector3 forward = camTr.forward;
                 forward.y = 0f;
 
@@ -331,10 +320,28 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Animator.SetBool(AnimatorKey.Hash.IsDash, false);
     }
 
-    #endregion
+    #endregion =====DASH=====
 
-    #region Run
+    #region =====RUN=====
 
+    private void ConsumeRunSp()
+    {
+        // 걷기에서는 SP를 소비하지 않는다.
+        if (_currentRunFactor <= DefaultMoveFactor)
+        {
+            return;
+        }
+        
+        // 대시는 TryDash에서 SP를 소비한다.
+        if (Player.IsDashing)
+        {
+            return;
+        }
+
+        float spCost = RequiredSpRate * _runSpFactor * Time.fixedDeltaTime;
+        Player.SetSp(-spCost);
+    }
+    
     private void AdjustRunSpeed()
     {
         // 기본값은 걷기
@@ -356,5 +363,5 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         _currentRunFactor = _runFactor;
     }
 
-    #endregion
+    #endregion =====RUN=====
 }
