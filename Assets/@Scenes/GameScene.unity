@@ -11075,18 +11075,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.46969858
-      objectReference: {fileID: 0}
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0417829
-      objectReference: {fileID: 0}
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.02606731
-      objectReference: {fileID: 0}
     - target: {fileID: 1286639632634062274, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.817015
@@ -11127,33 +11115,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.5043734
-      objectReference: {fileID: 0}
-    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0287875
-      objectReference: {fileID: 0}
-    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.19181511
-      objectReference: {fileID: 0}
     - target: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_Name
       value: KatanaGirl_FullBody
-      objectReference: {fileID: 0}
-    - target: {fileID: 2820019762182822522, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: _groundCheckLayer.m_Bits
-      value: 520
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861278980064499775, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_Radius
-      value: 0.17
-      objectReference: {fileID: 0}
-    - target: {fileID: 6487812208516868389, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_Mass
-      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -46520,6 +46484,10 @@ PrefabInstance:
     - target: {fileID: 1562366688095400281, guid: 080dd86f1e68fdd4da32117ea8a84484, type: 3}
       propertyPath: m_Name
       value: SM_street_preset_05 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1562366688095400281, guid: 080dd86f1e68fdd4da32117ea8a84484, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2226313774210755555, guid: 080dd86f1e68fdd4da32117ea8a84484, type: 3}
       propertyPath: m_RootOrder
