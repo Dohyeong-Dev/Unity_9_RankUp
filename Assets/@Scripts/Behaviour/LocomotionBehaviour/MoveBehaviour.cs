@@ -75,6 +75,11 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     protected override void OnUpdate()
     {
+        if (Player.IsAttacking)
+        {
+            return;
+        }
+        
         if (Managers.Input.KeyDown_Space)
         {
             TryDash();
