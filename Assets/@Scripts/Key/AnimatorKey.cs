@@ -28,6 +28,8 @@ public abstract class AnimatorKey
         
         public const string DoIdleChange = "DoIdleChange";
         public const string DoDie = "DoDie";
+        public const string DoAttackFromSheathe = "DoAttackFromSheathe";
+        public const string DoCancelSheathe = "DoCancelSheathe";
 
         #endregion  -----TRIGGER-----
     }
@@ -58,6 +60,8 @@ public abstract class AnimatorKey
         
         public static readonly int DoIdleChange = Animator.StringToHash(Parameter.DoIdleChange);
         public static readonly int DoDie = Animator.StringToHash(Parameter.DoDie);
+        public static readonly int DoAttackFromSheathe = Animator.StringToHash(Parameter.DoAttackFromSheathe);
+        public static readonly int DoCancelSheathe = Animator.StringToHash(Parameter.DoCancelSheathe);
         
         #endregion -----TRIGGER-----
     }
