@@ -18,7 +18,7 @@ public class InputManager
     
     public float KeyAxisX { get; private set; }
     public float KeyAxisY { get; private set; }
-    public float KeyVecMagnitude => new Vector2(Managers.Input.KeyAxisX, Managers.Input.KeyAxisY).magnitude;
+    public float KeyVecSqrMagnitude => Mathf.Clamp01(new Vector2(Managers.Input.KeyAxisX, Managers.Input.KeyAxisY).sqrMagnitude);
     
     public bool Key_LeftShift => Input.GetKey(KeyCode.LeftShift);
     
