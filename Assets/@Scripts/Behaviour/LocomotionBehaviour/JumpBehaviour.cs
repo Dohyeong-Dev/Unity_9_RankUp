@@ -79,7 +79,7 @@ public class JumpBehaviour : BaseLocomotionBehaviour
                 Player.CapsuleCollider.material.staticFriction = 0.6f;
                 Player.CapsuleCollider.material.dynamicFriction = 0.6f;
 
-                Player.Animator.SetBool(AnimatorKey.Hash.IsGround, true);
+                Player.Animator.SetBool(AnimatorKey.Hash.IsFall, true);
                 Player.Animator.SetBool(AnimatorKey.Hash.IsJump, false);
 
                 Player.UnsetState(PlayerCtrl.PlayerState.Jumping);

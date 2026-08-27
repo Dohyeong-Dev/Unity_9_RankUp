@@ -294,7 +294,7 @@ Transform:
   m_Children:
   - {fileID: 7485690773264963667}
   m_Father: {fileID: 5494156876916441092}
-  m_LocalEulerAnglesHint: {x: 20.258896, y: 179.98302, z: -89.61632}
+  m_LocalEulerAnglesHint: {x: 20.258883, y: 179.983, z: -89.61634}
 --- !u!1 &1338762898160850638
 GameObject:
   m_ObjectHideFlags: 0
@@ -4908,14 +4908,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rotationSlerpFactor: 0.6
+  _bonusFallGravity: 400
+  _maxFallSpeed: 50
+  _fallAnimationMinSpeed: 2
+  _groundCheckLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  _groundCheckDistance: 0.1
   _maxHp: 100
   _maxSp: 100
   _spRecoveryThreshold: 10
   _spRecoveryRate: 30
   _str: 10
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 520
 --- !u!114 &9116578313329837819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4928,19 +4932,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bfd7bd4672f843b487f069c82ef68e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredSpRate: 2
+  _requiredSpRate: 0
   _moveSpeed: 5
   _dashSpeed: 8
   _dashCoolTime: 0.7
   _dashSpFactor: 4
   _runFactor: 1.5
   _runSpFactor: 1.8
-  _stepHeight: 0.3
-  _stepCheckDistance: 0.35
-  _stepCheckOffset: 0.05
-  _stepLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!114 &739053194219700891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4978,7 +4976,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.2
+  m_Radius: 0.17
   m_Height: 1.7
   m_Direction: 1
   m_Center: {x: 0, y: 0.85, z: 0}
@@ -4990,7 +4988,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1914275313167630200}
   serializedVersion: 4
-  m_Mass: 5
+  m_Mass: 30
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -5033,13 +5031,13 @@ MonoBehaviour:
     dropCommand: 
     socketSettings:
     - name: Katana_Close
-      eventStringName: To_Katana_Close-Blade
+      eventStringName: To_Katana_Close_Blade
       sourceIndex: 0
     - name: Hand_R_Socket
-      eventStringName: To_Hand_R_Socket-Blade
+      eventStringName: To_Hand_R_Socket_Blade
       sourceIndex: 1
     - name: add_weapon_r
-      eventStringName: To_add_weapon_r-Blade
+      eventStringName: To_add_weapon_r_Blade
       sourceIndex: 2
     weaponRigidbody: {fileID: 0}
   - name: Sheath
@@ -5047,13 +5045,13 @@ MonoBehaviour:
     dropCommand: Sheath_OFF
     socketSettings:
     - name: Hand_L_Socket
-      eventStringName: To_Hand_L_Socket-Sheath
+      eventStringName: To_Hand_L_Socket_Sheath
       sourceIndex: 0
     - name: add_weapon_l
-      eventStringName: To_add_weapon_r-Sheath
+      eventStringName: To_add_weapon_l_Sheath
       sourceIndex: 1
     - name: Put_Socket_Katana
-      eventStringName: To_Put_Socket_Katana-Sheath
+      eventStringName: To_Put_Socket_Katana_Sheath
       sourceIndex: 2
     weaponRigidbody: {fileID: 0}
   supportIKSettings: []
@@ -6274,7 +6272,7 @@ Transform:
   m_Children:
   - {fileID: 691389879924474506}
   m_Father: {fileID: 5494156876916441092}
-  m_LocalEulerAnglesHint: {x: -20.258497, y: -179.81001, z: -89.675995}
+  m_LocalEulerAnglesHint: {x: -20.258497, y: -179.81003, z: -89.67599}
 --- !u!1 &4757731610965478145
 GameObject:
   m_ObjectHideFlags: 0
@@ -8225,7 +8223,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4568709960661508591}
-  m_LocalEulerAnglesHint: {x: 0.28869516, y: 2.005796, z: 0.586547}
+  m_LocalEulerAnglesHint: {x: 0.28868452, y: 2.005802, z: 0.5865456}
 --- !u!1 &8364730371529209840
 GameObject:
   m_ObjectHideFlags: 0
@@ -8319,7 +8317,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4235387484278292594}
-  m_LocalEulerAnglesHint: {x: -0.12434721, y: 2.5729315, z: 0.628529}
+  m_LocalEulerAnglesHint: {x: -0.12434473, y: 2.5729423, z: 0.6285352}
 --- !u!1 &8526599651116170871
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,17 +17,31 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public Rigidbody Rigid => _rigid;
     private CapsuleCollider _capsuleCollider;
     public CapsuleCollider CapsuleCollider => _capsuleCollider;
+
     
-    
+    #region =====트랜스폼=====
+
     [Header("회전")]
-    [SerializeField, Range(0f, 1f)]
-    private float _rotationSlerpFactor = 0.6f;
+    [Range(0f, 1f)]
+    [SerializeField] private float _rotationSlerpFactor = 0.6f;
+
     public float RotationSlerpFactor => _rotationSlerpFactor;
-    
+
     private Vector3 _lastDirection;
+
+
+    [Header("낙하")]
+    [Tooltip("기본 중력에 추가로 적용되는 낙하 가속도")]
+    [SerializeField] private float _bonusFallGravity = 400f;
+
+    [Tooltip("캐릭터의 최대 낙하 속도")]
+    [SerializeField] private float _maxFallSpeed = 30f;
+
+    [Tooltip("이 속도 이상으로 하강할 때 낙하 애니메이션을 재생")]
+    [SerializeField] private float _fallAnimationMinSpeed = 2f;
     
-    [Header("중력 설정")]
-    [SerializeField] private float _fallGravity = 400f;
+    #endregion =====트랜스폼=====
+
     
     #region ===== 상태 =====
 
@@ -40,11 +54,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Colliding = 1 << 3,
         Dead = 1 << 4,
     }
-    
+
     [Header("상태")]
     [SerializeField] private LayerMask _groundCheckLayer;
     [SerializeField] private float _groundCheckDistance = 0.1f;
-    
+
     private PlayerState _state;
 
     public bool IsGrounded => HasState(PlayerState.Grounded);
@@ -57,52 +71,58 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 상태 =====
 
-    
+
     #region ===== 행동 =====
-    
+
     // Locomotion
     private readonly List<BaseLocomotionBehaviour> _locomotions = new();
     private int _defaultLocomotionBehaviourHash;
     private int _currentLocomotionBehaviourHash;
     public bool IsDefaultBehaviour => _currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash;
-    
+
     // Attack
     private BaseAttackBehaviour _curAttack;
     public bool IsAttacking => _curAttack != null;
-    
+
     #endregion ===== 행동 =====
-    
-    
+
+
     #region ===== 스탯 =====
-    
-    [Header("스탯")]
-    // HP
+
+    [Header("HP")]
     [SerializeField] private float _maxHp = 100f;
     public float MaxHP => _maxHp;
     private float _hp;
     public float HP => _hp;
+    
     public event Action<float, float> OnHpChanged;
     
-    // SP
+    
+    [Header("SP")]
     [SerializeField] private float _maxSp = 100f;
     public float MaxSP => _maxSp;
     private float _sp;
     public float SP => _sp;
-    [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
-    [SerializeField] private float _spRecoveryThreshold = 10f;
-    [Tooltip("초당 SP 회복량")]
-    [SerializeField] private float _spRecoveryRate = 30f;
+
+    [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")] [SerializeField]
+    private float _spRecoveryThreshold = 10f;
+
+    [Tooltip("초당 SP 회복량")] [SerializeField]
+    private float _spRecoveryRate = 30f;
+
     /// <summary> SP가 충분하여 스태미너를 사용하는 행동을 할 수 있는지 여부  </summary>
     public bool CanUseStamina { get; private set; }
+
     public event Action<float, float> OnSpChanged;
     
-    // STR
+    
+    [Header("STR")]
     [SerializeField] private float _str = 10;
     public float STR => _str;
-    
+
     #endregion ===== 스탯 =====
-    
-    
+
+
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -122,18 +142,23 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        _animator.SetBool(AnimatorKey.Hash.IsGround, CheckGroundStatus());
+        // 지면 체크 및 애니메이션 재생
+        bool isGrounded = CheckGroundStatus();
+        bool isFalling = !isGrounded && Rigid.velocity.y <= -_fallAnimationMinSpeed;
+        _animator.SetBool(AnimatorKey.Hash.IsFall, isFalling);
 
         CheckDie();
+        
         RecoverSp();
     }
 
     private void FixedUpdate()
     {
-        ApplyFallGravity();
+        ApplyBonusFallGravity();
+        
         UpdateBehaviours();
     }
-    
+
     private bool CheckGroundStatus()
     {
         float radius = _capsuleCollider.bounds.extents.x * 0.5f;
@@ -153,7 +178,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         return isGrounded;
     }
 
-    private void ApplyFallGravity()
+    private void ApplyBonusFallGravity()
     {
         if (IsGrounded)
         {
@@ -161,11 +186,12 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         Vector3 velocity = Rigid.velocity;
-        velocity.y -= _fallGravity * Time.fixedDeltaTime;
+        velocity.y -= _bonusFallGravity * Time.fixedDeltaTime;
+        velocity.y = Mathf.Max(velocity.y, -_maxFallSpeed);
 
         Rigid.velocity = velocity;
     }
-    
+
     public void SetCamera(CamCtrl cam)
     {
         _cam = cam;
@@ -175,7 +201,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         _lastDirection = lastDirection;
     }
-    
+
     #region ===== 행동 =====
 
     private void UpdateBehaviours()
@@ -289,10 +315,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         _curAttack = null;
     }
-    
+
     #endregion ===== 공격 =====
-    
-    
+
     #region ===== 데미지/죽음 =====
 
     public void TakeDamage(float damage)
@@ -318,14 +343,14 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             Die();
         }
     }
-    
+
     public void Die()
     {
         if (IsDead)
         {
             return;
         }
-        
+
         SetState(PlayerState.Dead);
 
         _animator.SetTrigger(AnimatorKey.Hash.DoDie);
@@ -338,7 +363,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 데미지/죽음 =====
 
-    
     #region ===== 상태 =====
 
     public void SetState(PlayerState state)
@@ -358,7 +382,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 상태 =====
 
-    
     #region ===== 스탯 =====
 
     public void SetHp(float value)

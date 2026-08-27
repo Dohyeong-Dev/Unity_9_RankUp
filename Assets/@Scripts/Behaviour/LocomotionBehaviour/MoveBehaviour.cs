@@ -54,8 +54,6 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         }
         else if (Player.Rigid.velocity.y < -1f)
         {
-            Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f);
-
             return;
         }
 
@@ -195,6 +193,11 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Vector3 horizontalVelocity = moveDirection * speed * movementInput;
         Player.Rigid.velocity = new Vector3(horizontalVelocity.x, Player.Rigid.velocity.y, horizontalVelocity.z);
 
+        if (Player.IsDashing)
+        {
+            return;
+        }
+        
         // 달리기 중에만 SP 소비
         ConsumeRunSp();
 

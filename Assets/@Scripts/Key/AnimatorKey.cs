@@ -4,61 +4,61 @@ public abstract class AnimatorKey
 {
     public static class Parameter
     {
-        #region int
+        #region -----INT-----
 
         public const string MeleeComboStep = "MeleeComboStep";
         
-        #endregion
+        #endregion -----INT-----
         
-        #region float
+        #region -----FLOAT-----
 
         public const string Speed = "Speed";
 
-        #endregion
+        #endregion -----FLOAT-----
         
-        #region bool
+        #region -----BOOL-----
         
-        public const string IsGround = "IsGround";
+        public const string IsFall = "IsFall";
         public const string IsJump = "IsJump";
         public const string IsDash = "IsDash";
         
-        #endregion
+        #endregion -----BOOL-----
         
-        #region trigger
+        #region -----TRIGGER-----
         
         public const string DoIdleChange = "DoIdleChange";
         public const string DoDie = "DoDie";
 
-        #endregion
+        #endregion  -----TRIGGER-----
     }
 
     public static class Hash
     {
-        #region int
+        #region -----INT-----
         
         public static readonly int MeleeComboStep = Animator.StringToHash(Parameter.MeleeComboStep);
         
-        #endregion
+        #endregion -----INT-----
         
-        #region float
+        #region -----FLOAT-----
         
         public static readonly int Speed = Animator.StringToHash(Parameter.Speed);
         
-        #endregion
+        #endregion -----FLOAT-----
         
-        #region bool
+        #region -----BOOL-----
         
-        public static readonly int IsGround = Animator.StringToHash(Parameter.IsGround);
+        public static readonly int IsFall = Animator.StringToHash(Parameter.IsFall);
         public static readonly int IsJump = Animator.StringToHash(Parameter.IsJump);
         public static readonly int IsDash = Animator.StringToHash(Parameter.IsDash);
         
-        #endregion
+        #endregion -----BOOL-----
         
-        #region trigger
+        #region -----TRIGGER-----
         
         public static readonly int DoIdleChange = Animator.StringToHash(Parameter.DoIdleChange);
         public static readonly int DoDie = Animator.StringToHash(Parameter.DoDie);
         
-        #endregion
+        #endregion -----TRIGGER-----
     }
 }
