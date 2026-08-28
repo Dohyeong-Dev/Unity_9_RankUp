@@ -3,36 +3,41 @@ using UnityEngine;
 
 public class UIManager
 {
-    #region CurrentSceneUI
+    // 현재 씬에 존재하는 UI
+    #region -----CurrentSceneUI-----
 
     public BaseHUD CurrentHUD { get; private set; }
     public BaseScreen CurrentScreen { get; private set; }
     public BasePopup CurrentPopup => _popupStack.Count > 0 ? _popupStack.Peek() : null;
 
-    #endregion
+    #endregion -----CurrentSceneUI-----
     
-    #region PopupUI
+    
+    #region -----PopupUI-----
 
     private readonly Stack<BasePopup> _popupStack = new();
     public int PopupCount => _popupStack.Count;
     private int _nextPopupSortingOrder = 2;
     
-    #endregion
+    #endregion -----PopupUI-----
 
-    #region Overlay
+    
+    #region -----Overlay-----
     
     private HitEffectUI _hitEffectUI;
     
-    #endregion
+    #endregion -----Overlay-----
     
-    #region LoadingUI
+    
+    #region -----LoadingUI-----
 
     private GameObject _loadingObject;
     public bool IsLoading => _loadingObject != null;
 
-    #endregion
+    #endregion -----LoadingUI-----
 
-    #region Root
+    
+    #region -----Root-----
     
     private GameObject _root;
 
@@ -64,8 +69,9 @@ public class UIManager
         }
     }
     
-    #endregion
+    #endregion -----Root-----
 
+    
     public void OnUpdate()
     {
         if (IsLoading)
@@ -102,13 +108,15 @@ public class UIManager
         {
             CurrentHUD = baseHUD;
         }
-        else if (baseUI is BasePopup)
+        
+        if (baseUI is BasePopup)
         {
             canvas.sortingOrder = _nextPopupSortingOrder++;
-            return;
         }
-
-        canvas.sortingOrder = baseUI.SortingOrder;
+        else
+        {
+            canvas.sortingOrder = baseUI.SortingOrder;    
+        }
     }
 
     #region Screen

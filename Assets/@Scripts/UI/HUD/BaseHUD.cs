@@ -41,6 +41,12 @@ public abstract class BaseHUD : BaseUI
         _canvasGroup.blocksRaycasts = enabled;
     }
 
+    // HUD UI의 Interact 여부 설정
+    public void SetInteractEnabled(bool enabled)
+    {
+        _canvasGroup.interactable = enabled;
+    }
+    
     // HUD UI의 표시 여부 설정
     public void SetVisible(bool visible)
     {

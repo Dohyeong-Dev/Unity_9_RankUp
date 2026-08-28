@@ -119,7 +119,8 @@ public abstract class BasePopup : BaseUI
                 if (isOpen)
                 {
                     backgroundTransform.DOLocalMove(Vector3.up * offsetY, 0.2f).SetEase(Ease.Linear)
-                        .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * offsetY).OnStart(() =>
+                        .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * offsetY)
+                        .OnStart(() =>
                         {
                             backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f);
                         }).OnComplete(OnOpened);

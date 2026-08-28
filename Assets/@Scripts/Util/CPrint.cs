@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 /* 그룹 사용방법
 CPrint.Group("Player", () =>

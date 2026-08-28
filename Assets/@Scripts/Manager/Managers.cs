@@ -20,9 +20,8 @@ public class Managers : MonoBehaviour
             return _instance;
         }
     }
-
+    
     private static bool _isQuitting;
-
     public static bool IsQuit => _isQuitting || !Application.isPlaying;
 
 
