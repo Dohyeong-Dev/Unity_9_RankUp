@@ -202,23 +202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
   _comboTransitionProgress: 0.8
---- !u!114 &-7525518783242461737
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bcd9cfb265cf4cb8a091fc7e4a9c5f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _exitTime: 1
-  _socketEvents:
-  - progress: 0
-    socketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
+  _trailStartProgress: 0.168
+  _trailEndProgress: 0.84
 --- !u!1107 &-7318115605470417875
 AnimatorStateMachine:
   serializedVersion: 6
@@ -293,7 +278,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39c18be58038e4441afe7031bd659c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dashEnableDelay: 0.1
+  _dashEnableDelay: 0.25
+  _runEnableDelay: 0.5
 --- !u!1102 &-6826552075401506237
 AnimatorState:
   serializedVersion: 6
@@ -308,6 +294,7 @@ AnimatorState:
   - {fileID: 1002358000803693887}
   m_StateMachineBehaviours:
   - {fileID: -6933434015415024395}
+  - {fileID: -461229222352845204}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -435,6 +422,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
   _comboTransitionProgress: 0.589
+  _trailStartProgress: 0.1
+  _trailEndProgress: 0.862
 --- !u!1101 &-5124570017387525155
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -688,9 +677,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - progress: 0
-    socketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
+  - Progress: 0
+    SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
 --- !u!114 &-1938360433838127208
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -886,18 +875,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 0.4
   _socketEvents:
-  - progress: 0
-    socketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
-  - progress: 0.553
-    socketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
-    executed: 0
-  - progress: 0.817
-    socketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
-    executed: 0
-  - progress: 1
-    socketCommand: To_Hand_L_Socket-Sheath
-    executed: 0
+  - Progress: 0
+    SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
+  - Progress: 0.553
+    SocketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
+    Executed: 0
+  - Progress: 0.817
+    SocketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
+    Executed: 0
+  - Progress: 1
+    SocketCommand: To_Hand_L_Socket-Sheath
+    Executed: 0
+--- !u!114 &-461229222352845204
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bcd9cfb265cf4cb8a091fc7e4a9c5f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _exitTime: 1
+  _socketEvents:
+  - Progress: 0
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
 --- !u!91 &9100000
 AnimatorController:
   m_ObjectHideFlags: 0
@@ -1099,18 +1105,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 0.5
   _socketEvents:
-  - progress: 0
-    socketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
-  - progress: 0.432
-    socketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
-    executed: 0
-  - progress: 0.811
-    socketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
-    executed: 0
-  - progress: 1
-    socketCommand: To_Hand_L_Socket-Sheath
-    executed: 0
+  - Progress: 0
+    SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
+  - Progress: 0.432
+    SocketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
+    Executed: 0
+  - Progress: 0.811
+    SocketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
+    Executed: 0
+  - Progress: 1
+    SocketCommand: To_Hand_L_Socket-Sheath
+    Executed: 0
+--- !u!114 &1662776774044903979
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bcd9cfb265cf4cb8a091fc7e4a9c5f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _exitTime: 1
+  _socketEvents:
+  - Progress: 0
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
 --- !u!1101 &1882366673202375149
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1220,7 +1243,7 @@ AnimatorState:
   - {fileID: 3036996042158671191}
   m_StateMachineBehaviours:
   - {fileID: -4759579986243032444}
-  - {fileID: -7525518783242461737}
+  - {fileID: 1662776774044903979}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1337,9 +1360,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - progress: 0
-    socketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
+  - Progress: 0
+    SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
 --- !u!114 &4413372044235735902
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1378,12 +1401,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - progress: 0
-    socketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
-  - progress: 0.374
-    socketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
-    executed: 0
+  - Progress: 0
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
+  - Progress: 0.374
+    SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
 --- !u!1101 &5451974848094700285
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1422,7 +1445,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
-  _comboTransitionProgress: 0.596
+  _comboTransitionProgress: 0.6
+  _trailStartProgress: 0.186
+  _trailEndProgress: 0.822
 --- !u!1102 &6071438603697399189
 AnimatorState:
   serializedVersion: 6
@@ -1550,7 +1575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207c2078ea586487b8a1392b109c0426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionDelay: 0.2
+  _actionDelay: 0.6
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1

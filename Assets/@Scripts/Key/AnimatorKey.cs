@@ -19,7 +19,6 @@ public abstract class AnimatorKey
         #region -----BOOL-----
         
         public const string IsFall = "IsFall";
-        public const string IsJump = "IsJump";
         public const string IsDash = "IsDash";
         
         #endregion -----BOOL-----
@@ -28,7 +27,6 @@ public abstract class AnimatorKey
         
         public const string DoIdleChange = "DoIdleChange";
         public const string DoDie = "DoDie";
-        public const string DoAttackFromSheathe = "DoAttackFromSheathe";
         public const string DoCancelSheathe = "DoCancelSheathe";
 
         #endregion  -----TRIGGER-----
@@ -51,7 +49,6 @@ public abstract class AnimatorKey
         #region -----BOOL-----
         
         public static readonly int IsFall = Animator.StringToHash(Parameter.IsFall);
-        public static readonly int IsJump = Animator.StringToHash(Parameter.IsJump);
         public static readonly int IsDash = Animator.StringToHash(Parameter.IsDash);
         
         #endregion -----BOOL-----
@@ -60,7 +57,6 @@ public abstract class AnimatorKey
         
         public static readonly int DoIdleChange = Animator.StringToHash(Parameter.DoIdleChange);
         public static readonly int DoDie = Animator.StringToHash(Parameter.DoDie);
-        public static readonly int DoAttackFromSheathe = Animator.StringToHash(Parameter.DoAttackFromSheathe);
         public static readonly int DoCancelSheathe = Animator.StringToHash(Parameter.DoCancelSheathe);
         
         #endregion -----TRIGGER-----
