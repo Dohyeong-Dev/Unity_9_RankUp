@@ -111,3 +111,9 @@ InitTestScene*.unity*
 
 # Keep the ThirdParty folder structure
 !/[Aa]ssets/[Tt]hird[Pp]arty/README.md
+
+# ==================================================
+# Archive Scripts
+# ==================================================
+# External assets that are not included in the public repository
+/[Aa]ssets/@[Ss]cripts/[Aa]rchive/
