@@ -46,6 +46,9 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         Player.AddLocomotionBehaviour(this);
         Player.SetDefLocomotionBehaviour(BehaviourHash);
+
+        SetDashStateAllowed(true);
+        SetRunStateAllowed(true);
     }
 
     public override void OnFixedUpdate()
@@ -236,8 +239,8 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             return;
         }
 
-        // 움직이고 있지만 SPEED가 0.1보다 작은경우 리턴
-        if (Player.IsMoving && Player.Animator.GetFloat(AnimatorKey.Hash.Speed) < 0.1f)
+        // 움직이고 있지 않거나 애니메이션 SPEED가 0.5보다 작은경우 리턴
+        if (!Player.IsMoving || Player.Animator.GetFloat(AnimatorKey.Hash.Speed) < 0.5f)
         {
             return;
         }
@@ -269,45 +272,15 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private Vector3 GetDashDirection()
     {
-        // 이동 입력이 있으면 카메라 기준 입력 방향으로 대시한다.
-        if (Player.IsMoving)
-        {
-            if (Player.Cam != null)
-            {
-                Transform camTr = Player.Cam.transform;
+        Vector3 direction = Player.Tr.forward;
+        direction.y = 0f;
 
-                Vector3 forward = camTr.forward;
-                forward.y = 0f;
-
-                if (forward.sqrMagnitude > Mathf.Epsilon)
-                {
-                    forward.Normalize();
-
-                    Vector3 right = camTr.right;
-                    right.y = 0f;
-                    if (right.sqrMagnitude > Mathf.Epsilon)
-                    {
-                        right.Normalize();
-
-                        Vector3 direction = right * Managers.Input.KeyAxisX + forward * Managers.Input.KeyAxisY;
-                        if (direction.sqrMagnitude > Mathf.Epsilon)
-                        {
-                            return direction.normalized;
-                        }
-                    }
-                }
-            }
-        }
-
-        // 이동 입력이 없다면 현재 캐릭터가 바라보는 방향으로 대시한다.
-        Vector3 characterForward = Player.Tr.forward;
-        characterForward.y = 0f;
-        if (characterForward.sqrMagnitude <= Mathf.Epsilon)
+        if (direction.sqrMagnitude <= Mathf.Epsilon)
         {
             return Vector3.zero;
         }
 
-        return characterForward.normalized;
+        return direction.normalized;
     }
 
     private void CalculateDashCoolTime()
@@ -399,22 +372,23 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private void AdjustRunSpeed()
     {
-        // 기본값은 걷기
         _currentRunFactor = DefaultMoveFactor;
 
-        // 달리기를 누르지 않았거나 이동하지 않으면 걷기
+        if (!_canRunInCurrentState)
+        {
+            return;
+        }
+
         if (!Managers.Input.Key_LeftShift || !Player.IsMoving)
         {
             return;
         }
 
-        // SP가 없으면 달리기만 사용할 수 없다. 걷기는 계속 가능하다.
         if (!Player.CanUseStamina)
         {
             return;
         }
 
-        // 달리기
         _currentRunFactor = _runFactor;
     }
 
@@ -439,7 +413,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        _canDashInCurrentState = allowed;
+        _canRunInCurrentState = allowed;
         _runStateCoroutine = null;
     }
     
