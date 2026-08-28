@@ -30,7 +30,7 @@ public class PlayerIdle02 : StateMachineBehaviour
             return;
         }
 
-        if (!_player.IsDefaultBehaviour || _player.IsMoving || _player.IsAttacking)
+        if (!_player.IsDefaultBehaviour || _player.IsMoving || _player.IsAttacking || _player.IsDashing)
         {
             _isReturningToIdle01 = true;
 

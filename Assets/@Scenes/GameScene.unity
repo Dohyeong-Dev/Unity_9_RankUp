@@ -11119,6 +11119,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KatanaGirl_FullBody
       objectReference: {fileID: 0}
+    - target: {fileID: 9116578313329837819, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: _dashCoolTime
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
