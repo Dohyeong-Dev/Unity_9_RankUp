@@ -67,7 +67,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool IsColliding => HasState(PlayerState.Colliding);
     public bool IsDead => HasState(PlayerState.Dead);
 
-    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecMagnitude > Mathf.Epsilon;
+    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecSqrMagnitude > Mathf.Epsilon;
 
     #endregion ===== 상태 =====
 

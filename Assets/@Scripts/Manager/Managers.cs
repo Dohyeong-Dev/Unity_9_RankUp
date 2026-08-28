@@ -9,12 +9,22 @@ public class Managers : MonoBehaviour
         {
             if (_instance == null)
             {
+                if (IsQuit)
+                {
+                    return null;
+                }
+
                 Init();
             }
 
             return _instance;
         }
     }
+
+    private static bool _isQuitting;
+
+    public static bool IsQuit => _isQuitting || !Application.isPlaying;
+
 
     #region NO_MONOBEHAVIOUR
 
@@ -27,8 +37,9 @@ public class Managers : MonoBehaviour
 
     #endregion
 
+
     #region MONOBEHAVIOUR
-    
+
     private static ScenesManager _scene;
     public static ScenesManager Scene
     {
@@ -36,6 +47,11 @@ public class Managers : MonoBehaviour
         {
             if (_scene == null)
             {
+                if (IsQuit)
+                {
+                    return null;
+                }
+
                 GameObject go = new GameObject(nameof(ScenesManager));
                 go.transform.SetParent(Instance.transform);
                 _scene = go.GetOrAddComponent<ScenesManager>();
@@ -44,22 +60,40 @@ public class Managers : MonoBehaviour
             return _scene;
         }
     }
-    
+
     #endregion
-    
+
+
     private void Update()
     {
+        if (IsQuit)
+        {
+            return;
+        }
+        
         UI.OnUpdate();
         Input.OnUpdate();
     }
 
+    private void OnApplicationQuit()
+    {
+        _isQuitting = true;
+    }
+
     private static void Init()
     {
-        if (_instance == null)
+        if (!Application.isPlaying)
         {
-            GameObject go = new GameObject("@Managers");
-            _instance = go.AddComponent<Managers>();
-            DontDestroyOnLoad(go);
+            return;
         }
+
+        if (_instance != null)
+        {
+            return;
+        }
+
+        GameObject go = new GameObject("@Managers");
+        _instance = go.AddComponent<Managers>();
+        DontDestroyOnLoad(go);
     }
 }
