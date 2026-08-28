@@ -8,7 +8,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         Second,
         Third,
     }
-    
+
     // 현재 콤보 단계
     private ComboStep _currentComboStep;
 
@@ -21,16 +21,17 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
     // 칼집 모션이 이동으로 취소되었는지 여부
     private bool _isSheatheCancelled;
 
-    
+
     [Header("공격 판정")]
     [SerializeField] private AttackRange _meleeAttackRange;
     [SerializeField] private LayerMask _meleeLayerMask;
 
 
     [Header("이펙트")]
-    [SerializeField] private WeaponTrail _weaponTrail;
+    [SerializeField] private ParticleSystem _slashVFX;
+    [SerializeField] private ParticleSystem _sheatheParticle;
 
-    
+
     protected override void OnUpdate()
     {
         if (Managers.Input.MouseDown_Left)
@@ -38,7 +39,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
             TryAttack();
         }
     }
-   
+
     public void Clear()
     {
         Player.UnsetCurAttack();
@@ -51,13 +52,10 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, 0);
     }
 
-    public void SetWeaponTrail(bool value)
-    {
-        _weaponTrail?.SetActive(value);
-    }
     
+
     #region -----Attack-----
-    
+
     /// <summary> 공격을 인풋받았을 때 호출한다. </summary>
     private void TryAttack()
     {
@@ -86,7 +84,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         // 다음 공격 예약
         _isComboInputBuffered = true;
     }
-    
+
     /// <summary> 지정한 콤보 단계의 공격을 시작한다. </summary>
     private void StartAttack(ComboStep comboStep)
     {
@@ -95,10 +93,10 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
 
         _currentComboStep = comboStep;
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, (int)_currentComboStep);
-        
+
         _isComboInputBuffered = false;
     }
-    
+
     /// <summary> 입력 버퍼가 존재하면 다음 콤보 공격으로 전환한다. </summary>
     public void TryTransitionCombo()
     {
@@ -115,7 +113,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
 
         StartAttack(GetNextComboStep());
     }
-    
+
     /// <summary> 현재 콤보의 다음 단계를 반환한다. </summary>
     private ComboStep GetNextComboStep()
     {
@@ -125,10 +123,10 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         {
             _currentComboStep = ComboStep.First;
         }
-        
+
         return _currentComboStep;
     }
-    
+
     /// <summary> 현재 공격의 근접 공격 판정을 수행한다. </summary>
     public void CheckMeleeAttackRange()
     {
@@ -154,11 +152,11 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
             }
         }
     }
-    
+
     #endregion -----Attack-----
-    
+
     #region -----Sheathe-----
-    
+
     /// <summary> 칼집 모션 진행 여부를 설정한다. </summary>
     public void SetSheathing(bool value)
     {
@@ -170,7 +168,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
     {
         _isSheatheCancelled = value;
     }
-    
+
     /// <summary> 칼집 모션 중 이동하면 칼집 모션을 취소한다. </summary>
     public void CancelSheathe()
     {
@@ -184,6 +182,46 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         Player.Animator.SetTrigger(AnimatorKey.Hash.DoCancelSheathe);
         Clear();
     }
-    
+
     #endregion -----Sheathe-----
+
+
+    #region -----Effect-----
+
+    public void PlaySheatheParticle()
+    {
+        if (_sheatheParticle == null)
+        {
+            CPrint.Warning("칼집 파티클 없음");
+            return;
+        }
+
+        _sheatheParticle.Play();
+    }
+    
+    public void SetSlashVFXTransform(Vector3 localPosition,  Vector3 localEulerAngles)
+    {
+        if (_slashVFX == null)
+        {
+            return;
+        }
+
+        Transform tr = _slashVFX.transform;
+
+        tr.localPosition = localPosition;
+        tr.localEulerAngles = localEulerAngles;
+    }
+
+    public void PlaySlashVFX()
+    {
+        if (_slashVFX == null)
+        {
+            CPrint.Warning("슬래시 파티클 없음");
+            return;
+        }
+
+        _slashVFX.Play();
+    }
+
+    #endregion -----Effect-----
 }

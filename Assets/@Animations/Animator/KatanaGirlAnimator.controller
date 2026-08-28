@@ -177,8 +177,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
   _comboTransitionProgress: 0.8
-  _trailStartProgress: 0.168
-  _trailEndProgress: 0.84
+  _slashStartProgress: 0.535
+  _slashPosition: {x: 0.4, y: 0.9, z: 0.8}
+  _slashRotation: {x: 30, y: -80, z: 200}
 --- !u!1107 &-7318115605470417875
 AnimatorStateMachine:
   serializedVersion: 6
@@ -202,11 +203,10 @@ AnimatorStateMachine:
     m_Position: {x: 40, y: 210, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7001703656084316295}
-    m_Position: {x: 350, y: 340, z: 0}
+    m_Position: {x: 330, y: 360, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: 1882366673202375149}
-  - {fileID: 7743704748154130429}
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
@@ -223,7 +223,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Player_Dash
-  m_Speed: 0.4
+  m_Speed: 0.3
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -6124297150815999750}
@@ -236,7 +236,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 13a4d9cd0d6b04c79be461307fbdfb73, type: 2}
+  m_Motion: {fileID: 7400000, guid: 561096dd2074c442f8fb3bbf1502fe55, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -372,9 +372,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
-  _comboTransitionProgress: 0.589
-  _trailStartProgress: 0.1
-  _trailEndProgress: 0.862
+  _comboTransitionProgress: 0.9
+  _slashStartProgress: 0.35
+  _slashPosition: {x: 0, y: 0.8, z: 1}
+  _slashRotation: {x: 0, y: -20, z: 180}
 --- !u!1101 &-6124297150815999750
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -993,6 +994,31 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &399858740125063492
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: IsDash
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -7001703656084316295}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.1
+  m_TransitionOffset: 0
+  m_ExitTime: 0.695946
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &834773936667532819
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1204,6 +1230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _actionDelay: 0.4
+  _particleProgress: 0.425
 --- !u!1102 &2488756829527297743
 AnimatorState:
   serializedVersion: 6
@@ -1422,8 +1449,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
   _comboTransitionProgress: 0.6
-  _trailStartProgress: 0.186
-  _trailEndProgress: 0.822
+  _slashStartProgress: 0.398
+  _slashPosition: {x: 0, y: 0.9, z: 0.45}
+  _slashRotation: {x: -30, y: 30, z: 30}
 --- !u!1102 &6071438603697399189
 AnimatorState:
   serializedVersion: 6
@@ -1539,31 +1567,6 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!1101 &7743704748154130429
-AnimatorStateTransition:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_Conditions:
-  - m_ConditionMode: 1
-    m_ConditionEvent: IsDash
-    m_EventTreshold: 0
-  m_DstStateMachine: {fileID: 0}
-  m_DstState: {fileID: -7001703656084316295}
-  m_Solo: 0
-  m_Mute: 0
-  m_IsExit: 0
-  serializedVersion: 3
-  m_TransitionDuration: 0.1
-  m_TransitionOffset: 0
-  m_ExitTime: 0.75
-  m_HasExitTime: 0
-  m_HasFixedDuration: 1
-  m_InterruptionSource: 0
-  m_OrderedInterruption: 1
-  m_CanTransitionToSelf: 1
 --- !u!114 &7934589746361512072
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1577,6 +1580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _actionDelay: 0.6
+  _particleProgress: 0.38
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1603,6 +1607,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: -1324865462467238833}
   - {fileID: -8064666104612315939}
+  - {fileID: 399858740125063492}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0

@@ -11119,9 +11119,53 @@ PrefabInstance:
       propertyPath: m_Name
       value: KatanaGirl_FullBody
       objectReference: {fileID: 0}
-    - target: {fileID: 9116578313329837819, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: _dashCoolTime
-      value: 1
+    - target: {fileID: 3371973297619674496, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371973297619674496, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: InitialModule.startRotation.scalar
+      value: -0.5235988
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.29232776
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.6458811
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.0874393
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.6998117
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -80
+      objectReference: {fileID: 0}
+    - target: {fileID: 6568553679814938827, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 200
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

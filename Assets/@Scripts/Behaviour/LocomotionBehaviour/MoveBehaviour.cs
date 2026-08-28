@@ -216,6 +216,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         // 실제 이동 속도에 맞춰 애니메이션 속도 조절
         float animationSpeed = movementInput * speedFactor;
+
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, 0.01f, Time.fixedDeltaTime);
     }
 
@@ -223,11 +224,24 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private void TryDash()
     {
-        if (!Player.IsDefaultBehaviour || !_canDash || !_canDashInCurrentState || !Player.IsGrounded)
+        // 기본 로코모션이 이동이 아니거나 땅 위가 아니면 리턴
+        if (!Player.IsDefaultBehaviour || !Player.IsGrounded)
         {
             return;
         }
 
+        // 대시를 할 수 없는 상태면 리턴
+        if (!_canDash || !_canDashInCurrentState)
+        {
+            return;
+        }
+
+        // 움직이고 있지만 SPEED가 0.1보다 작은경우 리턴
+        if (Player.IsMoving && Player.Animator.GetFloat(AnimatorKey.Hash.Speed) < 0.1f)
+        {
+            return;
+        }
+        
         float requiredSp = RequiredSpRate * _dashSpFactor;
 
         // SP가 부족하면 대시하지 않는다.

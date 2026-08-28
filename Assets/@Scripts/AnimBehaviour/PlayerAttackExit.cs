@@ -12,6 +12,13 @@ public class PlayerAttackExit : StateMachineBehaviour
     [Tooltip("칼집 모션 시작 후 이 시간이 지나야 추가 행동이 가능"), Min(0f)]
     [SerializeField] private float _actionDelay = 0.1f;
 
+
+    [Header("칼집 이펙트")]
+    [Range(0f, 1f)]
+    [SerializeField] private float _particleProgress = 0.7f;
+    private bool _isParticlePlayed;
+    
+    
     public override void OnStateEnter(Animator animator,  AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (_player == null)
@@ -53,6 +60,12 @@ public class PlayerAttackExit : StateMachineBehaviour
             return;
         }
 
+        if (!_isParticlePlayed && stateInfo.normalizedTime >= _particleProgress)
+        {
+            _isParticlePlayed = true;
+            _meleeAttack.PlaySheatheParticle();
+        }
+        
         _stateTimer += Time.deltaTime;
 
         // 행동 가능 시간이 아직 지나지 않았다면 대기
@@ -75,7 +88,8 @@ public class PlayerAttackExit : StateMachineBehaviour
             return;
         }
 
-        _meleeAttack.SetWeaponTrail(false);
+        _isParticlePlayed = false;
+        
         _meleeAttack.SetSheathing(false);
 
         _meleeAttack.Clear();
