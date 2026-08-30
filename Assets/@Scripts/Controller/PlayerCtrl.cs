@@ -13,12 +13,13 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private Animator _animator;
     public Animator Animator => _animator;
+
     private Rigidbody _rigid;
     public Rigidbody Rigid => _rigid;
-    private CapsuleCollider _capsuleCollider;
-    public CapsuleCollider CapsuleCollider => _capsuleCollider;
 
-    
+    private CapsuleCollider _capsuleCollider;
+
+
     #region =====트랜스폼=====
 
     [Header("회전")]
@@ -26,8 +27,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [SerializeField] private float _rotationSlerpFactor = 0.6f;
 
     public float RotationSlerpFactor => _rotationSlerpFactor;
-
-    private Vector3 _lastDirection;
 
 
     [Header("낙하")]
@@ -39,10 +38,10 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     [Tooltip("이 속도 이상으로 하강할 때 낙하 애니메이션을 재생")]
     [SerializeField] private float _fallAnimationMinSpeed = 2f;
-    
+
     #endregion =====트랜스폼=====
 
-    
+
     #region ===== 상태 =====
 
     [Flags]
@@ -74,13 +73,13 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #region ===== 행동 =====
 
-    // Locomotion
     private readonly List<BaseLocomotionBehaviour> _locomotions = new();
+
     private int _defaultLocomotionBehaviourHash;
     private int _currentLocomotionBehaviourHash;
+
     public bool IsDefaultBehaviour => _currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash;
 
-    // Attack
     private BaseAttackBehaviour _curAttack;
     public bool IsAttacking => _curAttack != null;
 
@@ -92,30 +91,32 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [Header("HP")]
     [SerializeField] private float _maxHp = 100f;
     public float MaxHP => _maxHp;
+
     private float _hp;
     public float HP => _hp;
-    
+
     public event Action<float, float> OnHpChanged;
-    
-    
+
+
     [Header("SP")]
     [SerializeField] private float _maxSp = 100f;
     public float MaxSP => _maxSp;
+
     private float _sp;
     public float SP => _sp;
 
-    [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")] [SerializeField]
-    private float _spRecoveryThreshold = 10f;
+    [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
+    [SerializeField] private float _spRecoveryThreshold = 10f;
 
-    [Tooltip("초당 SP 회복량")] [SerializeField]
-    private float _spRecoveryRate = 30f;
+    [Tooltip("초당 SP 회복량")]
+    [SerializeField] private float _spRecoveryRate = 30f;
 
-    /// <summary> SP가 충분하여 스태미너를 사용하는 행동을 할 수 있는지 여부  </summary>
+    /// <summary> 최소SP가 충분하여 스태미너를 사용 할 수 있는지 여부 </summary>
     public bool CanUseStamina { get; private set; }
 
     public event Action<float, float> OnSpChanged;
-    
-    
+
+
     [Header("STR")]
     [SerializeField] private float _str = 10;
     public float STR => _str;
@@ -142,21 +143,20 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        // 지면 체크 및 애니메이션 재생
+        // 지형체크
         bool isGrounded = CheckGroundStatus();
         bool isFalling = !isGrounded && Rigid.velocity.y <= -_fallAnimationMinSpeed;
+        // 낙하 애니메이션 재생/정지
         _animator.SetBool(AnimatorKey.Hash.IsFall, isFalling);
 
         CheckDie();
-        
         RecoverSp();
     }
 
     private void FixedUpdate()
     {
         ApplyBonusFallGravity();
-        
-        UpdateBehaviours();
+        FixedUpdateLocomotions();
     }
 
     private bool CheckGroundStatus()
@@ -166,6 +166,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Ray ray = new Ray(transform.position + Vector3.up * radius * 2, Vector3.down);
 
         bool isGrounded = Physics.SphereCast(ray, radius, radius + _groundCheckDistance, _groundCheckLayer);
+
         if (isGrounded)
         {
             SetState(PlayerState.Grounded);
@@ -197,21 +198,16 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _cam = cam;
     }
 
-    public void SetLastDirection(Vector3 lastDirection)
-    {
-        _lastDirection = lastDirection;
-    }
+    
+    #region ===== 로코모션 =====
 
-    #region ===== 행동 =====
-
-    private void UpdateBehaviours()
+    private void FixedUpdateLocomotions()
     {
         if (IsDead)
         {
             return;
         }
 
-        bool isPlayingLocomotion = false;
         if (_curAttack == null)
         {
             for (int i = 0; i < _locomotions.Count; i++)
@@ -223,50 +219,18 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
                     continue;
                 }
 
-                if (_currentLocomotionBehaviourHash != locomotion.BehaviourHash)
+                if (!IsCurLocomotionBehaviour(locomotion.BehaviourHash))
                 {
                     continue;
                 }
-
-                isPlayingLocomotion = true;
 
                 locomotion.OnFixedUpdate();
 
                 break;
             }
         }
-
-        if (!isPlayingLocomotion && _curAttack == null)
-        {
-            Reposit();
-        }
     }
-
-    /// <summary> 마지막으로 바라보던 방향으로 플레이어를 회전 </summary>
-    private void Reposit()
-    {
-        if (_lastDirection == Vector3.zero)
-        {
-            return;
-        }
-
-        Vector3 viewDir = _lastDirection;
-        viewDir.y = 0f;
-        if (viewDir.sqrMagnitude <= Mathf.Epsilon)
-        {
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(viewDir);
-        Quaternion viewRotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSlerpFactor);
-
-        _rigid.MoveRotation(viewRotation);
-    }
-
-    #endregion ===== 행동 =====
-
-    #region ===== 로코모션 =====
-
+    
     public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
     {
         _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
@@ -297,12 +261,13 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
     }
 
-    public bool IsCurLocomotionBehaviour(int locomotionBehaviourHash)
+    private bool IsCurLocomotionBehaviour(int locomotionBehaviourHash)
     {
         return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
     }
 
     #endregion ===== 로코모션 =====
+
 
     #region ===== 공격 =====
 
@@ -317,6 +282,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 공격 =====
+
 
     #region ===== 데미지/죽음 =====
 
@@ -363,6 +329,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 데미지/죽음 =====
 
+
     #region ===== 상태 =====
 
     public void SetState(PlayerState state)
@@ -382,6 +349,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 상태 =====
 
+
     #region ===== 스탯 =====
 
     public void SetHp(float value)
@@ -396,18 +364,22 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary> 특정 행동에 필요한 SP가 충분한지 확인 </summary>
+    public bool HasEnoughSp(float requiredSp)
+    {
+        return _sp >= requiredSp && CanUseStamina;
+    }
+    
     public void SetSp(float value)
     {
         float previousSp = _sp;
 
         _sp = Mathf.Clamp(_sp + value, 0f, _maxSp);
 
-        // SP가 모두 소진되면 스태미너 사용 행동 차단
         if (_sp <= 0f)
         {
             CanUseStamina = false;
         }
-        // 일정량 이상 회복되면 다시 사용 가능
         else if (!CanUseStamina && _sp >= _spRecoveryThreshold)
         {
             CanUseStamina = true;
@@ -421,25 +393,17 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private void RecoverSp()
     {
-        // 이미 최대 SP라면 회복할 필요 없음
         if (_sp >= _maxSp)
         {
             return;
         }
 
-        // 이동 중 또는 공격중에는 SP를 회복하지 않음
         if (IsMoving || IsAttacking)
         {
             return;
         }
 
         SetSp(_spRecoveryRate * Time.deltaTime);
-    }
-
-    /// <summary> 특정 행동에 필요한 SP가 충분한지 확인  </summary>
-    public bool HasEnoughSp(float requiredSp)
-    {
-        return _sp >= requiredSp && CanUseStamina;
     }
 
     #endregion ===== 스탯 =====

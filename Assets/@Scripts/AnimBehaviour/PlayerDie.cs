@@ -18,7 +18,7 @@ public class PlayerDie : StateMachineBehaviour
     {
         if (_player == null)
         {
-            CPrint.Error("No PlayerCtrl attached");
+            CPrint.Error("PlayerCtrl no found!");
             return;
         }
         

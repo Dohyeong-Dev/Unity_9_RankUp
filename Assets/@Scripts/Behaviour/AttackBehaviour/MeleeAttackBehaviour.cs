@@ -29,7 +29,6 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
 
     [Header("이펙트")]
     [SerializeField] private ParticleSystem _slashVFX;
-    [SerializeField] private ParticleSystem _sheatheParticle;
 
 
     protected override void OnUpdate()
@@ -51,9 +50,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
 
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, 0);
     }
-
     
-
     #region -----Attack-----
 
     /// <summary> 공격을 인풋받았을 때 호출한다. </summary>
@@ -185,20 +182,8 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
 
     #endregion -----Sheathe-----
 
-
     #region -----Effect-----
 
-    public void PlaySheatheParticle()
-    {
-        if (_sheatheParticle == null)
-        {
-            CPrint.Warning("칼집 파티클 없음");
-            return;
-        }
-
-        _sheatheParticle.Play();
-    }
-    
     public void SetSlashVFXTransform(Vector3 localPosition,  Vector3 localEulerAngles)
     {
         if (_slashVFX == null)

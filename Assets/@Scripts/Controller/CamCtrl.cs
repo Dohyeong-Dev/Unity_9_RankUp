@@ -100,6 +100,12 @@ public class CamCtrl : MonoBehaviour
     [Tooltip("카메라가 플레이어와 너무 가까워지지 않도록 유지할 최소 거리")]
     [SerializeField] private float _minCameraDistance = 0.5f;
 
+    [Tooltip("카메라 충돌 보정이 부드럽게 적용되는 시간")]
+    [SerializeField] private float _collisionSmoothTime = 0.08f;
+
+    private float _currentCollisionDistance;
+    private float _collisionDistanceVelocity;
+    
     #endregion ===== 카메라 충돌 =====
     
     
@@ -149,6 +155,9 @@ public class CamCtrl : MonoBehaviour
         // 초기 정수리 뷰 거리 계산
         // 시작 각도가 이미 위쪽을 보고 있다면 그 각도에 해당하는 TopView 거리도 처음부터 즉시 적용한다.
         _currentTopViewDistance = GetTopViewDistance();
+        
+        // 초기 카메라 거리
+        _currentCollisionDistance = _currentZoomDistance + _currentTopViewDistance;
         
         // 시작 시 트랜스폼 즉시 적용
         UpdateCameraTransform();
@@ -254,24 +263,38 @@ public class CamCtrl : MonoBehaviour
         // 최종 위치
         Vector3 desiredPos = cameraPivot + shoulderOffset + heightOffset + distOffset;
 
-        // 충돌
-        Vector3 safePos = GetSafeCamPos(desiredPos, cameraPivot);
+        // 충돌 체크 및 보간 이동
+        float safeDistance = GetSafeCamDistance(desiredPos, cameraPivot);
 
-        // 적용
+        if (safeDistance < _currentCollisionDistance)
+        {
+            // 벽에 가까워지는 경우에는 즉시 당긴다.
+            _currentCollisionDistance = safeDistance;
+            _collisionDistanceVelocity = 0f;
+        }
+        else
+        {
+            // 벽에서 멀어지는 경우에만 부드럽게 복귀한다.
+            _currentCollisionDistance = Mathf.SmoothDamp(_currentCollisionDistance, safeDistance,
+                ref _collisionDistanceVelocity, _collisionSmoothTime);
+        }
+
+        Vector3 cameraDirection = (desiredPos - cameraPivot).normalized;
+        Vector3 safePos = cameraPivot + cameraDirection * _currentCollisionDistance;
+
         transform.position = safePos + _shakeOffset;
         transform.rotation = aimRotation;
     }
 
-    /// <summary> 플레이어와 카메라 사이 오브젝트 충돌 시 안전 위치를 구한다 </summary>
-    private Vector3 GetSafeCamPos(Vector3 desiredPos, Vector3 pivot)
+    /// <summary> 플레이어와 카메라 사이 오브젝트 충돌 시 안전 거리를 구한다 </summary>
+    private float GetSafeCamDistance(Vector3 desiredPos, Vector3 pivot)
     {
         Vector3 targetToCamVec = desiredPos - pivot;
-
         float targetToCamDist = targetToCamVec.magnitude;
 
         if (targetToCamDist < 0.1f)
         {
-            return pivot;
+            return 0f;
         }
 
         Vector3 targetToCamDir = targetToCamVec.normalized;
@@ -280,12 +303,10 @@ public class CamCtrl : MonoBehaviour
                 targetToCamDist, _collisionCheckLayerMask))
         {
             float safeDistance = hit.distance - _collisionOffset;
-            safeDistance = Mathf.Max(safeDistance, _minCameraDistance);
-
-            return pivot + targetToCamDir * safeDistance;
+            return Mathf.Max(safeDistance, _minCameraDistance);
         }
 
-        return desiredPos;
+        return targetToCamDist;
     }
 
     public void ShakeCamera()

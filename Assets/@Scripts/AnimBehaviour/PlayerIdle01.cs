@@ -29,6 +29,7 @@ public class PlayerIdle01 : StateMachineBehaviour
     {
         if (_player == null)
         {
+            CPrint.Error("PlayerCtrl no found!");
             return;
         }
 

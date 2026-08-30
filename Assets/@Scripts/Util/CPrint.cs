@@ -46,7 +46,6 @@ public static class CPrint
 
     public static void Error(object message) => Emit(PrintType.Error, message);
 
-
     /*
        🔵 [LOG]      플레이어 생성
        🟢 [SUCCESS]  아이템 획득

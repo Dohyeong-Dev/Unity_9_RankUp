@@ -49,7 +49,7 @@ public class PlayerAttack : StateMachineBehaviour
     {
         if (_meleeAttack == null)
         {
-            CPrint.Error($"{animator.name} : No meleeAttack found!");
+            CPrint.Error("MeleeAttack no found!");
             return;
         }
 
