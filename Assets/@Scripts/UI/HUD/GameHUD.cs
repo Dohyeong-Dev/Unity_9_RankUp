@@ -10,13 +10,20 @@ public class GameHUD : BaseHUD
         SpSlider,
     }
 
+    private enum Texts
+    {
+        HpText,
+        SpText,
+    }
+
     public RectTransform HpSliderTransform => Get<Slider>(Sliders.HpSlider).GetComponent<RectTransform>();
-    
+
     private PlayerCtrl _player;
 
     protected override void OnAwake()
     {
         Bind<Slider>(typeof(Sliders));
+        Bind<TMP_Text>(typeof(Texts));
     }
 
     protected override void OnStart()
@@ -56,21 +63,31 @@ public class GameHUD : BaseHUD
 
     private void UpdateHpSlider(float currentHp, float maxHp)
     {
-        if (Get<Slider>(Sliders.HpSlider) == null)
+        Slider hpSlider = Get<Slider>(Sliders.HpSlider);
+
+        if (hpSlider == null)
         {
             return;
         }
 
-        Get<Slider>(Sliders.HpSlider).value = maxHp > 0f ? currentHp / maxHp : 0f;
+        float sliderValue = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
+
+        hpSlider.value = sliderValue;
+        Get<TMP_Text>(Texts.HpText).text = (sliderValue * 100f).ToString("F0") + "%";
     }
 
     private void UpdateSpSlider(float currentSp, float maxSp)
     {
-        if (Get<Slider>(Sliders.SpSlider) == null)
+        Slider spSlider = Get<Slider>(Sliders.SpSlider);
+
+        if (spSlider == null)
         {
             return;
         }
 
-        Get<Slider>(Sliders.SpSlider).value = maxSp > 0f ? currentSp / maxSp : 0f;
+        float sliderValue = maxSp > 0f ? Mathf.Clamp01(currentSp / maxSp) : 0f;
+
+        spSlider.value = sliderValue;
+        Get<TMP_Text>(Texts.SpText).text = (sliderValue * 100f).ToString("F0") + "%";
     }
 }
