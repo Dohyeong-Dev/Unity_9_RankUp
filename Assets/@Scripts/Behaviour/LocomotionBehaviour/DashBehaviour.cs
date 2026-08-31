@@ -58,7 +58,7 @@ public class DashBehaviour : BaseLocomotionBehaviour
 
     protected override void OnUpdate()
     {
-        if (Managers.Input.KeyDown_Space)
+        if (Managers.Input.KeyDown_Space || Managers.Input.MouseDown_Right)
         {
             TryDash();
         }
