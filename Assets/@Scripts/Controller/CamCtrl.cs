@@ -291,17 +291,18 @@ public class CamCtrl : MonoBehaviour
     {
         Vector3 targetToCamVec = desiredPos - pivot;
         float targetToCamDist = targetToCamVec.magnitude;
-
+        Debug.DrawLine(pivot, desiredPos, Color.white);
         if (targetToCamDist < 0.1f)
         {
             return 0f;
         }
 
         Vector3 targetToCamDir = targetToCamVec.normalized;
-
+        
         if (Physics.SphereCast(pivot, _collisionRadius, targetToCamDir, out RaycastHit hit,
-                targetToCamDist, _collisionCheckLayerMask))
+                targetToCamDist, _collisionCheckLayerMask, QueryTriggerInteraction.Ignore))
         {
+            Debug.DrawLine(pivot, desiredPos, Color.red);
             float safeDistance = hit.distance - _collisionOffset;
             return Mathf.Max(safeDistance, _minCameraDistance);
         }
