@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 [RequireComponent(typeof(CapsuleCollider))]
@@ -198,6 +200,30 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _cam = cam;
     }
 
+    public void TeleportToTarget(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        Managers.UI.OpenLoadingUI(0.3f, openAction: () =>
+        {
+            _rigid.velocity = Vector3.zero;
+            _rigid.angularVelocity = Vector3.zero;
+
+            // Rigidbody를 사용하는 오브젝트이므로 위치는 Rigidbody 기준
+            _rigid.position = target.position;
+
+            // 회전은 Transform 기준으로 적용
+            transform.rotation = target.rotation;
+
+            _cam.ResetRotationToTarget(6f);
+
+            Managers.UI.CloseLoadingUI(0.3f);
+        });
+    }
+
     
     #region ===== 로코모션 =====
 
@@ -230,7 +256,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             }
         }
     }
-    
+
     public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
     {
         _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
@@ -369,7 +395,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         return _sp >= requiredSp && CanUseStamina;
     }
-    
+
     public void SetSp(float value)
     {
         float previousSp = _sp;

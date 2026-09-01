@@ -22,21 +22,21 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
 
     private void Update()
     {
-        OnUpdateAlways();
+        OnUpdateBeforeInput();
 
         if (!Managers.Input.CanReceiveInput)
         {
             return;
         }
 
-        OnUpdate();
+        OnUpdateAfterInput();
     }
 
-    /// <summary> UI 입력 상태나 현재 행동과 관계없이 항상 실행됩니다. </summary>
-    protected virtual void OnUpdateAlways()
+    /// <summary> 입력 가능 여부를 확인하기 전에 항상 실행됩니다. </summary>
+    protected virtual void OnUpdateBeforeInput()
     {
     }
 
     /// <summary> 플레이어 입력이 가능한 경우 실행됩니다. </summary>
-    protected abstract void OnUpdate();
+    protected abstract void OnUpdateAfterInput();
 }

@@ -29,11 +29,15 @@ public class Managers : MonoBehaviour
 
     private InputManager _input = new();
     public static InputManager Input => Instance?._input;
+    
     private UIManager _ui = new();
     public static UIManager UI => Instance?._ui;
+    
     private ResourceManager _resource = new();
     public static ResourceManager Resource => Instance?._resource;
 
+    private PoolManager _pool = new();
+    public static PoolManager Pool => Instance?._pool;
     #endregion
 
 

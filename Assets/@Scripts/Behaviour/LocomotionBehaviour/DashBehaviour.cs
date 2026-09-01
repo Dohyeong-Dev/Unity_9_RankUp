@@ -39,7 +39,7 @@ public class DashBehaviour : BaseLocomotionBehaviour
         UpdateDashMove();
     }
 
-    protected override void OnUpdateAlways()
+    protected override void OnUpdateBeforeInput()
     {
         CalculateDashCoolTime();
 
@@ -56,7 +56,7 @@ public class DashBehaviour : BaseLocomotionBehaviour
         }
     }
 
-    protected override void OnUpdate()
+    protected override void OnUpdateAfterInput()
     {
         if (Managers.Input.KeyDown_Space || Managers.Input.MouseDown_Right)
         {

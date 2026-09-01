@@ -6,6 +6,11 @@ public class ForceField : MonoBehaviour
     [SerializeField] private Material _redMaterial;
     [SerializeField] private Material _blueMaterial;
 
+    [Header("Challenge")]
+    [SerializeField] private Transform _spawner;
+    
+    private PlayerCtrl _player;
+
     private Renderer _renderer;
 
     private bool _isStarted;
@@ -17,19 +22,27 @@ public class ForceField : MonoBehaviour
 
         if (_renderer == null)
         {
-            CPrint.Error("[ForceField] Renderer를 찾을 수 없습니다.");
+            CPrint.Error("Renderer를 찾을 수 없습니다.");
             return;
         }
 
         _renderer.enabled = true;
     }
 
-
     private void Start()
     {
+        GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
+        if (gameScene == null)
+        {
+            CPrint.Log("GameScene no found!");
+        }
+        else
+        {
+            _player = gameScene.Player;
+        }
+        
         SetBlue();
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
@@ -38,7 +51,6 @@ public class ForceField : MonoBehaviour
             return;
         }
 
-        // 이미 시련이 시작됐다면 다시 팝업을 띄우지 않는다.
         if (_isStarted)
         {
             return;
@@ -47,7 +59,6 @@ public class ForceField : MonoBehaviour
         OpenAlertPopup();
     }
 
-
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag(TagKey.Player))
@@ -55,18 +66,12 @@ public class ForceField : MonoBehaviour
             return;
         }
 
-        // 아직 시련을 시작하지 않았다면
-        // 다시 파란색 상태로 유지한다.
         if (!_isStarted)
         {
             SetBlue();
         }
     }
 
-
-    /// <summary>
-    /// 시련 시작 여부를 묻는 팝업
-    /// </summary>
     private void OpenAlertPopup()
     {
         AlertPopup popup = Managers.UI.OpenPopup<AlertPopup>();
@@ -81,9 +86,7 @@ public class ForceField : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// AlertPopup에서 Yes를 눌렀을 때 실행
-    /// </summary>
+    /// <summary> AlertPopup에서 Yes를 눌렀을 때 실행 </summary>
     private void StartChallenge()
     {
         if (_isStarted)
@@ -95,9 +98,19 @@ public class ForceField : MonoBehaviour
 
         SetRed();
 
-        // TODO
-        // 몬스터 생성
-        // 시련 시작
+        if (_player == null)
+        {
+            CPrint.Error("Player를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (_spawner == null)
+        {
+            CPrint.Error("[ForceField] Spawner가 연결되지 않았습니다.");
+            return;
+        }
+
+        _player.TeleportToTarget(_spawner);
     }
 
 

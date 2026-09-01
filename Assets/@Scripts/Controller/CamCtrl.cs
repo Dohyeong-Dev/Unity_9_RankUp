@@ -310,6 +310,32 @@ public class CamCtrl : MonoBehaviour
         return targetToCamDist;
     }
 
+    /// <summary> 카메라 방향을 타겟이 바라보는 방향으로 초기화 </summary>
+    public void ResetRotationToTarget(float zoomDistance)
+    {
+        if (_target == null)
+        {
+            return;
+        }
+
+        _eulerY = _target.eulerAngles.y;
+
+        // 기존 상하 각도는 유지
+        _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
+
+        // 줌 거리 초기화
+        float clampedZoomDistance = Mathf.Clamp(zoomDistance, _minZoomDistance, _maxZoomDistance);
+
+        _targetZoomDistance = clampedZoomDistance;
+        _currentZoomDistance = clampedZoomDistance;
+
+        // SmoothDamp 진행 중이던 값 초기화
+        _zoomVelocity = 0f;
+
+        UpdateTargetFocusPos();
+        UpdateCameraTransform();
+    }
+    
     public void ShakeCamera()
     {
         if (_isShake)

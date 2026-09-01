@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine.UI;
 
@@ -16,17 +17,30 @@ public class LoadingUI : BaseUI
         Bind<Image>(typeof(Images));
     }
 
-    public void FadeIn(float fadeTime)
+    public void FadeIn(float fadeTime, Action completeAction = null)
     {
         Get<Image>(Images.BG).DOKill();
-        Get<Image>(Images.BG).DOFade(1f, fadeTime).From(0f);
+        Get<Image>(Images.BG).DOFade(1f, fadeTime).From(0f).SetEase(Ease.InQuad)
+            .OnComplete(() =>
+        {
+            completeAction?.Invoke();
+        });
     }
 
-    public void FadeOut(float fadeTime)
+    public void FadeOut(float fadeTime, Action completionAction = null)
     {
-        Get<Image>(Images.BG).DOKill();
-        Get<Image>(Images.BG).DOFade(0f, fadeTime).From(1f).OnComplete(() =>
+        Image background = Get<Image>(Images.BG);
+
+        background.DOKill();
+
+        Sequence sequence = DOTween.Sequence();
+
+        sequence.AppendInterval(0.1f);
+        sequence.Append(background.DOFade(0f, fadeTime).From(1f).SetEase(Ease.OutQuad));
+
+        sequence.OnComplete(() =>
         {
+            completionAction?.Invoke();
             Managers.UI.CloseLoadingUI();
         });
     }

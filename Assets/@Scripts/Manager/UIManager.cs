@@ -276,7 +276,7 @@ public class UIManager
     #region LoadingUI
     
     /// <summary> Loading UI 열기 </summary>
-    public void OpenLoadingUI(float fadeTime = 0f)
+    public void OpenLoadingUI(float fadeTime = 0f, System.Action openAction = null)
     {
         if (_loadingObject != null)
         {
@@ -297,11 +297,11 @@ public class UIManager
         _loadingObject = uiObject;
 
         LoadingUI loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
-        loadingUI.FadeIn(fadeTime);
+        loadingUI.FadeIn(fadeTime, openAction);
     }
 
     /// <summary> Loading UI 닫기 </summary>
-    public void CloseLoadingUI(float fadeTime = 0f)
+    public void CloseLoadingUI(float fadeTime = 0f, System.Action closeAction = null)
     {
         if (_loadingObject == null)
         {
@@ -324,7 +324,7 @@ public class UIManager
             return;
         }
         
-        loadingUI.FadeOut(fadeTime);
+        loadingUI.FadeOut(fadeTime, closeAction);
     }
     
     #endregion

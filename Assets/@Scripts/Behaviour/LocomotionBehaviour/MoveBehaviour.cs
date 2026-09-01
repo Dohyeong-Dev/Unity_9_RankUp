@@ -48,7 +48,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         UpdateMove();
     }
 
-    protected override void OnUpdateAlways()
+    protected override void OnUpdateBeforeInput()
     {
         if (Player.IsAttacking)
         {
@@ -56,7 +56,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         }
     }
 
-    protected override void OnUpdate()
+    protected override void OnUpdateAfterInput()
     {
         if (Player.IsAttacking)
         {

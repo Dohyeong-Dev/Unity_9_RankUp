@@ -27,7 +27,7 @@ public class EnemyHpUI : MonoBehaviour
             return;
         }
         
-        _enemy.OnHpChanged += UpdateHp;
+        //_enemy.OnHpChanged += UpdateHp;
     }
     
     public void UpdateHp(float currentHp, float maxHp)
@@ -42,6 +42,6 @@ public class EnemyHpUI : MonoBehaviour
             return;
         }
 
-        _enemy.OnHpChanged -= UpdateHp;
+        //_enemy.OnHpChanged -= UpdateHp;
     }
 }

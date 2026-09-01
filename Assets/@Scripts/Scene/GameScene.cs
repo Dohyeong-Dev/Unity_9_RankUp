@@ -6,6 +6,7 @@ public class GameScene : BaseScene
     public GameHUD HUD => _hud;
     
     [SerializeField] private PlayerCtrl _player;
+    public PlayerCtrl Player => _player;
     [SerializeField] private CamCtrl _camera;
     public CamCtrl Cam => _camera;
     
