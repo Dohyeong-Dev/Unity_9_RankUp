@@ -1,111 +1,96 @@
-using System;
-using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class EnemyCtrl : MonoBehaviour, IDamageable
+[RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
+public class EnemyCtrl : MonoBehaviour
 {
-    [SerializeField] private AttackRange _attackRange;
-    [SerializeField] private float _attackDelay = 1;
-    [SerializeField] private float _damage = 1;
+    [Header("Dissolve")]
+    [SerializeField] private float _dissolveDuration = 0.5f;
 
-    private float _hp;
-    [SerializeField] private float _maxHp = 30;
-    public event Action<float, float> OnHpChanged;
+    [Tooltip("디졸브 진행 속도")]
+    [SerializeField] private Ease _dissolveEase = Ease.InOutQuad;
 
-    private bool _isDead;
-    public bool IsDead => _isDead;
+    private readonly List<Material> _materials = new();
 
-    private Collider _collider;
+    private Tween _dissolveTween;
+    private float _dissolveValue;
+
 
     private void Awake()
     {
-        _hp = _maxHp;
+        InitializeMaterials();
+
+        SetDissolveValue(0f);
     }
 
-    private void Start()
+    private void InitializeMaterials()
     {
-        if (_attackRange == null)
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+
+        foreach (Renderer renderer in renderers)
         {
-            CPrint.Error("No attack range!");
-            return;
-        }
+            Material[] materials = renderer.materials;
 
-        _collider = transform.GetComponent<Collider>();
-        if (_collider == null)
-        {
-            CPrint.Warning("No _collider!");
-            return;
-        }
-
-        StartCoroutine(Co_Attack());
-    }
-
-    private IEnumerator Co_Attack()
-    {
-        WaitForSeconds delay = new WaitForSeconds(_attackDelay == 0 ? 0.1f : _attackDelay);
-
-        while (true)
-        {
-            Collider[] colliders = _attackRange.GetColliders(LayerKey.Mask.Player);
-
-            for (int i = 0; i < colliders.Length; i++)
+            foreach (Material material in materials)
             {
-                if (colliders[i].TryGetComponent<IDamageable>(out IDamageable damageable))
+                if (material.HasProperty("_Dissolve"))
                 {
-                    damageable.TakeDamage(_damage);
+                    _materials.Add(material);
                 }
             }
-
-            yield return delay;
         }
     }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag(TagKey.Player))
+        {
+            return;
+        }
+
+        Dissolve(true);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag(TagKey.Player))
+        {
+            return;
+        }
+
+        Dissolve(false);
+    }
+
+
+    private void Dissolve(bool isDissolve)
+    {
+        float targetValue = isDissolve ? 1f : 0f;
+
+        _dissolveTween?.Kill();
+
+        _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
+            .SetEase(_dissolveEase);
+    }
+
+
+    private void SetDissolveValue(float value)
+    {
+        _dissolveValue = value;
+
+        foreach (Material material in _materials)
+        {
+            material.SetFloat("_Dissolve", value);
+        }
+    }
+
 
     private void OnDestroy()
     {
-        StopAllCoroutines();
-    }
-
-    public void TakeDamage(float damage)
-    {
-        if (IsDead)
-        {
-            return;
-        }
-
-        SetHp(-damage);
-
-        if (_hp <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void Die()
-    {
-        if (IsDead)
-        {
-            return;
-        }
-
-        _isDead = true;
-        _collider.enabled = false;
-
-        Sequence sequence = DOTween.Sequence();
-
-        sequence.Append(transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.OutFlash)).Join(transform.DOMoveY(
-            transform.position.y + 1.5f, 0.3f).SetEase(Ease.OutQuad)).OnComplete(() => { Destroy(gameObject); });
-    }
-
-    public void SetHp(float value)
-    {
-        float previousHp = _hp;
-
-        _hp = Mathf.Clamp(_hp + value, 0f, _maxHp);
-
-        if (!Mathf.Approximately(previousHp, _hp))
-        {
-            OnHpChanged?.Invoke(_hp, _maxHp);
-        }
+        _dissolveTween?.Kill();
     }
 }
