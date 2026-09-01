@@ -17,13 +17,13 @@ public class LoadingUI : BaseUI
         Bind<Image>(typeof(Images));
     }
 
-    public void FadeIn(float fadeTime, Action completeAction = null)
+    public void FadeIn(float fadeTime, Action completionAction = null)
     {
         Get<Image>(Images.BG).DOKill();
         Get<Image>(Images.BG).DOFade(1f, fadeTime).From(0f).SetEase(Ease.InQuad)
             .OnComplete(() =>
         {
-            completeAction?.Invoke();
+            completionAction?.Invoke();
         });
     }
 

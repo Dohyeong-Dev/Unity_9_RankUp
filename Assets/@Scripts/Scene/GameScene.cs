@@ -7,14 +7,15 @@ public class GameScene : BaseScene
     
     [SerializeField] private PlayerCtrl _player;
     public PlayerCtrl Player => _player;
+    
     [SerializeField] private CamCtrl _camera;
     public CamCtrl Cam => _camera;
     
-    private float _remainingTime = 20f;
-    private int _lastDisplayedSecond = -1;
-
+    [SerializeField] private SpawnerCtrl _spawnerCtrl;
+    public SpawnerCtrl SpawnerCtrl => _spawnerCtrl;
+    
+    
     private bool _isStart;
-    public bool IsStart => _isStart;
     
     protected override void OnAwake()
     {
@@ -31,6 +32,7 @@ public class GameScene : BaseScene
 
     protected override void OnStart()
     {
+        Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 5);
     }
 
     protected override void OnUpdate()

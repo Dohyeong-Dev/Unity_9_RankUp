@@ -1,6 +1,6 @@
 public abstract class PoolKey
 {
-    public const string RootPath = "Prefabs/Pool/";
+    private const string RootPath = "Prefab/Pool/";
 
     public static class Name
     {

@@ -40,6 +40,7 @@ public abstract class BaseScene : MonoBehaviour
     {
         Managers.UI.Clear();
         Managers.Resource.Clear();
+        Managers.Pool.Clear();
     }
 
     private void InitializeEventSystem()

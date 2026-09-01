@@ -10,7 +10,7 @@ public class Pool
         {
             if (_rootObject == null)
             {
-                _rootObject = new GameObject($"Pool_{_prefab.name}_{Managers.Pool.RootObject.transform.childCount}");
+                _rootObject = new GameObject($"Pool_{_prefab.name}");
             }
 
             return _rootObject;

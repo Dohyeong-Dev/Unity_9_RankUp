@@ -100,17 +100,31 @@ public class ForceField : MonoBehaviour
 
         if (_player == null)
         {
-            CPrint.Error("Player를 찾을 수 없습니다.");
+            CPrint.Error("_player no found!");
             return;
         }
 
         if (_spawner == null)
         {
-            CPrint.Error("[ForceField] Spawner가 연결되지 않았습니다.");
+            CPrint.Error("Spawner no found!");
             return;
         }
 
-        _player.TeleportToTarget(_spawner);
+        _player.TeleportToTarget(_spawner, () =>
+        {
+            GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
+
+            if (gameScene == null)
+            {
+                CPrint.Error("GameScene no found!");
+            }
+            else
+            {
+                int forceFieldIndex = transform.GetSiblingIndex();
+
+                gameScene.SpawnerCtrl.SpawnEnemies(forceFieldIndex);
+            }
+        });
     }
 
 

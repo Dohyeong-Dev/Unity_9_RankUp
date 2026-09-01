@@ -8,6 +8,10 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyCtrl : MonoBehaviour
 {
+    private PlayerCtrl _player; 
+
+    #region -----Dissolve-----
+    
     [Header("Dissolve")]
     [SerializeField] private float _dissolveDuration = 0.5f;
 
@@ -19,14 +23,29 @@ public class EnemyCtrl : MonoBehaviour
     private Tween _dissolveTween;
     private float _dissolveValue;
 
-
+    #endregion -----Dissolve-----
+    
+        
     private void Awake()
     {
-        InitializeMaterials();
+        GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
+        if (gameScene == null)
+        {
+            CPrint.Error("GameScene no found!");
+            return;
+        }
 
+        _player = gameScene.Player;
+        
+        InitializeMaterials();
         SetDissolveValue(0f);
     }
-
+    
+    private void OnDestroy()
+    {
+        _dissolveTween?.Kill();
+    }
+    
     private void InitializeMaterials()
     {
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
@@ -45,39 +64,38 @@ public class EnemyCtrl : MonoBehaviour
         }
     }
 
-
-    private void OnTriggerEnter(Collider other)
+    public void Spawn(Transform spawnPoint)
     {
-        if (!other.CompareTag(TagKey.Player))
+        if (spawnPoint == null)
         {
             return;
         }
 
-        Dissolve(true);
-    }
+        // 위치 설정
+        transform.position = spawnPoint.position;
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag(TagKey.Player))
+        // 플레이어 방향 바라보기
+        if (_player != null)
         {
-            return;
+            CPrint.Log("Spawn point is " + _player.transform.position);
+            Vector3 direction = _player.transform.position - transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > Mathf.Epsilon)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
         }
 
-        Dissolve(false);
-    }
-
-
-    private void Dissolve(bool isDissolve)
-    {
-        float targetValue = isDissolve ? 1f : 0f;
-
+        // 등장 시 디졸브 상태 초기화
         _dissolveTween?.Kill();
 
-        _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
-            .SetEase(_dissolveEase);
+        SetDissolveValue(1f);
+
+        // 사라진 상태 → 나타나는 상태
+        Dissolve(false);
     }
-
-
+    
     private void SetDissolveValue(float value)
     {
         _dissolveValue = value;
@@ -87,10 +105,14 @@ public class EnemyCtrl : MonoBehaviour
             material.SetFloat("_Dissolve", value);
         }
     }
-
-
-    private void OnDestroy()
+    
+    private void Dissolve(bool isDissolve)
     {
+        float targetValue = isDissolve ? 1f : 0f;
+
         _dissolveTween?.Kill();
+
+        _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
+            .SetEase(_dissolveEase);
     }
 }
