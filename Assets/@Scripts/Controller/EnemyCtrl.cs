@@ -77,7 +77,6 @@ public class EnemyCtrl : MonoBehaviour
         // 플레이어 방향 바라보기
         if (_player != null)
         {
-            CPrint.Log("Spawn point is " + _player.transform.position);
             Vector3 direction = _player.transform.position - transform.position;
             direction.y = 0f;
 
