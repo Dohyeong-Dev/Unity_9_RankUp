@@ -14,7 +14,8 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     private void Awake()
     {
         Player = GetComponent<PlayerCtrl>();
-
+        Player.AddLocomotionBehaviour(this);
+        
         BehaviourHash = GetType().GetHashCode();
     }
 

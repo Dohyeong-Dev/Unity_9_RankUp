@@ -5,14 +5,14 @@ public class ResourceManager
 {
     // 키 : 자료형
     // 값 : 딕셔너리(키 : Path, 값 : 오브젝트)
-    private Dictionary<System.Type, Dictionary<string, Object>> _loadedObjDic = new();
+    private readonly Dictionary<System.Type, Dictionary<string, Object>> _loadedObjMap = new();
 
     public T Load<T>(string path) where T : Object
     {
-        if (!_loadedObjDic.TryGetValue(typeof(T), out var dic))
+        if (!_loadedObjMap.TryGetValue(typeof(T), out var dic))
         {
             dic = new Dictionary<string, Object>();
-            _loadedObjDic.Add(typeof(T), dic);
+            _loadedObjMap.Add(typeof(T), dic);
         }
 
         if (dic.TryGetValue(path, out Object cachedObj))
@@ -72,7 +72,7 @@ public class ResourceManager
 
     public void Clear()
     {
-        _loadedObjDic.Clear();
+        _loadedObjMap.Clear();
         // 참조되지 않는 Asset을 정리
         Resources.UnloadUnusedAssets();
     }

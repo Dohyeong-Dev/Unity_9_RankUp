@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    #region -----감지 세팅-----
+    #region ===== 감지 세팅 =====
 
     [Header("감지 세팅")]
     [Tooltip("타겟을 감지할 수 있는 최대 거리")]
@@ -27,16 +27,17 @@ public class FieldOfView : MonoBehaviour
     [SerializeField]
     private LayerMask _obstacleLayer;
 
-    #endregion -----감지 세팅-----
+    #endregion ===== 감지 세팅 =====
 
 
-    #region -----감지 결과-----
+    #region ===== 감지 결과 =====
 
     private readonly List<Transform> _visibleTargets = new();
 
     private Transform _currentTarget;
+    public Transform CurrentTarget => _currentTarget;
 
-    #endregion -----감지 결과-----
+    #endregion ===== 감지 결과 =====
 
 
     private void Start()
@@ -115,7 +116,6 @@ public class FieldOfView : MonoBehaviour
             }
         }
     }
-
     
     #region -----Gizmos-----
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class InputManager
 {
-    #region -----MOUSE-----
+    #region ===== 마우스 =====
     
     public float MouseAxisX { get; private set; }
     public float MouseAxisY { get; private set; }
@@ -13,10 +13,10 @@ public class InputManager
     
     public bool MouseDown_Right => Input.GetMouseButtonDown(1);
     
-    #endregion -----MOUSE-----
+    #endregion ===== 마우스 =====
 
     
-    #region -----KEY-----
+    #region ===== 키보드 =====
     
     // 키 민감도
     private const float AxisSensitivity = 1f;
@@ -30,7 +30,7 @@ public class InputManager
     public bool KeyDown_Space => Input.GetKeyDown(KeyCode.Space);
     public bool KeyDown_Esc => Input.GetKeyDown(KeyCode.Escape);
     
-    #endregion -----KEY-----
+    #endregion ===== 키보드 =====
     
     
     public bool CanReceiveInput { get; private set; }

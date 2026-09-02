@@ -135,14 +135,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         InitializeStat();
     }
 
-    private void InitializeStat()
-    {
-        _hp = _maxHp;
-        _sp = _maxSp;
-
-        CanUseStamina = true;
-    }
-
     private void Update()
     {
         // 지형체크
@@ -161,6 +153,14 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         FixedUpdateLocomotions();
     }
 
+    private void InitializeStat()
+    {
+        _hp = _maxHp;
+        _sp = _maxSp;
+
+        CanUseStamina = true;
+    }
+    
     private bool CheckGroundStatus()
     {
         float radius = _capsuleCollider.bounds.extents.x * 0.5f;

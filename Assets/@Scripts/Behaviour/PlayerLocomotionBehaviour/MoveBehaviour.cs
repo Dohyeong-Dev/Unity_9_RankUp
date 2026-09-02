@@ -23,7 +23,6 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private void Start()
     {
-        Player.AddLocomotionBehaviour(this);
         Player.SetDefLocomotionBehaviour(BehaviourHash);
     }
 

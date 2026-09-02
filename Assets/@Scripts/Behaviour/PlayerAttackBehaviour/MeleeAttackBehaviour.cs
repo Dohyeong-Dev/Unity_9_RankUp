@@ -51,7 +51,7 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, 0);
     }
     
-    #region -----Attack-----
+    #region ===== 공격 =====
 
     /// <summary> 공격을 인풋받았을 때 호출한다. </summary>
     private void TryAttack()
@@ -150,9 +150,9 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         }
     }
 
-    #endregion -----Attack-----
+    #endregion ===== 공격 =====
 
-    #region -----Sheathe-----
+    #region ===== 시즈 =====
 
     /// <summary> 칼집 모션 진행 여부를 설정한다. </summary>
     public void SetSheathing(bool value)
@@ -180,9 +180,9 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         Clear();
     }
 
-    #endregion -----Sheathe-----
+    #endregion ===== 시즈 =====
 
-    #region -----Effect-----
+    #region ===== 이펙트 =====
 
     public void SetSlashVFXTransform(Vector3 localPosition,  Vector3 localEulerAngles)
     {
@@ -208,5 +208,5 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         _slashVFX.Play();
     }
 
-    #endregion -----Effect-----
+    #endregion ===== 이펙트 =====
 }

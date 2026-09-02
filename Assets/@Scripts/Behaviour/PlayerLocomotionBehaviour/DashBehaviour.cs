@@ -25,8 +25,6 @@ public class DashBehaviour : BaseLocomotionBehaviour
     {
         _dashCoolTimer = _dashCoolTime;
         _canDash = true;
-
-        Player.AddLocomotionBehaviour(this);
     }
 
     public override void OnFixedUpdate()

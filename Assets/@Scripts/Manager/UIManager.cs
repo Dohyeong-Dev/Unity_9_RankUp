@@ -4,40 +4,39 @@ using UnityEngine;
 public class UIManager
 {
     // 현재 씬에 존재하는 UI
-    #region -----CurrentSceneUI-----
+    #region ===== CurrentSceneUI =====
 
     public BaseHUD CurrentHUD { get; private set; }
     public BaseScreen CurrentScreen { get; private set; }
     public BasePopup CurrentPopup => _popupStack.Count > 0 ? _popupStack.Peek() : null;
 
-    #endregion -----CurrentSceneUI-----
+    #endregion ===== CurrentSceneUI =====
     
     
-    #region -----PopupUI-----
+    #region ===== PopupUI =====
 
     private readonly Stack<BasePopup> _popupStack = new();
-    public int PopupCount => _popupStack.Count;
     private int _nextPopupSortingOrder = 2;
     
-    #endregion -----PopupUI-----
+    #endregion ===== PopupUI =====
 
     
-    #region -----Overlay-----
+    #region ===== Overlay =====
     
     private HitEffectUI _hitEffectUI;
     
-    #endregion -----Overlay-----
+    #endregion -----Overlay =====
     
     
-    #region -----LoadingUI-----
+    #region ===== LoadingUI =====
 
     private GameObject _loadingObject;
     public bool IsLoading => _loadingObject != null;
 
-    #endregion -----LoadingUI-----
+    #endregion ===== LoadingUI =====
 
     
-    #region -----Root-----
+    #region ===== Root =====
     
     private GameObject _root;
 
@@ -69,7 +68,7 @@ public class UIManager
         }
     }
     
-    #endregion -----Root-----
+    #endregion ===== Root =====
 
     
     public void OnUpdate()
