@@ -1,5 +1,6 @@
-// VSCode로 이 스크립트를 열면 바로 색상 확인 가능
-public abstract class ColorKey
+using UnityEngine;
+
+public static class ColorKey
 {
-    public const string SKY_BLUE = "#00BEFF";
+    public static readonly Color SkyBlue = new Color32(0, 190, 255, 255);
 }

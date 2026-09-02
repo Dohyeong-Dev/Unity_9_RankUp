@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Humanoid_Body_PlasticY
+  m_Name: Melee_Body_PlasticY
   m_Shader: {fileID: -6465566751694194690, guid: 2c6e52535f17dfc4b8e0bb3d1e91aea4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -119,7 +119,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.9245283, g: 0.36915135, b: 0.18752226, a: 1}
     - _Color: {r: 0.85882354, g: 0.44705883, b: 0.019607844, a: 1}
     - _EdgeColor: {r: 0, g: 3.890196, b: 4, a: 0}
     - _Edge_Color: {r: 0.9716981, g: 0.2311699, b: 0, a: 0}

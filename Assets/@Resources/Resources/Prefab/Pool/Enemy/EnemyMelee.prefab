@@ -1131,6 +1131,7 @@ GameObject:
   - component: {fileID: 8716027239909535574}
   - component: {fileID: 1348572054228863927}
   - component: {fileID: 3607764460814878370}
+  - component: {fileID: 2962899990557143582}
   m_Layer: 0
   m_Name: EnemyMelee
   m_TagString: Untagged
@@ -1262,6 +1263,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _dissolveDuration: 0.5
   _dissolveEase: 7
+--- !u!114 &2962899990557143582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4937344872469748292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b6dc69b4bd4944c6a5e556676d63f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _detectionRadius: 5
+  _fieldOfViewAngle: 100
+  _detectionInterval: 0.2
+  _targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  _obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!1 &5092463709841558120
 GameObject:
   m_ObjectHideFlags: 0
