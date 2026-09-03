@@ -1265,7 +1265,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _detectionRadius: 12
   _fieldOfViewAngle: 220
-  _detectionInterval: 0.2
+  _detectionInterval: 0.1
   _targetLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -1286,6 +1286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _walkSpeed: 1.5
   _runSpeed: 4
+  _runSpeedVariance: 1
   _rotationSpeed: 720
   _chaseStoppingDistance: 2
   _knockbackDistance: 1

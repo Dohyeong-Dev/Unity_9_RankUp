@@ -34,6 +34,8 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     public float WalkSpeed => _walkSpeed;
     [SerializeField] private float _runSpeed = 4f;
     public float RunSpeed => _runSpeed;
+    [SerializeField] private float _runSpeedVariance = 1f;
+    public float RunSpeedVariance => _runSpeedVariance;
     [SerializeField] private float _rotationSpeed = 360f;
     public float RotationSpeed => _rotationSpeed;
     [SerializeField] private float _chaseStoppingDistance = 2f;

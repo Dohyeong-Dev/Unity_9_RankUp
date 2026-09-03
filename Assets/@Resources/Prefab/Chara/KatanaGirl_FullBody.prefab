@@ -4951,7 +4951,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ac7e20147384d1e9859924f991695f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredSpRate: 3
+  _requiredSpRate: 10
   _dashSpeed: 30
   _dashDuration: 0.2
   _dashCoolTime: 1
