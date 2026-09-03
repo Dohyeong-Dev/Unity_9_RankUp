@@ -6,7 +6,7 @@ public class Billboard : MonoBehaviour
 
     private void Start()
     {
-        if (Managers.Scene.CurrentScene is GameScene gameScene)
+        if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
         {
             _camTr = gameScene.Cam.transform;
         }

@@ -1171,7 +1171,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: f209d33f43c964c5abc3437dbaa1b8de, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -1288,7 +1288,7 @@ MonoBehaviour:
   _runSpeed: 4
   _runSpeedVariance: 1
   _rotationSpeed: 720
-  _chaseStoppingDistance: 2
+  _chaseStoppingDistance: 1
   _knockbackDistance: 1
   _knockbackDuration: 0.15
   _knockbackEase: 6

@@ -3,7 +3,6 @@ using UnityEngine;
 public class GameScene : BaseScene
 {
     private GameHUD _hud;
-    public GameHUD HUD => _hud;
     
     [SerializeField] private PlayerCtrl _player;
     public PlayerCtrl Player => _player;
@@ -13,9 +12,6 @@ public class GameScene : BaseScene
     
     [SerializeField] private SpawnerCtrl _spawnerCtrl;
     public SpawnerCtrl SpawnerCtrl => _spawnerCtrl;
-    
-    
-    private bool _isStart;
     
     protected override void OnAwake()
     {
@@ -37,10 +33,5 @@ public class GameScene : BaseScene
 
     protected override void OnUpdate()
     {
-    }
-
-    public void SetStart(bool isStart)
-    {
-        _isStart = isStart;
     }
 }

@@ -58,6 +58,18 @@ public class PoolManager
 
         string poolName = poolObject.gameObject.name;
 
+        int lastUnderscoreIndex = poolName.LastIndexOf('_');
+
+        if (lastUnderscoreIndex >= 0)
+        {
+            string suffix = poolName.Substring(lastUnderscoreIndex + 1);
+
+            if (int.TryParse(suffix, out _))
+            {
+                poolName = poolName.Substring(0, lastUnderscoreIndex);
+            }
+        }
+
         if (!_pools.TryGetValue(poolName, out Pool pool))
         {
             CPrint.Warning($"반환할 Pool을 찾을 수 없습니다. Name : {poolName}");

@@ -41,7 +41,7 @@ public class Pool
         GameObject instance = Object.Instantiate(_prefab, RootObject.transform);
 
         // (Clone)이 붙지 않도록 원본 프리팹 이름 유지
-        instance.name = _prefab.name;
+        instance.name = $"{_prefab.name}_{_rootObject.transform.childCount}";
 
         return instance.GetOrAddComponent<PoolObj>();
     }

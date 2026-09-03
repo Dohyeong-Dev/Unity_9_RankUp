@@ -127,13 +127,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     private void Awake()
     {
-        GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
-
-        if (gameScene == null)
-        {
-            CPrint.Error("GameScene not found!");
-        }
-        else
+        if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
         {
             _player = gameScene.Player;
         }
@@ -437,8 +431,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         SetCombatTarget(_player != null ? _player.transform : null);
 
         SetHp(-damage);
-        PlayHitEffect();
 
+        PlayHitEffect();
+        
         if (IsDead)
         {
             return;
@@ -463,13 +458,10 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        if (Target != null)
+        if (_stateMachine.TryGetCurrentState<HitState>(out var hitState))
         {
-            _stateMachine.ChangeState<ChaseState>();
-            return;
+            hitState.SetAnimationFinished();
         }
-
-        _stateMachine.ChangeState<ReturnState>();
     }
 
     public void Die()

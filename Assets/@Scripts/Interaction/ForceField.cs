@@ -31,12 +31,7 @@ public class ForceField : MonoBehaviour
 
     private void Start()
     {
-        GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
-        if (gameScene == null)
-        {
-            CPrint.Log("GameScene no found!");
-        }
-        else
+        if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
         {
             _player = gameScene.Player;
         }
@@ -112,13 +107,7 @@ public class ForceField : MonoBehaviour
 
         _player.TeleportToTarget(_spawner, () =>
         {
-            GameScene gameScene = Managers.Scene.CurrentScene as GameScene;
-
-            if (gameScene == null)
-            {
-                CPrint.Error("GameScene no found!");
-            }
-            else
+            if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
             {
                 int forceFieldIndex = transform.GetSiblingIndex();
 

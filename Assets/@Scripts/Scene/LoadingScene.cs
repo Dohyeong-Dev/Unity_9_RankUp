@@ -63,7 +63,7 @@ public class LoadingScene : BaseScene
             yield return null;
         }
 
-        Managers.Scene.CurrentScene.Clear();
+        Managers.Scene.ClearCurrentScene();
 
         operation.allowSceneActivation = true;
     }

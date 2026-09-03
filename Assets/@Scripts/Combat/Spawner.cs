@@ -9,6 +9,11 @@ public class Spawner : MonoBehaviour
         {
             Transform spawnPoint = transform.GetChild(i);
 
+            if (!spawnPoint.gameObject.activeSelf)
+            {
+                continue;
+            }
+            
             SpawnEnemy(spawnPoint);
         }
     }

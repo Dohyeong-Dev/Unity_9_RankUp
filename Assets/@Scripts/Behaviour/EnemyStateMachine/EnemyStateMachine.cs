@@ -83,4 +83,11 @@ public class EnemyStateMachine
     {
         return _currentState is T;
     }
+
+    public bool TryGetCurrentState<T>(out T enemyState) where T : BaseEnemyState
+    {
+        enemyState = _currentState as T;
+
+        return enemyState != null;
+    }
 }
