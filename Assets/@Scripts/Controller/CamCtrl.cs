@@ -336,7 +336,7 @@ public class CamCtrl : MonoBehaviour
         UpdateCameraTransform();
     }
     
-    public void ShakeCamera()
+    public void ShakeCamera(int factor = 1)
     {
         if (_isShake)
         {
@@ -348,7 +348,7 @@ public class CamCtrl : MonoBehaviour
         Vector3 randomOffset = Random.insideUnitSphere;
         randomOffset.z = 0f;
 
-        _shakeOffset = randomOffset * _shakeStrength;
+        _shakeOffset = randomOffset * _shakeStrength * factor;
 
         StartCoroutine(Co_ShakeCamera());
     }

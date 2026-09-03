@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,13 @@ public class GameHUD : BaseHUD
         SpText,
     }
 
-    public RectTransform HpSliderTransform => Get<Slider>(Sliders.HpSlider).GetComponent<RectTransform>();
+    private enum Images
+    {
+        SpSliderCover
+    }
+    
+    private Tween _spEmptyCoverTween;
+    private Color _spCoverDefaultColor;
 
     private PlayerCtrl _player;
 
@@ -24,6 +31,12 @@ public class GameHUD : BaseHUD
     {
         Bind<Slider>(typeof(Sliders));
         Bind<TMP_Text>(typeof(Texts));
+        Bind<Image>(typeof(Images));
+        
+        if (_spCoverDefaultColor == default(Color))
+        {
+            _spCoverDefaultColor = Get<Image>(Images.SpSliderCover).color;
+        }
     }
 
     protected override void OnStart()
@@ -52,6 +65,8 @@ public class GameHUD : BaseHUD
 
     private void OnDestroy()
     {
+        _spEmptyCoverTween?.Kill();
+        
         if (_player == null)
         {
             return;
@@ -89,5 +104,33 @@ public class GameHUD : BaseHUD
 
         spSlider.value = sliderValue;
         Get<TMP_Text>(Texts.SpText).text = (sliderValue * 100f).ToString("F0") + "%";
+
+        if (currentSp >= _player.SpRecoveryThreshold)
+        {
+            StopSpEmptyWarning();
+        }
+        else
+        {
+            PlaySpEmptyWarning();
+        }
+    }
+    
+    private void PlaySpEmptyWarning()
+    {
+        if (_spEmptyCoverTween != null && _spEmptyCoverTween.IsActive())
+        {
+            return;
+        }
+
+        _spEmptyCoverTween = Get<Image>(Images.SpSliderCover).DOColor(Color.red, 0.25f)
+            .SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+    }
+    
+    private void StopSpEmptyWarning()
+    {
+        _spEmptyCoverTween?.Kill();
+        _spEmptyCoverTween = null;
+
+        Get<Image>(Images.SpSliderCover).color = _spCoverDefaultColor;
     }
 }

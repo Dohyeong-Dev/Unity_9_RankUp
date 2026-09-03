@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
-  _comboTransitionProgress: 0.8
+  _comboTransitionProgress: 0.7
   _slashStartProgress: 0.535
   _slashPosition: {x: 0.4, y: 0.9, z: 0.8}
   _slashRotation: {x: 30, y: -80, z: 200}
@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c42c085eec1b40618fe8c1d916f6e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRangeProgress: 0.5
+  _attackRangeProgress: 0.4
   _comboTransitionProgress: 0.9
   _slashStartProgress: 0.35
   _slashPosition: {x: 0, y: 0.8, z: 1}
@@ -1445,7 +1445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c42c085eec1b40618fe8c1d916f6e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRangeProgress: 0.5
+  _attackRangeProgress: 0.4
   _comboTransitionProgress: 0.6
   _slashStartProgress: 0.398
   _slashPosition: {x: 0, y: 0.9, z: 0.45}

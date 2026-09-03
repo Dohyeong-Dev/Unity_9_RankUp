@@ -70,6 +70,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Vector3 velocity = Player.Rigid.velocity;
         Player.Rigid.velocity = Vector3.up * velocity.y;
 
+        Player.UnsetState(PlayerCtrl.PlayerState.Running);
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f, 0.01f, Time.fixedDeltaTime);
     }
 
@@ -183,6 +184,8 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     private void AdjustRunSpeed()
     {
+        Player.UnsetState(PlayerCtrl.PlayerState.Running);
+        
         _currentRunFactor = DefaultMoveFactor;
 
         if (!_canRunInCurrentState)
@@ -200,6 +203,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             return;
         }
 
+        Player.SetState(PlayerCtrl.PlayerState.Running);
         _currentRunFactor = _runFactor;
     }
 

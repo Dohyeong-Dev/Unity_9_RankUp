@@ -81,6 +81,11 @@ public class AlertPopup : BasePopup
 
     protected override void DestroyOverride()
     {
+        if (Managers.Input == null)
+        {
+            return;
+        }
+        
         Managers.Input.SetCursorLock(true);
         
         _yesAction = null;

@@ -3,7 +3,7 @@
 public class Billboard : MonoBehaviour
 {
     private Transform _camTr;
-    
+
     private void Start()
     {
         if (Managers.Scene.CurrentScene is GameScene gameScene)
@@ -14,9 +14,11 @@ public class Billboard : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_camTr)
+        if (_camTr == null)
         {
-            transform.forward = _camTr.transform.forward;
+            return;
         }
+
+        transform.rotation = Quaternion.LookRotation(_camTr.forward, _camTr.up);
     }
 }

@@ -54,6 +54,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Jumping = 1 << 2,
         Colliding = 1 << 3,
         Dead = 1 << 4,
+        Running = 1 << 5,
     }
 
     [Header("상태")]
@@ -64,6 +65,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     public bool IsGrounded => HasState(PlayerState.Grounded);
     public bool IsDashing => HasState(PlayerState.Dashing);
+    public bool IsRunning => HasState(PlayerState.Running);
     public bool IsJumping => HasState(PlayerState.Jumping);
     public bool IsColliding => HasState(PlayerState.Colliding);
     public bool IsDead => HasState(PlayerState.Dead);
@@ -109,7 +111,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
     [SerializeField] private float _spRecoveryThreshold = 10f;
-
+    public float SpRecoveryThreshold => _spRecoveryThreshold;
+    
     [Tooltip("초당 SP 회복량")]
     [SerializeField] private float _spRecoveryRate = 30f;
 
@@ -117,7 +120,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool CanUseStamina { get; private set; }
 
     public event Action<float, float> OnSpChanged;
-
+    public event Action<bool> OnCanUseStaminaChanged;
+    
 
     [Header("STR")]
     [SerializeField] private float _str = 10;
@@ -399,8 +403,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     public void SetSp(float value)
     {
-        float previousSp = _sp;
-
         _sp = Mathf.Clamp(_sp + value, 0f, _maxSp);
 
         if (_sp <= 0f)
@@ -411,11 +413,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         {
             CanUseStamina = true;
         }
-
-        if (!Mathf.Approximately(previousSp, _sp))
-        {
-            OnSpChanged?.Invoke(_sp, _maxSp);
-        }
+        
+        OnSpChanged?.Invoke(_sp, _maxSp);
     }
 
     private void RecoverSp()
@@ -425,12 +424,12 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        if (IsMoving || IsAttacking)
+        if (IsDashing || IsRunning || IsAttacking)
         {
             return;
         }
 
-        SetSp(_spRecoveryRate * Time.deltaTime);
+        SetSp(_spRecoveryRate * (IsMoving ? 0.5f : 1f) * Time.deltaTime);
     }
 
     #endregion ===== 스탯 =====
