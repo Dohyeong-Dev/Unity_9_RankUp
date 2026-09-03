@@ -865,7 +865,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - Progress: 0.036
+  - Progress: 0.03
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
+    Executed: 0
+  - Progress: 0.7
     SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &-29832039766167812
