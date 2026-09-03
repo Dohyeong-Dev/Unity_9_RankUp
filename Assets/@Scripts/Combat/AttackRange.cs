@@ -1,21 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackRange : MonoBehaviour
 {
-    [SerializeField] private Vector3 boxSize = Vector3.one;
-    [SerializeField] private Color color;
+    [SerializeField]
+    private Color _gizmoColor =
+        new(1f, 0f, 0f, 0.3f);
 
-    public Collider[] GetColliders(LayerMask layerMask)
+
+    /// <summary> 공격 범위 안의 Collider를 반환합니다. </summary>
+    public Collider[] GetColliders(LayerMask targetLayer)
     {
-        return Physics.OverlapBox(transform.position, boxSize * 0.5f, transform.rotation, layerMask);
+        Vector3 halfExtents = transform.lossyScale * 0.5f;
+
+        return Physics.OverlapBox(transform.position, halfExtents, transform.rotation, targetLayer,
+            QueryTriggerInteraction.Collide);
     }
+
 
     private void OnDrawGizmos()
     {
-        Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.color = color;
-        Gizmos.DrawCube(Vector3.zero, boxSize);
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        Gizmos.color = _gizmoColor;
+
+        Gizmos.DrawCube(Vector3.zero, transform.lossyScale);
+
+        Gizmos.matrix = Matrix4x4.identity;
     }
 }

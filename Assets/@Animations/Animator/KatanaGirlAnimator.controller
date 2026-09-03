@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
-  _comboTransitionProgress: 0.7
+  _comboTransitionProgress: 0.35
   _slashStartProgress: 0.535
   _slashPosition: {x: 0.4, y: 0.9, z: 0.8}
   _slashRotation: {x: 30, y: -80, z: 200}
@@ -865,7 +865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - Progress: 0
+  - Progress: 0.036
     SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &-29832039766167812
@@ -1095,7 +1095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - Progress: 0
+  - Progress: 0.036
     SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &1882366673202375149
@@ -1191,7 +1191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207c2078ea586487b8a1392b109c0426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementEnableDelay: 0.5
+  _movementEnableDelay: 0.1
 --- !u!1102 &2488756829527297743
 AnimatorState:
   serializedVersion: 6
@@ -1605,7 +1605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207c2078ea586487b8a1392b109c0426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementEnableDelay: 0.7
+  _movementEnableDelay: 0.1
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1

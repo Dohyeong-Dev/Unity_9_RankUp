@@ -47,7 +47,6 @@ public class MeleeAttackBehaviour : BaseAttackBehaviour
         
         _nextComboDirection = Vector3.zero;
         _hasNextComboDirection = false;
-        
         SetSheathing(false);
         SetSheathingCancelled(false);
 

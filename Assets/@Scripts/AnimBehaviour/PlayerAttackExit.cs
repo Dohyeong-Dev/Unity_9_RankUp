@@ -71,8 +71,6 @@ public class PlayerAttackExit : StateMachineBehaviour
             return;
         }
 
-        _meleeAttack.SetSheathing(false);
-
         _meleeAttack.Clear();
     }
 }
