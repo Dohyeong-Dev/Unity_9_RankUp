@@ -8,11 +8,9 @@ public class EnemyStateMachine
     private BaseEnemyState _currentState;
 
     private float _stateElapsedTime;
-    /// <summary> 현재 State에 머문 시간 </summary>
     public float StateElapsedTime => _stateElapsedTime;
 
-    
-    /// <summary> 현재 State를 업데이트합니다. </summary>
+
     public void UpdateCurrentState(float deltaTime)
     {
         if (_currentState == null)
@@ -25,7 +23,6 @@ public class EnemyStateMachine
         _currentState.Update(deltaTime);
     }
 
-    /// <summary> State를 등록합니다. </summary>
     public void RegisterState(BaseEnemyState state)
     {
         if (state == null)
@@ -44,7 +41,6 @@ public class EnemyStateMachine
         _stateMap.Add(stateType, state);
     }
 
-    /// <summary> 지정한 State로 전환합니다. </summary>
     public void ChangeState<T>() where T : BaseEnemyState
     {
         Type stateType = typeof(T);
@@ -67,7 +63,24 @@ public class EnemyStateMachine
         _stateElapsedTime = 0f;
 
         _currentState.Enter();
-        
-        CPrint.Success(_currentState.GetType().Name + "전환");
+    }
+
+    public void RestartCurrentState()
+    {
+        if (_currentState == null)
+        {
+            return;
+        }
+
+        _currentState.Exit();
+
+        _stateElapsedTime = 0f;
+
+        _currentState.Enter();
+    }
+
+    public bool IsCurrentState<T>() where T : BaseEnemyState
+    {
+        return _currentState is T;
     }
 }
