@@ -6,9 +6,6 @@ public class ForceField : MonoBehaviour
     [SerializeField] private Material _redMaterial;
     [SerializeField] private Material _blueMaterial;
 
-    [Header("스폰")]
-    [SerializeField] private Spawner _spawner;
-
     [Header("가이드")]
     [SerializeField] private ParticleSystem _arrow;
     
@@ -16,6 +13,8 @@ public class ForceField : MonoBehaviour
 
     private Renderer _renderer;
 
+    private Spawner _spawner;
+    
     private int _phase;
     
     private bool _isStarted;
@@ -35,8 +34,9 @@ public class ForceField : MonoBehaviour
         _phase = transform.GetSiblingIndex();
         Managers.Event.OnPhaseUpdated += HandlePhaseUpdated;
         
-        if (_spawner != null)
+        if (_spawner == null)
         {
+            _spawner = GetComponentInChildren<Spawner>();
             _spawner.OnAllEnemiesDefeated += HandleAllEnemiesDefeated;
         }
     }
@@ -90,7 +90,15 @@ public class ForceField : MonoBehaviour
             return;
         }
 
-        popup.Set("시련을 극복하시겠습니까?", true, StartChallenge);
+        if (_phase == 0)
+        {
+            popup.Set("시련을 극복하시겠습니까?", true, StartChallenge);
+        }
+        else // TODO 보스까지 완성
+        {
+            popup.Set("준비 중 입니다.");
+        }
+        
     }
 
     /// <summary> AlertPopup에서 Yes를 눌렀을 때 실행 </summary>
@@ -113,7 +121,6 @@ public class ForceField : MonoBehaviour
         if (_spawner == null)
         {
             CPrint.Error("Spawner no found!");
-            Managers.UI.OpenPopup<AlertPopup>().Set("준비 중입니다.");
             
             return;
         }

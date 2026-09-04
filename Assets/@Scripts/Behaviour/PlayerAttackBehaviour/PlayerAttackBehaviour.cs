@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(PlayerCtrl))]
 public abstract class PlayerAttackBehaviour : MonoBehaviour
@@ -18,6 +20,13 @@ public abstract class PlayerAttackBehaviour : MonoBehaviour
         Player = GetComponent<PlayerCtrl>();
     }
 
+    private void FixedUpdate()
+    {
+        OnFixedUpdate();
+    }
+
+    protected abstract void OnFixedUpdate();
+    
     private void Update()
     {
         if (!Managers.Input.CanReceiveInput)

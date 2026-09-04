@@ -255,7 +255,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public void PlayHitEffect(Transform attacker)
     {
         Transform hitEffect = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect).transform;
-        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(1f);
+        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(0.5f);
         
         // 공격자 방향 계산
         Vector3 direction = (attacker.position - transform.position).normalized;
@@ -504,7 +504,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        if (IsDashing || IsRunning || IsAttacking)
+        if (IsDashing || IsRunning || IsAttacking || IsDead)
         {
             return;
         }
