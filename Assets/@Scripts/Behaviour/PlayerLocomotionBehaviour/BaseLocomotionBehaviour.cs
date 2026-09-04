@@ -3,14 +3,15 @@
 [RequireComponent(typeof(PlayerCtrl))]
 public abstract class BaseLocomotionBehaviour : MonoBehaviour
 {
+    protected PlayerCtrl Player;
+    
     // 1초에 소비되는 SP
     [SerializeField] private float _requiredSpRate;
     public float RequiredSpRate => _requiredSpRate;
-
-    protected PlayerCtrl Player;
-
+    
     public int BehaviourHash { get; private set; }
 
+    
     private void Awake()
     {
         Player = GetComponent<PlayerCtrl>();

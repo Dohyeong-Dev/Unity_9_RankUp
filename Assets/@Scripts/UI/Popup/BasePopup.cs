@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -7,6 +8,7 @@ public abstract class BasePopup : BaseUI
 {
     protected bool IsClosing;
 
+    private Action _closeAction;
 
     public enum AnimationType
     {
@@ -198,7 +200,7 @@ public abstract class BasePopup : BaseUI
         }
     }
 
-    public virtual void Close()
+    public virtual void Close(Action closeAction = null)
     {
         if (IsClosing)
         {
@@ -206,6 +208,8 @@ public abstract class BasePopup : BaseUI
         }
 
         IsClosing = true;
+
+        _closeAction = closeAction;
 
         PlayAnimation(false);
     }
@@ -216,7 +220,12 @@ public abstract class BasePopup : BaseUI
 
     private void CloseImmediately()
     {
+        Action closeAction = _closeAction;
+        _closeAction = null;
+
         Managers.UI.ClosePopupUI(this);
+
+        closeAction?.Invoke();
     }
 
     protected virtual void OnDestroy()

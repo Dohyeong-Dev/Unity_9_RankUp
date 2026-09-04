@@ -1,6 +1,6 @@
 public class HitState : BaseEnemyState
 {
-    private const float HitRecoveryDelay = 1f;
+    private const float HitRecoveryTime = 1f;
     
     private bool _isAnimationFinished;
 
@@ -19,7 +19,7 @@ public class HitState : BaseEnemyState
 
     public override void Update(float deltaTime)
     {
-        if (StateMachine.StateElapsedTime < HitRecoveryDelay)
+        if (StateMachine.StateElapsedTime < HitRecoveryTime)
         {
             return;
         }

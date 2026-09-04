@@ -38,8 +38,10 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     public float RunSpeedVariance => _runSpeedVariance;
     [SerializeField] private float _rotationSpeed = 360f;
     public float RotationSpeed => _rotationSpeed;
-    [SerializeField] private float _chaseStoppingDistance = 2f;
-    public float ChaseStoppingDistance => _chaseStoppingDistance;
+    [SerializeField] private float _defaultChaseStoppingDistance = 1f;
+    public float ChaseStoppingDistance => CurrentAttackBehaviour == null
+        ? _defaultChaseStoppingDistance
+        : CurrentAttackBehaviour.AttackableDistance;
 
     [Header("넉백")]
     [SerializeField] private float _knockbackDistance = 1f;
@@ -87,28 +89,47 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
                 return _combatTarget;
             }
 
-            return _fieldOfView != null ? _fieldOfView.CurrentTarget : null;
+            if (_fieldOfView != null)
+            {
+                return _fieldOfView.CurrentTarget;
+            }
+
+            return null;
         }
     }
 
     #endregion ===== 타겟 =====
 
 
-    #region ===== 상태 머신 =====
+    #region ===== 행동 =====
 
     private readonly EnemyStateMachine _stateMachine = new();
 
-    public enum EnemyState
+    private readonly List<EnemyAttackBehaviour> _attacks = new();
+    public EnemyAttackBehaviour CurrentAttackBehaviour { get; private set; }
+
+    public event Action OnAttackFinished;
+    public event Action<EnemyCtrl> OnDead;
+
+    public bool IsDead { get; private set; }
+    public bool IsAttackableDistance
     {
-        None = 0,
-        Dead = 1 << 0,
+        get
+        {
+            if (Target == null || CurrentAttackBehaviour == null)
+            {
+                return false;
+            }
+
+            float sqrDistance = (Target.position - transform.position).sqrMagnitude;
+            float sqrAttackDistance =
+                CurrentAttackBehaviour.AttackableDistance * CurrentAttackBehaviour.AttackableDistance;
+
+            return sqrDistance <= sqrAttackDistance;
+        }
     }
 
-    private EnemyState _state;
-
-    public bool IsDead => HasState(EnemyState.Dead);
-
-    #endregion ===== 상태 머신 =====
+    #endregion ===== 행동 =====
 
 
     #region ===== 스탯 =====
@@ -121,6 +142,11 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     public float HP => _hp;
 
     public event Action<float, float> OnHpChanged;
+
+
+    [Header("STR")]
+    [SerializeField] private float _str = 10;
+    public float STR => _str;
 
     #endregion ===== 스탯 =====
 
@@ -157,6 +183,23 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         UpdateCombatTarget();
 
         _stateMachine.UpdateCurrentState(Time.deltaTime);
+        UpdateCurrentAttackBehaviour();
+    }
+
+    private void OnEnable()
+    {
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPlayerDead += HandlePlayerDead;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPlayerDead -= HandlePlayerDead;
+        }
     }
 
     private void OnDestroy()
@@ -165,12 +208,30 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _knockbackTween?.Kill();
     }
 
+    private void HandlePlayerDead()
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        _combatTarget = null;
+        _combatTargetTimer = 0f;
+
+        _fieldOfView.ClearTarget();
+
+        StopMovement();
+
+        _stateMachine.ChangeState<ReturnState>();
+    }
+
     private void InitializeStateMachine()
     {
         _stateMachine.RegisterState(new IdleState(_stateMachine, this));
         _stateMachine.RegisterState(new ChaseState(_stateMachine, this));
         _stateMachine.RegisterState(new ReturnState(_stateMachine, this));
         _stateMachine.RegisterState(new HitState(_stateMachine, this));
+        _stateMachine.RegisterState(new AttackState(_stateMachine, this));
     }
 
     public void ResetEnemy()
@@ -181,12 +242,11 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _knockbackTween?.Kill();
         _knockbackTween = null;
 
-        _state = EnemyState.None;
-
         _combatTarget = null;
         _combatTargetTimer = 0f;
 
         _hp = _maxHp;
+        IsDead = false;
 
         _collider.enabled = true;
 
@@ -292,8 +352,8 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             Managers.Pool.Return(poolObj);
         }
     }
-    
-    
+
+
     #region ===== 타겟 =====
 
     /// <summary> 전투 타겟이 설정된 거리 안에 있으면 설정된 전투 타겟 유지 시간으로 초기화시킵니다. </summary>
@@ -418,6 +478,56 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     #endregion ===== 이동/내브매쉬 =====
 
+    #region ===== 공격 =====
+
+    public void RaiseAttackFinished()
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        OnAttackFinished?.Invoke();
+    }
+
+    public void AddAttackBehaviour(EnemyAttackBehaviour attackBehaviour)
+    {
+        if (!_attacks.Contains(attackBehaviour))
+        {
+            _attacks.Add(attackBehaviour);
+        }
+    }
+
+    private void UpdateCurrentAttackBehaviour()
+    {
+        if (_attacks.Count == 0)
+        {
+            return;
+        }
+
+        if (CurrentAttackBehaviour == null || !CurrentAttackBehaviour.IsAvailable)
+        {
+            EnemyAttackBehaviour attackBehaviour = _attacks[UnityEngine.Random.Range(0, _attacks.Count)];
+
+            if (attackBehaviour.IsAvailable)
+            {
+                CurrentAttackBehaviour = attackBehaviour;
+            }
+        }
+    }
+
+    public void ExecuteAttack()
+    {
+        if (CurrentAttackBehaviour == null || Target == null)
+        {
+            return;
+        }
+
+        CurrentAttackBehaviour.ExecuteAttack();
+        CurrentAttackBehaviour = null;
+    }
+
+    #endregion ===== 공격 =====
 
     #region ===== 데미지/죽음 =====
 
@@ -433,7 +543,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         SetHp(-damage);
 
         PlayHitEffect();
-        
+
         if (IsDead)
         {
             return;
@@ -471,7 +581,8 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        SetState(EnemyState.Dead);
+        IsDead = true;
+        OnDead?.Invoke(this);
 
         _knockbackTween?.Kill();
         _knockbackTween = null;
@@ -597,26 +708,6 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 넉백 =====
-
-    
-    #region ===== 상태 =====
-
-    public void SetState(EnemyState state)
-    {
-        _state |= state;
-    }
-
-    public void UnsetState(EnemyState state)
-    {
-        _state &= ~state;
-    }
-
-    private bool HasState(EnemyState state)
-    {
-        return (_state & state) != 0;
-    }
-
-    #endregion ===== 상태 =====
 
 
     #region ===== 디졸브 =====

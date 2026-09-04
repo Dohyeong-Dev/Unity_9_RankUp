@@ -3,10 +3,10 @@ using UnityEngine;
 public class PlayerAttackExit : StateMachineBehaviour
 {
     private PlayerCtrl _player;
-    private MeleeAttackBehaviour _meleeAttack;
+    private PlayerMeleeAttack _meleeAttack;
 
     // State 진입 후 실제 경과 시간
-    private float _stateTimer;
+    private float _elapsedTime;
 
     [Header("칼집 모션 중 행동")]
     [Tooltip("칼집 모션 시작 후 이 시간이 지나야 이동 가능"), Min(0f)]
@@ -20,7 +20,7 @@ public class PlayerAttackExit : StateMachineBehaviour
             _player = animator.GetComponent<PlayerCtrl>();
         }
         
-        _stateTimer = 0f;
+        _elapsedTime = 0f;
 
         if (_meleeAttack == null && !animator.TryGetComponent(out _meleeAttack))
         {
@@ -49,10 +49,10 @@ public class PlayerAttackExit : StateMachineBehaviour
             return;
         }
 
-        _stateTimer += Time.deltaTime;
+        _elapsedTime += Time.deltaTime;
 
         // 이동 가능 시간이 아직 지나지 않았다면 대기
-        if (_stateTimer < _movementEnableDelay)
+        if (_elapsedTime < _movementEnableDelay)
         {
             return;
         }

@@ -7,12 +7,16 @@ public class EnemyHpUI : MonoBehaviour
     private Image _hpImage;
 
     [Header("위치")]
-    [SerializeField] private float _heightOffset = 2.5f;
+    [SerializeField] private float _heightOffset = 0.5f;
 
+    [SerializeField] private float _minFillAmount = 0.05f;
+    
     private void Awake()
     {
         _enemy = gameObject.FindParent<EnemyCtrl>();
         _hpImage = gameObject.FindChild<Image>("HpFill", true);
+        
+        transform.position = _enemy.transform.position + Vector3.up * _heightOffset;
     }
 
     private void OnEnable()
@@ -25,16 +29,6 @@ public class EnemyHpUI : MonoBehaviour
         _enemy.OnHpChanged += UpdateHp;
     }
 
-    private void LateUpdate()
-    {
-        if (_enemy == null)
-        {
-            return;
-        }
-
-        transform.position = _enemy.transform.position + Vector3.up * _heightOffset;
-    }
-
     public void UpdateHp(float currentHp, float maxHp)
     {
         if (_hpImage == null)
@@ -42,7 +36,9 @@ public class EnemyHpUI : MonoBehaviour
             return;
         }
 
-        _hpImage.fillAmount = currentHp / maxHp;
+        float ratio = currentHp / maxHp;
+        float fillAmount = ratio <= 0f ? 0f : Mathf.Max(ratio, _minFillAmount);
+        _hpImage.fillAmount = fillAmount;
 
         if (_hpImage.fillAmount <= 0f)
         {

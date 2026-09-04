@@ -4,6 +4,7 @@ using UnityEngine;
 public class UIManager
 {
     // 현재 씬에 존재하는 UI
+
     #region ===== CurrentSceneUI =====
 
     public BaseHUD CurrentHUD { get; private set; }
@@ -11,23 +12,23 @@ public class UIManager
     public BasePopup CurrentPopup => _popupStack.Count > 0 ? _popupStack.Peek() : null;
 
     #endregion ===== CurrentSceneUI =====
-    
-    
+
+
     #region ===== PopupUI =====
 
     private readonly Stack<BasePopup> _popupStack = new();
     private int _nextPopupSortingOrder = 2;
-    
+
     #endregion ===== PopupUI =====
 
-    
+
     #region ===== Overlay =====
-    
+
     private HitEffectUI _hitEffectUI;
-    
+
     #endregion -----Overlay =====
-    
-    
+
+
     #region ===== LoadingUI =====
 
     private GameObject _loadingObject;
@@ -35,9 +36,9 @@ public class UIManager
 
     #endregion ===== LoadingUI =====
 
-    
+
     #region ===== Root =====
-    
+
     private GameObject _root;
 
     public GameObject Root
@@ -52,7 +53,7 @@ public class UIManager
             return _root;
         }
     }
-    
+
     private GameObject _persistentRoot;
     private GameObject PersistentRoot
     {
@@ -67,10 +68,10 @@ public class UIManager
             return _persistentRoot;
         }
     }
-    
+
     #endregion ===== Root =====
 
-    
+
     public void OnUpdate()
     {
         if (IsLoading)
@@ -107,19 +108,19 @@ public class UIManager
         {
             CurrentHUD = baseHUD;
         }
-        
+
         if (baseUI is BasePopup)
         {
             canvas.sortingOrder = _nextPopupSortingOrder++;
         }
         else
         {
-            canvas.sortingOrder = baseUI.SortingOrder;    
+            canvas.sortingOrder = baseUI.SortingOrder;
         }
     }
 
     #region Screen
-    
+
     /// <summary> Screen UI 열기 </summary>
     public T OpenScreen<T>() where T : BaseScreen
     {
@@ -150,11 +151,11 @@ public class UIManager
 
         return screen;
     }
-    
+
     #endregion
-    
+
     #region Popup
-    
+
     /// <summary> Popup UI 열기 </summary>
     public T OpenPopup<T>() where T : BasePopup
     {
@@ -175,10 +176,13 @@ public class UIManager
         {
             uiObject.transform.SetParent(Root.transform, worldPositionStays: false);
         }
+
         uiObject.transform.localScale = Vector3.one;
 
         T popup = uiObject.GetOrAddComponent<T>();
         _popupStack.Push(popup);
+        
+        Managers.Input.SetCursorLock(false);
 
         return popup;
     }
@@ -198,6 +202,13 @@ public class UIManager
         }
 
         _nextPopupSortingOrder--;
+
+        // 모든 팝업이 닫혔을 때만 커서를 다시 잠금
+
+        if (_popupStack.Count == 0)
+        {
+            Managers.Input.SetCursorLock(true);
+        }
     }
 
     /// <summary> 지정된 Popup이 가장 최근 Popup일 경우 닫기 </summary>
@@ -216,7 +227,7 @@ public class UIManager
 
         ClosePopupUI();
     }
-    
+
     /// <summary> 모든 Popup 닫기 </summary>
     public void CloseAllPopupUI()
     {
@@ -225,11 +236,11 @@ public class UIManager
             ClosePopupUI();
         }
     }
-    
+
     #endregion
-    
+
     #region Overlay
-    
+
     public void OpenHitEffect()
     {
         if (_hitEffectUI == null)
@@ -245,9 +256,9 @@ public class UIManager
 
         _hitEffectUI.Play();
     }
-    
+
     #endregion
-    
+
     #region Clear
 
     /// <summary> 현재 Screen과 모든 Popup 닫기 </summary>
@@ -261,7 +272,7 @@ public class UIManager
             CurrentScreen = null;
         }
     }
-    
+
     public void Clear()
     {
         CloseAll();
@@ -271,9 +282,9 @@ public class UIManager
     }
 
     #endregion
-    
+
     #region LoadingUI
-    
+
     /// <summary> Loading UI 열기 </summary>
     public void OpenLoadingUI(float fadeTime = 0f, System.Action openAction = null)
     {
@@ -322,9 +333,9 @@ public class UIManager
             _loadingObject = null;
             return;
         }
-        
+
         loadingUI.FadeOut(fadeTime, closeAction);
     }
-    
+
     #endregion
 }

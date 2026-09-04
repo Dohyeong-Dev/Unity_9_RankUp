@@ -3,8 +3,7 @@ using UnityEngine;
 public class AttackRange : MonoBehaviour
 {
     [SerializeField]
-    private Color _gizmoColor =
-        new(1f, 0f, 0f, 0.3f);
+    private Color _gizmoColor = new(1f, 0f, 0f, 0.3f);
 
 
     /// <summary> 공격 범위 안의 Collider를 반환합니다. </summary>
@@ -15,7 +14,6 @@ public class AttackRange : MonoBehaviour
         return Physics.OverlapBox(transform.position, halfExtents, transform.rotation, targetLayer,
             QueryTriggerInteraction.Collide);
     }
-
 
     private void OnDrawGizmos()
     {

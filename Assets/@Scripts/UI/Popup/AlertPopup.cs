@@ -30,7 +30,6 @@ public class AlertPopup : BasePopup
 
     protected override void OnStart()
     {
-        Managers.Input.SetCursorLock(false);
     }
 
     protected override void OnUpdate()
@@ -69,9 +68,10 @@ public class AlertPopup : BasePopup
 
     private void OnClickYes()
     {
-        _yesAction?.Invoke();
-
-        Close();
+        Close(() =>
+        {
+            _yesAction?.Invoke();
+        });
     }
 
     private void OnClickNo()
@@ -85,8 +85,6 @@ public class AlertPopup : BasePopup
         {
             return;
         }
-        
-        Managers.Input.SetCursorLock(true);
         
         _yesAction = null;
         

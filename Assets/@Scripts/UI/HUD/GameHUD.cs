@@ -19,10 +19,13 @@ public class GameHUD : BaseHUD
 
     private enum Images
     {
+        HpSliderCover,
         SpSliderCover
     }
     
+    private Tween _hpEmptyCoverTween;
     private Tween _spEmptyCoverTween;
+    private Color _hpCoverDefaultColor;
     private Color _spCoverDefaultColor;
 
     private PlayerCtrl _player;
@@ -33,7 +36,12 @@ public class GameHUD : BaseHUD
         Bind<TMP_Text>(typeof(Texts));
         Bind<Image>(typeof(Images));
         
-        if (_spCoverDefaultColor == default(Color))
+        if (_hpCoverDefaultColor == default)
+        {
+            _hpCoverDefaultColor = Get<Image>(Images.HpSliderCover).color;
+        }
+        
+        if (_spCoverDefaultColor == default)
         {
             _spCoverDefaultColor = Get<Image>(Images.SpSliderCover).color;
         }
@@ -65,6 +73,7 @@ public class GameHUD : BaseHUD
 
     private void OnDestroy()
     {
+        _hpEmptyCoverTween?.Kill();
         _spEmptyCoverTween?.Kill();
         
         if (_player == null)
@@ -89,8 +98,36 @@ public class GameHUD : BaseHUD
 
         hpSlider.value = sliderValue;
         Get<TMP_Text>(Texts.HpText).text = (sliderValue * 100f).ToString("F0") + "%";
+        
+        if (sliderValue <= 0.1f)
+        {
+            PlayHpEmptyWarning();
+        }
+        else
+        {
+            StopHpEmptyWarning();
+        }
     }
 
+    private void PlayHpEmptyWarning()
+    {
+        if (_hpEmptyCoverTween != null && _hpEmptyCoverTween.IsActive())
+        {
+            return;
+        }
+
+        _hpEmptyCoverTween = Get<Image>(Images.HpSliderCover).DOColor(Color.red, 0.25f)
+            .SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+    }
+    
+    private void StopHpEmptyWarning()
+    {
+        _hpEmptyCoverTween?.Kill();
+        _hpEmptyCoverTween = null;
+
+        Get<Image>(Images.HpSliderCover).color = _hpCoverDefaultColor;
+    }
+    
     private void UpdateSpSlider(float currentSp, float maxSp)
     {
         Slider spSlider = Get<Slider>(Sliders.SpSlider);

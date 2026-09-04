@@ -27,7 +27,7 @@ public class FieldOfView : MonoBehaviour
     [SerializeField]
     private LayerMask _obstacleLayer;
 
-    #endregion ===== 감지 세팅 =====
+    #endregion
 
 
     #region ===== 감지 결과 =====
@@ -37,7 +37,7 @@ public class FieldOfView : MonoBehaviour
     private Transform _currentTarget;
     public Transform CurrentTarget => _currentTarget;
 
-    #endregion ===== 감지 결과 =====
+    #endregion
 
 
     private void Start()
@@ -68,14 +68,24 @@ public class FieldOfView : MonoBehaviour
 
         float halfFieldOfViewAngle = _fieldOfViewAngle * 0.5f;
 
-        // 시야 범위에 포함되기 위한 최소 Dot 값
         float minimumViewDot = Mathf.Cos(halfFieldOfViewAngle * Mathf.Deg2Rad);
 
         float closestDistance = float.MaxValue;
 
         for (int i = 0; i < detectedColliders.Length; i++)
         {
-            Transform targetTransform = detectedColliders[i].transform;
+            Collider targetCollider = detectedColliders[i];
+
+            // 죽은 플레이어는 감지 대상에서 제외
+            if (targetCollider.TryGetComponent(out IDamageable actor))
+            {
+                if (actor.IsDead)
+                {
+                    continue;
+                }
+            }
+
+            Transform targetTransform = targetCollider.transform;
 
             Vector3 directionToTarget = targetTransform.position - transform.position;
 
@@ -108,6 +118,7 @@ public class FieldOfView : MonoBehaviour
 
             // 3. 감지된 타겟 등록
             _visibleTargets.Add(targetTransform);
+
             // 가장 가까운 타겟을 현재 타겟으로 설정
             if (distanceToTarget < closestDistance)
             {
@@ -116,6 +127,14 @@ public class FieldOfView : MonoBehaviour
             }
         }
     }
+
+    /// <summary> 현재 감지 중인 타겟을 즉시 제거한다. </summary>
+    public void ClearTarget()
+    {
+        _currentTarget = null;
+        _visibleTargets.Clear();
+    }
+
     
     #region -----Gizmos-----
 
@@ -128,7 +147,6 @@ public class FieldOfView : MonoBehaviour
         DrawVisibleTargets(origin);
     }
 
-    /// <summary> 감지 범위를 그린다. </summary>
     private void DrawDetectionRadius(Vector3 origin)
     {
         Gizmos.color = Color.blue;
@@ -136,19 +154,16 @@ public class FieldOfView : MonoBehaviour
         Gizmos.DrawWireSphere(origin, _detectionRadius);
     }
 
-    /// <summary> 시야각 경계선을 그린다. </summary>
     private void DrawFieldOfView(Vector3 origin)
     {
         Vector3 leftBoundaryDirection = GetDirectionFromAngle(-_fieldOfViewAngle * 0.5f);
         Vector3 rightBoundaryDirection = GetDirectionFromAngle(_fieldOfViewAngle * 0.5f);
 
         Gizmos.color = Color.green;
-
         Gizmos.DrawLine(origin, origin + leftBoundaryDirection * _detectionRadius);
         Gizmos.DrawLine(origin, origin + rightBoundaryDirection * _detectionRadius);
     }
 
-    /// <summary> 현재 감지된 타겟을 표시한다. </summary>
     private void DrawVisibleTargets(Vector3 origin)
     {
         Gizmos.color = Color.red;
@@ -164,7 +179,6 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
-    /// <summary> 현재 Transform의 Y축 회전을 기준으로 지정한 각도의 방향 벡터를 반환한다. </summary>
     private Vector3 GetDirectionFromAngle(float angle)
     {
         float worldAngle = angle + transform.eulerAngles.y;
@@ -173,5 +187,5 @@ public class FieldOfView : MonoBehaviour
         return new Vector3(Mathf.Sin(angleInRadians), 0f, Mathf.Cos(angleInRadians));
     }
 
-    #endregion ------Gizmos-----
+    #endregion
 }

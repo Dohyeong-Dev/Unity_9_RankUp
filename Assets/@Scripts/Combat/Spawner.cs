@@ -1,10 +1,20 @@
+using System;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    /// <summary> 모든 자식 위치에 적을 생성 </summary>
+    private int _spawnedEnemyCount;
+    private int _defeatedEnemyCount;
+
+    public event Action OnAllEnemiesDefeated;
+
+    
+    /// <summary> 모든 자식 위치에 적을 생성합니다. </summary>
     public void SpawnEnemies()
     {
+        _spawnedEnemyCount = 0;
+        _defeatedEnemyCount = 0;
+
         for (int i = 0; i < transform.childCount; i++)
         {
             Transform spawnPoint = transform.GetChild(i);
@@ -13,12 +23,15 @@ public class Spawner : MonoBehaviour
             {
                 continue;
             }
-            
+
             SpawnEnemy(spawnPoint);
         }
+
+        CheckAllEnemiesDefeated();
     }
 
-    /// <summary> 지정된 위치에 적 생성 </summary>
+    
+    /// <summary> 지정된 위치에 적을 생성합니다. </summary>
     private void SpawnEnemy(Transform spawnPoint)
     {
         PoolObj enemyObj = Managers.Pool.Get(PoolKey.Path.EnemyMelee);
@@ -29,9 +42,41 @@ public class Spawner : MonoBehaviour
             return;
         }
 
-        if (enemyObj.TryGetComponent(out EnemyCtrl enemy))
+        if (!enemyObj.TryGetComponent(out EnemyCtrl enemy))
         {
-            enemy.Spawn(spawnPoint);
+            return;
         }
+
+        _spawnedEnemyCount++;
+
+        enemy.OnDead += HandleEnemyDead;
+
+        enemy.Spawn(spawnPoint);
+    }
+
+    
+    private void HandleEnemyDead(EnemyCtrl enemy)
+    {
+        enemy.OnDead -= HandleEnemyDead;
+
+        _defeatedEnemyCount++;
+
+        CheckAllEnemiesDefeated();
+    }
+
+    
+    private void CheckAllEnemiesDefeated()
+    {
+        if (_spawnedEnemyCount == 0)
+        {
+            return;
+        }
+
+        if (_defeatedEnemyCount < _spawnedEnemyCount)
+        {
+            return;
+        }
+
+        OnAllEnemiesDefeated?.Invoke();
     }
 }

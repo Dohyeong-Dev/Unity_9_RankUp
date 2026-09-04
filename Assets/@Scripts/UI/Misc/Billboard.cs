@@ -19,6 +19,6 @@ public class Billboard : MonoBehaviour
             return;
         }
 
-        transform.rotation = Quaternion.LookRotation(_camTr.forward, _camTr.up);
+        transform.rotation = _camTr.rotation;
     }
 }

@@ -52,7 +52,7 @@ public abstract class BaseScene : MonoBehaviour
             return;
         }
 
-        GameObject eventSystemObject = Managers.Resource.Spawn(ResourceKey.Path.Etc + ResourceKey.Name.Event);
+        GameObject eventSystemObject = Managers.Resource.Spawn(ResourceKey.Path.Misc + ResourceKey.Name.Event);
         if (eventSystemObject == null)
         {
             CPrint.Error("EventSystem을 생성하지 못했습니다.");

@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+using Random = System.Random;
 
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
@@ -20,6 +23,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public Rigidbody Rigid => _rigid;
 
     private CapsuleCollider _capsuleCollider;
+
+    private int _reactionLayerIndex;
 
 
     #region =====트랜스폼=====
@@ -55,6 +60,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         Colliding = 1 << 3,
         Dead = 1 << 4,
         Running = 1 << 5,
+        Hit = 1 << 6,
     }
 
     [Header("상태")]
@@ -69,8 +75,16 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool IsJumping => HasState(PlayerState.Jumping);
     public bool IsColliding => HasState(PlayerState.Colliding);
     public bool IsDead => HasState(PlayerState.Dead);
+    public bool IsHit => HasState(PlayerState.Hit);
 
     public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecSqrMagnitude > Mathf.Epsilon;
+
+
+    [Header("피격")]
+    [SerializeField] private float _hitInvincibleDuration = 0.5f;
+    private float _hitInvincibleTimer;
+
+    public bool IsHitInvincible => _hitInvincibleTimer > 0f;
 
     #endregion ===== 상태 =====
 
@@ -79,13 +93,13 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private readonly List<BaseLocomotionBehaviour> _locomotions = new();
 
-    private int _defaultLocomotionBehaviourHash;
-    private int _currentLocomotionBehaviourHash;
+    private int _defaultLocomotionHash;
+    private int _currentLocomotionHash;
 
-    public bool IsDefaultBehaviour => _currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash;
+    public bool IsDefaultBehaviour => _currentLocomotionHash == _defaultLocomotionHash;
 
-    private BaseAttackBehaviour _curAttack;
-    public bool IsAttacking => _curAttack != null;
+    private PlayerAttackBehaviour _currentAttack;
+    public bool IsAttacking => _currentAttack != null;
 
     #endregion ===== 행동 =====
 
@@ -112,7 +126,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
     [SerializeField] private float _spRecoveryThreshold = 10f;
     public float SpRecoveryThreshold => _spRecoveryThreshold;
-    
+
     [Tooltip("초당 SP 회복량")]
     [SerializeField] private float _spRecoveryRate = 30f;
 
@@ -120,8 +134,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool CanUseStamina { get; private set; }
 
     public event Action<float, float> OnSpChanged;
-    public event Action<bool> OnCanUseStaminaChanged;
-    
+
 
     [Header("STR")]
     [SerializeField] private float _str = 10;
@@ -133,6 +146,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private void Awake()
     {
         _animator = GetComponent<Animator>();
+        _reactionLayerIndex = _animator.GetLayerIndex(AnimatorKey.Layer.Reaction);
+
         _rigid = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -141,6 +156,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        UpdateHitInvincibility();
+
         // 지형체크
         bool isGrounded = CheckGroundStatus();
         bool isFalling = !isGrounded && Rigid.velocity.y <= -_fallAnimationMinSpeed;
@@ -164,7 +181,17 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         CanUseStamina = true;
     }
-    
+
+    private void UpdateHitInvincibility()
+    {
+        if (_hitInvincibleTimer <= 0f)
+        {
+            return;
+        }
+
+        _hitInvincibleTimer -= Time.deltaTime;
+    }
+
     private bool CheckGroundStatus()
     {
         float radius = _capsuleCollider.bounds.extents.x * 0.5f;
@@ -217,29 +244,42 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             _rigid.rotation = target.rotation;
             _rigid.velocity = Vector3.zero;
             _rigid.angularVelocity = Vector3.zero;
-            
+
             transform.position = target.position;
             transform.rotation = target.rotation;
-            
+
             _cam.ResetRotationToTarget(6f);
 
             completionAction?.Invoke();
-            
+
             Managers.UI.CloseLoadingUI(0.3f);
         });
     }
 
+    public void PlayHitEffect(Transform attacker)
+    {
+        Transform hitEffect = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect).transform;
+        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(1f);
+        
+        // 공격자 방향 계산
+        Vector3 direction = (attacker.position - transform.position).normalized;
+        // 플레이어 위치에서 공격자 방향으로 아주 조금 이동
+        hitEffect.transform.position = transform.position + 
+                                       Vector3.up * 1.2f + direction * 0.1f;
+        hitEffect.transform.LookAt(attacker);
+    }
+
     
-    #region ===== 로코모션 =====
+    #region ===== 로코모션(행동) =====
 
     private void FixedUpdateLocomotions()
     {
-        if (IsDead)
+        if (IsDead || IsHit)
         {
             return;
         }
 
-        if (_curAttack == null)
+        if (_currentAttack == null)
         {
             for (int i = 0; i < _locomotions.Count; i++)
             {
@@ -264,23 +304,23 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     public void SetDefLocomotionBehaviour(int locomotionBehaviourHash)
     {
-        _defaultLocomotionBehaviourHash = locomotionBehaviourHash;
-        _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+        _defaultLocomotionHash = locomotionBehaviourHash;
+        _currentLocomotionHash = locomotionBehaviourHash;
     }
 
     public void SetCurLocomotionBehaviour(int locomotionBehaviourHash)
     {
-        if (_currentLocomotionBehaviourHash == _defaultLocomotionBehaviourHash)
+        if (_currentLocomotionHash == _defaultLocomotionHash)
         {
-            _currentLocomotionBehaviourHash = locomotionBehaviourHash;
+            _currentLocomotionHash = locomotionBehaviourHash;
         }
     }
 
     public void UnsetCurLocomotionBehaviour(int locomotionBehaviourHash)
     {
-        if (_currentLocomotionBehaviourHash == locomotionBehaviourHash)
+        if (_currentLocomotionHash == locomotionBehaviourHash)
         {
-            _currentLocomotionBehaviourHash = _defaultLocomotionBehaviourHash;
+            _currentLocomotionHash = _defaultLocomotionHash;
         }
     }
 
@@ -294,43 +334,77 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     private bool IsCurLocomotionBehaviour(int locomotionBehaviourHash)
     {
-        return _currentLocomotionBehaviourHash == locomotionBehaviourHash;
+        return _currentLocomotionHash == locomotionBehaviourHash;
     }
 
-    #endregion ===== 로코모션 =====
+    #endregion ===== 로코모션(행동) =====
 
 
-    #region ===== 공격 =====
+    #region ===== 공격(행동) =====
 
-    public void SetCurAttack(BaseAttackBehaviour attackBehaviour)
+    public void SetCurAttack(PlayerAttackBehaviour attackBehaviour)
     {
-        _curAttack = attackBehaviour;
+        _currentAttack = attackBehaviour;
     }
 
     public void UnsetCurAttack()
     {
-        _curAttack = null;
+        _currentAttack = null;
     }
 
-    #endregion ===== 공격 =====
+    private void ClearCurAttack()
+    {
+        if (_currentAttack == null)
+        {
+            return;
+        }
+
+        _currentAttack.Clear();
+    }
+
+    #endregion ===== 공격(행동) =====
 
 
     #region ===== 데미지/죽음 =====
 
     public void TakeDamage(float damage)
     {
-        if (IsDead)
+        if (IsDead || IsHitInvincible)
         {
             return;
         }
 
         SetHp(-damage);
+
         Managers.UI.OpenHitEffect();
 
-        if (_hp <= 0)
+        if (_hp <= 0f)
         {
             Die();
+            return;
         }
+
+        _hitInvincibleTimer = _hitInvincibleDuration;
+
+        EnterHit();
+    }
+
+    private void EnterHit()
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        // 현재 공격 강제 종료
+        ClearCurAttack();
+
+        // 피격 상태
+        SetState(PlayerState.Hit);
+
+        // 피격 애니메이션
+        int hitHash = UnityEngine.Random.Range(0, 2) == 0 ? AnimatorKey.Hash.Hit1 : AnimatorKey.Hash.Hit2;
+        _animator.CrossFade(hitHash, 0.02f, _reactionLayerIndex, 0f);
     }
 
     private void CheckDie()
@@ -348,12 +422,22 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
+        UnsetCurAttack();
+
         SetState(PlayerState.Dead);
 
-        _animator.SetTrigger(AnimatorKey.Hash.DoDie);
+        int dieHash = AnimatorKey.Hash.Die;
+        _animator.CrossFade(dieHash, 0.02f, _reactionLayerIndex, 0f);
+
+        Managers.Event.RaisePlayerDead();
     }
 
-    public void OnDeadAnimationEnd()
+    public void OnHitAnimationFinished()
+    {
+        UnsetState(PlayerState.Hit);
+    }
+
+    public void OnDeadAnimationEnded()
     {
         Managers.UI.OpenScreen<EndScreen>()?.Open(true);
     }
@@ -413,7 +497,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         {
             CanUseStamina = true;
         }
-        
+
         OnSpChanged?.Invoke(_sp, _maxSp);
     }
 

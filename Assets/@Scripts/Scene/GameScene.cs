@@ -3,16 +3,15 @@ using UnityEngine;
 public class GameScene : BaseScene
 {
     private GameHUD _hud;
-    
+
     [SerializeField] private PlayerCtrl _player;
     public PlayerCtrl Player => _player;
-    
+
     [SerializeField] private CamCtrl _camera;
     public CamCtrl Cam => _camera;
-    
-    [SerializeField] private SpawnerCtrl _spawnerCtrl;
-    public SpawnerCtrl SpawnerCtrl => _spawnerCtrl;
-    
+
+    public int CurrentPhase { get; private set; }
+
     protected override void OnAwake()
     {
         _hud = GetComponentInChildren<GameHUD>(true);
@@ -20,6 +19,7 @@ public class GameScene : BaseScene
         {
             CPrint.Error("GameHUD를 찾을 수 없습니다.");
         }
+
         Managers.UI.OpenPopup<StartPopup>();
 
         _player.SetCamera(_camera);
@@ -28,10 +28,25 @@ public class GameScene : BaseScene
 
     protected override void OnStart()
     {
-        Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 5);
+        CreatePool();
+
+        Managers.Event.RaisePhaseUpdated();
     }
 
     protected override void OnUpdate()
     {
+    }
+
+    private void CreatePool()
+    {
+        Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 10);
+        Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 10);
+    }
+
+    public void AdvancePhase()
+    {
+        CurrentPhase++;
+
+        Managers.Event.RaisePhaseUpdated();
     }
 }

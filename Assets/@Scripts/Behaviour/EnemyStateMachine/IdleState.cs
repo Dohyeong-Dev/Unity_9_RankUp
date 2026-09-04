@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class IdleState : BaseEnemyState
 {
-    private const float ChaseDistanceMargin = 0.5f;
-    
     public IdleState(EnemyStateMachine stateMachine, EnemyCtrl enemy) : base(stateMachine, enemy)
     {
     }
@@ -22,10 +20,15 @@ public class IdleState : BaseEnemyState
             return;
         }
 
-        float sqrDistance = (target.position - Enemy.transform.position).sqrMagnitude;
+        if (Enemy.IsAttackableDistance &&
+            Enemy.CurrentAttackBehaviour != null && Enemy.CurrentAttackBehaviour.IsAvailable)
+        {
+            StateMachine.ChangeState<AttackState>();
+            return;
+        }
 
-        float chaseDistance = Enemy.ChaseStoppingDistance + ChaseDistanceMargin;
-        float sqrChaseDistance = chaseDistance * chaseDistance;
+        float sqrDistance = (target.position - Enemy.transform.position).sqrMagnitude;
+        float sqrChaseDistance = Enemy.ChaseStoppingDistance * Enemy.ChaseStoppingDistance;
 
         if (sqrDistance <= sqrChaseDistance)
         {

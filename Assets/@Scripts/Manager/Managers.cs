@@ -38,6 +38,10 @@ public class Managers : MonoBehaviour
 
     private PoolManager _pool = new();
     public static PoolManager Pool => Instance?._pool;
+    
+    private EventManager _event = new();
+    public static EventManager Event => Instance?._event;
+    
     #endregion
 
 

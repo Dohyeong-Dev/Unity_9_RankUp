@@ -31,7 +31,7 @@ public class PlayerDie : StateMachineBehaviour
         if (stateInfo.normalizedTime >= 1f)
         {
             _isFinished = true;
-            _player.OnDeadAnimationEnd();
+            _player.OnDeadAnimationEnded();
         }
     }
 }

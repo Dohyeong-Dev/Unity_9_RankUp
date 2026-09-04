@@ -7,6 +7,8 @@ public abstract class PoolKey
         public const string EnemyMelee = "EnemyMelee";
         public const string EnemyRange = "EnemyRange";
         public const string EnemyBoss = "EnemyBoss";
+        
+        public const string PlayerHitEffect = "PlayerHitEffect";
     }
 
     public static class Path
@@ -17,5 +19,7 @@ public abstract class PoolKey
         public const string EnemyMelee = EnemyPath + Name.EnemyMelee;
         public const string EnemyRange = EnemyPath + Name.EnemyRange;
         public const string EnemyBoss = EnemyPath + Name.EnemyBoss;
+        
+        public const string PlayerHitEffect = EffectPath + Name.PlayerHitEffect;
     }
 }

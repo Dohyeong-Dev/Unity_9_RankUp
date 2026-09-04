@@ -2,7 +2,7 @@ public abstract class ResourceKey
 {
     public static class Path
     {
-        public const string Etc = "Prefab/Etc/";
+        public const string Misc = "Prefab/Misc/";
 
         public const string UI = "Prefab/UI/";
         public const string ScreenUI = UI + "ScreenUI/";

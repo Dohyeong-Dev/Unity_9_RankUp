@@ -4918,6 +4918,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _groundCheckDistance: 0.1
+  _hitInvincibleDuration: 0.5
+  _hitEffect: {fileID: 0}
   _maxHp: 100
   _maxSp: 100
   _spRecoveryThreshold: 10
@@ -5040,7 +5042,7 @@ MonoBehaviour:
   defaultEventSetting:
     enabled: 0
     eventName: 
-    monitoredLayers: 010000
+    monitoredLayers: 01000000
   showDebugLog: 0
   weaponSlots:
   - name: Blade

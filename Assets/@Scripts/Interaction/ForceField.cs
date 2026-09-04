@@ -2,19 +2,23 @@ using UnityEngine;
 
 public class ForceField : MonoBehaviour
 {
-    [Header("Material")]
+    [Header("마테리얼")]
     [SerializeField] private Material _redMaterial;
     [SerializeField] private Material _blueMaterial;
 
-    [Header("Challenge")]
-    [SerializeField] private Transform _spawner;
+    [Header("스폰")]
+    [SerializeField] private Spawner _spawner;
+
+    [Header("가이드")]
+    [SerializeField] private ParticleSystem _arrow;
     
     private PlayerCtrl _player;
 
     private Renderer _renderer;
 
+    private int _phase;
+    
     private bool _isStarted;
-
 
     private void Awake()
     {
@@ -27,6 +31,14 @@ public class ForceField : MonoBehaviour
         }
 
         _renderer.enabled = true;
+        
+        _phase = transform.GetSiblingIndex();
+        Managers.Event.OnPhaseUpdated += HandlePhaseUpdated;
+        
+        if (_spawner != null)
+        {
+            _spawner.OnAllEnemiesDefeated += HandleAllEnemiesDefeated;
+        }
     }
 
     private void Start()
@@ -35,8 +47,9 @@ public class ForceField : MonoBehaviour
         {
             _player = gameScene.Player;
         }
-        
-        SetBlue();
+
+        _isStarted = false;
+        UpdateAlertStarted();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -54,16 +67,16 @@ public class ForceField : MonoBehaviour
         OpenAlertPopup();
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnDestroy()
     {
-        if (!other.CompareTag(TagKey.Player))
+        if (Managers.Event != null)
         {
-            return;
+            Managers.Event.OnPhaseUpdated -= HandlePhaseUpdated;
         }
 
-        if (!_isStarted)
+        if (_spawner != null)
         {
-            SetBlue();
+            _spawner.OnAllEnemiesDefeated -= HandleAllEnemiesDefeated;
         }
     }
 
@@ -80,7 +93,6 @@ public class ForceField : MonoBehaviour
         popup.Set("시련을 극복하시겠습니까?", true, StartChallenge);
     }
 
-
     /// <summary> AlertPopup에서 Yes를 눌렀을 때 실행 </summary>
     private void StartChallenge()
     {
@@ -90,8 +102,7 @@ public class ForceField : MonoBehaviour
         }
 
         _isStarted = true;
-
-        SetRed();
+        UpdateAlertStarted();
 
         if (_player == null)
         {
@@ -102,39 +113,63 @@ public class ForceField : MonoBehaviour
         if (_spawner == null)
         {
             CPrint.Error("Spawner no found!");
+            Managers.UI.OpenPopup<AlertPopup>().Set("준비 중입니다.");
+            
             return;
         }
 
-        _player.TeleportToTarget(_spawner, () =>
+        _player.TeleportToTarget(_spawner.transform, () =>
         {
-            if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
-            {
-                int forceFieldIndex = transform.GetSiblingIndex();
-
-                gameScene.SpawnerCtrl.SpawnEnemies(forceFieldIndex);
-            }
+            _spawner.SpawnEnemies();
         });
     }
 
-
-    public void SetRed()
+    public void UpdateAlertStarted()
     {
         if (_renderer == null)
         {
             return;
         }
 
-        _renderer.material = _redMaterial;
+        _renderer.material = _isStarted ? _redMaterial : _blueMaterial;
+        
+        _arrow.gameObject.SetActive(!_isStarted);
     }
 
-
-    public void SetBlue()
+    #region ===== 핸들 =====
+    
+    private void HandlePhaseUpdated()
     {
-        if (_renderer == null)
+        if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
         {
+            if (gameScene.CurrentPhase != _phase)
+            {
+                gameObject.SetActive(false);
+                
+                return;
+            }
+        }
+        else
+        {
+            CPrint.Error("Scene no found!");
+            
+            gameObject.SetActive(false);
+            
             return;
         }
-
-        _renderer.material = _blueMaterial;
+        
+        gameObject.SetActive(true);
     }
+    
+    private void HandleAllEnemiesDefeated()
+    {
+        gameObject.SetActive(false);
+
+        if (Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
+        {
+            gameScene.AdvancePhase();
+        }
+    }
+    
+    #endregion ===== 핸들 =====
 }

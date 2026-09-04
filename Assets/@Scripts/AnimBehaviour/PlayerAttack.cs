@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerAttack : StateMachineBehaviour
 {
-    private MeleeAttackBehaviour _meleeAttack;
+    private PlayerMeleeAttack _meleeAttack;
 
     private bool _isAttackRangeChecked;
     private bool _isComboTransitionChecked;
@@ -37,7 +37,7 @@ public class PlayerAttack : StateMachineBehaviour
     {
         if (_meleeAttack == null)
         {
-            _meleeAttack = animator.GetComponent<MeleeAttackBehaviour>();
+            _meleeAttack = animator.GetComponent<PlayerMeleeAttack>();
         }
 
         _isAttackRangeChecked = false;
