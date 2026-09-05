@@ -3,60 +3,61 @@ using UnityEngine;
 public class EnemyAttack : StateMachineBehaviour
 {
     private EnemyCtrl _enemy;
-    
-    // 현재 State 진입 후 경과 시간
-    private float _elapsedTime;
 
-    // 공격이 이미 실행되었는지 여부
-    private bool _hasAttacked;
+    // 현재 State에 진입한 후 경과 시간
+    private float _stateElapsedTime;
+
+    // 현재 State에서 공격 실행 여부
+    private bool _isAttackExecuted;
 
     [Header("공격 실행")]
-    [Tooltip("State 진입 후 실제 공격이 실행되기까지의 시간")]
-    [SerializeField] private float _attackTimeDelay = 0.2f;
+    [Tooltip("State 진입 후 실제 공격을 실행하기까지 대기하는 시간")]
+    [SerializeField] private float _attackDelay = 0.2f;
 
 
-    public override void OnStateEnter(Animator animator,  AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (!animator.TryGetComponent(out _enemy))
         {
-            CPrint.Error("EnemyCtrl no found!");
+            CPrint.Error("EnemyCtrl를 찾을 수 없습니다.");
+            return;
         }
-        
-        _elapsedTime = 0f;
-        _hasAttacked = false;
+
+        _stateElapsedTime = 0f;
+        _isAttackExecuted = false;
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (!_enemy)
-        {
-            return;
-        }
-        
-        if (_hasAttacked)
+        if (_enemy == null || _isAttackExecuted)
         {
             return;
         }
 
-        _elapsedTime += Time.deltaTime;
+        _stateElapsedTime += Time.deltaTime;
 
-        if (_elapsedTime < _attackTimeDelay)
+        if (_stateElapsedTime < _attackDelay)
         {
             return;
         }
 
-        _enemy.ExecuteAttack();
-        
-        _hasAttacked = true;
+        ExecuteAttack();
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (!_enemy)
+        if (_enemy == null)
         {
             return;
         }
-        
+
         _enemy.RaiseAttackFinished();
+    }
+
+    /// <summary> 적의 실제 공격을 실행하고 현재 State의 공격 실행 상태를 갱신한다. </summary>
+    private void ExecuteAttack()
+    {
+        _enemy.ExecuteAttack();
+        _isAttackExecuted = true;
     }
 }

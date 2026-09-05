@@ -47,8 +47,8 @@ public abstract class EnemyAttackBehaviour : MonoBehaviour
     
     protected float GetRandomDamage()
     {
-        float minDamage = Enemy.STR * 0.8f;
-        float maxDamage = Enemy.STR;
+        float minDamage = Enemy.Strength * 0.8f;
+        float maxDamage = Enemy.Strength;
 
         return UnityEngine.Random.Range(minDamage, maxDamage) * _damageFactor;
     }

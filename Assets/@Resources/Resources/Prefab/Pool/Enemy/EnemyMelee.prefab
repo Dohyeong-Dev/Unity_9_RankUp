@@ -1293,6 +1293,11 @@ MonoBehaviour:
   _runSpeedVariance: 1
   _rotationSpeed: 720
   _defaultChaseStoppingDistance: 1
+  _animationSpeedMultiplier: 0.2
+  _combatTargetDuration: 3
+  _combatRetentionDistance: 8
+  _maxHp: 100
+  _strength: 10
   _knockbackDistance: 1
   _knockbackDuration: 0.15
   _knockbackEase: 6
@@ -1304,11 +1309,6 @@ MonoBehaviour:
   _hitEffect: {fileID: 8318467592180314545}
   _dissolveDuration: 1.5
   _dissolveEase: 6
-  _animationSpeedMultiplier: 0.3
-  _combatTargetDuration: 3
-  _combatRetentionDistance: 8
-  _maxHp: 100
-  _str: 10
 --- !u!114 &2418391248936940347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2591,6 +2591,10 @@ PrefabInstance:
     - target: {fileID: 2914147733972209522, guid: f64e1526a65d84855a83f299aa2def3d, type: 3}
       propertyPath: _heightOffset
       value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3880061719665872174, guid: f64e1526a65d84855a83f299aa2def3d, type: 3}
+      propertyPath: _heightOffset
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 4606488521125525654, guid: f64e1526a65d84855a83f299aa2def3d, type: 3}
       propertyPath: m_PresetInfoIsWorld

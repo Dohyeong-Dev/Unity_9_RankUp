@@ -1,0 +1,250 @@
+using UnityEngine;
+
+/// <summary> 페이즈별 시련 시작 지점과 스폰 진행 상태를 관리한다. </summary>
+public class ForceField : MonoBehaviour
+{
+    #region ===== 컴포넌트 =====
+
+    private PlayerCtrl _player;
+    private Renderer _renderer;
+    private Spawner _spawner;
+
+    #endregion ===== 컴포넌트 =====
+
+    #region ===== 마테리얼 =====
+
+    [Header("마테리얼")]
+    [SerializeField] private Material _redMaterial;
+    [SerializeField] private Material _blueMaterial;
+
+    #endregion ===== 마테리얼 =====
+
+    #region ===== 가이드 =====
+
+    [Header("가이드")]
+    [SerializeField] private ParticleSystem _arrow;
+
+    #endregion ===== 가이드 =====
+
+    #region ===== 상태 =====
+
+    private int _phase;
+    private bool _isStarted;
+
+    #endregion ===== 상태 =====
+
+    private void Awake()
+    {
+        InitializeComponents();
+        InitializePhase();
+
+        if (_renderer == null)
+        {
+            CPrint.Error("[ForceField] Renderer를 찾을 수 없습니다.");
+            enabled = false;
+            return;
+        }
+
+        _renderer.enabled = true;
+
+        SubscribeEvents();
+    }
+
+    private void Start()
+    {
+        TryResolvePlayer();
+        UpdateVisualState();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag(TagKey.Player) || _isStarted)
+        {
+            return;
+        }
+
+        TryResolvePlayer(other);
+        OpenAlertPopup();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeEvents();
+    }
+
+    #region ===== 초기화 =====
+
+    /// <summary> ForceField가 사용하는 컴포넌트를 초기화한다. </summary>
+    private void InitializeComponents()
+    {
+        _renderer = GetComponentInChildren<Renderer>(true);
+        _spawner = GetComponentInChildren<Spawner>(true);
+    }
+
+    /// <summary> Transform 계층 구조를 기준으로 현재 페이즈 번호를 초기화한다. </summary>
+    private void InitializePhase()
+    {
+        _phase = transform.GetSiblingIndex();
+    }
+
+    #endregion ===== 초기화 =====
+
+    #region ===== 플레이어 =====
+
+    /// <summary> 현재 씬 또는 충돌한 오브젝트에서 플레이어 참조를 확보한다. </summary>
+    private bool TryResolvePlayer(Collider other = null)
+    {
+        if (_player != null)
+        {
+            return true;
+        }
+
+        if (other != null && other.TryGetComponent(out PlayerCtrl player))
+        {
+            _player = player;
+            return true;
+        }
+
+        if (Managers.Scene != null 
+            && Managers.Scene.TryGetCurrentScene(out GameScene gameScene) && gameScene.Player != null)
+        {
+            _player = gameScene.Player;
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion ===== 플레이어 =====
+
+    #region ===== 시련 =====
+
+    /// <summary> 시련 시작 여부를 확인하는 팝업을 표시한다. </summary>
+    private void OpenAlertPopup()
+    {
+        AlertPopup popup = Managers.UI.OpenPopup<AlertPopup>();
+
+        if (popup == null)
+        {
+            CPrint.Error("[ForceField] AlertPopup을 열 수 없습니다.");
+            return;
+        }
+
+        popup.Set("시련을 극복하시겠습니까?", true, StartChallenge);
+    }
+
+    /// <summary> 시련을 시작하고 플레이어 이동이 완료되면 적 스폰을 시작한다. </summary>
+    private void StartChallenge()
+    {
+        if (_isStarted)
+        {
+            return;
+        }
+
+        if (!TryResolvePlayer())
+        {
+            CPrint.Error("[ForceField] Player를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (_spawner == null)
+        {
+            CPrint.Error("[ForceField] Spawner를 찾을 수 없습니다.");
+            return;
+        }
+
+        _isStarted = true;
+        UpdateVisualState();
+
+        _player.TeleportToTarget(_spawner.transform, _spawner.SpawnEnemies);
+    }
+
+    /// <summary> 현재 시련을 종료하고 다음 페이즈로 진행한다. </summary>
+    private void CompleteChallenge()
+    {
+        gameObject.SetActive(false);
+
+        if (!Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
+        {
+            CPrint.Error("[ForceField] GameScene을 찾을 수 없습니다.");
+            return;
+        }
+
+        gameScene.AdvancePhase();
+    }
+
+    #endregion ===== 시련 =====
+
+    #region ===== 시각 효과 =====
+
+    /// <summary> 시련 시작 상태에 따라 마테리얼과 가이드 표시를 갱신한다. </summary>
+    private void UpdateVisualState()
+    {
+        if (_renderer != null)
+        {
+            _renderer.material = _isStarted ? _redMaterial : _blueMaterial;
+        }
+
+        if (_arrow != null)
+        {
+            _arrow.gameObject.SetActive(!_isStarted);
+        }
+    }
+
+    #endregion ===== 시각 효과 =====
+
+    #region ===== 이벤트 =====
+
+    /// <summary> 필요한 이벤트를 구독한다. </summary>
+    private void SubscribeEvents()
+    {
+        if (_spawner != null)
+        {
+            _spawner.OnAllEnemiesDefeated += HandleAllEnemiesDefeated;
+        }
+        else
+        {
+            CPrint.Warning("[ForceField] Spawner를 찾을 수 없습니다.");
+        }
+
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPhaseUpdated += HandlePhaseUpdated;
+        }
+    }
+
+    /// <summary> 구독한 이벤트를 해제한다. </summary>
+    private void UnsubscribeEvents()
+    {
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPhaseUpdated -= HandlePhaseUpdated;
+        }
+
+        if (_spawner != null)
+        {
+            _spawner.OnAllEnemiesDefeated -= HandleAllEnemiesDefeated;
+        }
+    }
+    
+    /// <summary> 현재 페이즈가 변경되면 자신의 활성 상태를 갱신한다. </summary>
+    private void HandlePhaseUpdated()
+    {
+        if (!Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
+        {
+            CPrint.Error("[ForceField] GameScene을 찾을 수 없습니다.");
+            gameObject.SetActive(false);
+            return;
+        }
+
+        gameObject.SetActive(gameScene.CurrentPhase == _phase);
+    }
+
+    /// <summary> 모든 적이 처치되면 현재 시련 완료 처리를 수행한다. </summary>
+    private void HandleAllEnemiesDefeated()
+    {
+        CompleteChallenge();
+    }
+
+    #endregion ===== 이벤트 =====
+}

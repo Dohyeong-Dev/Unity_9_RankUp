@@ -2,33 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> 일정 주기로 시야 범위 내의 타겟을 감지하고 가장 가까운 타겟을 관리한다. </summary>
 public class FieldOfView : MonoBehaviour
 {
-    #region ===== 감지 세팅 =====
+    #region ===== 감지 설정 =====
 
-    [Header("감지 세팅")]
+    [Header("감지 설정")]
     [Tooltip("타겟을 감지할 수 있는 최대 거리")]
-    [SerializeField]
-    private float _detectionRadius = 5f;
+    [SerializeField] private float _detectionRadius = 5f;
 
     [Tooltip("감지 가능한 시야각")]
-    [SerializeField, Range(0f, 360f)]
-    private float _fieldOfViewAngle = 180f;
+    [SerializeField, Range(0f, 360f)] private float _fieldOfViewAngle = 180f;
 
     [Tooltip("타겟 탐색 주기")]
-    [SerializeField]
-    private float _detectionInterval = 0.2f;
+    [SerializeField] private float _detectionInterval = 0.2f;
 
     [Tooltip("감지할 타겟 레이어")]
-    [SerializeField]
-    private LayerMask _targetLayer;
+    [SerializeField] private LayerMask _targetLayer;
 
     [Tooltip("시야를 가리는 장애물 레이어")]
-    [SerializeField]
-    private LayerMask _obstacleLayer;
+    [SerializeField] private LayerMask _obstacleLayer;
 
-    #endregion
-
+    #endregion ===== 감지 설정 =====
 
     #region ===== 감지 결과 =====
 
@@ -37,15 +32,47 @@ public class FieldOfView : MonoBehaviour
     private Transform _currentTarget;
     public Transform CurrentTarget => _currentTarget;
 
-    #endregion
+    private Coroutine _detectionCoroutine;
 
+    #endregion ===== 감지 결과 =====
 
-    private void Start()
+    private void OnEnable()
     {
-        StartCoroutine(Co_UpdateDetection());
+        StartDetection();
     }
 
-    /// <summary> 일정 주기로 타겟 감지 정보를 갱신한다. </summary>
+    private void OnDisable()
+    {
+        StopDetection();
+        ClearTarget();
+    }
+
+    #region ===== 감지 =====
+
+    /// <summary> 일정 주기로 타겟 감지를 시작한다. </summary>
+    private void StartDetection()
+    {
+        if (_detectionCoroutine != null)
+        {
+            return;
+        }
+
+        _detectionCoroutine = StartCoroutine(Co_UpdateDetection());
+    }
+
+    /// <summary> 실행 중인 타겟 감지를 중지한다. </summary>
+    private void StopDetection()
+    {
+        if (_detectionCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_detectionCoroutine);
+        _detectionCoroutine = null;
+    }
+
+    /// <summary> 일정 주기로 시야 범위 내의 타겟 정보를 갱신한다. </summary>
     private IEnumerator Co_UpdateDetection()
     {
         WaitForSeconds wait = new WaitForSeconds(_detectionInterval);
@@ -58,37 +85,24 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
-    /// <summary> 시야 범위 내의 타겟을 탐색하고 현재 타겟을 갱신한다. </summary>
+    /// <summary> 시야 범위 내의 타겟을 탐색하고 가장 가까운 타겟을 현재 타겟으로 설정한다. </summary>
     private void UpdateVisibleTargets()
     {
-        _visibleTargets.Clear();
-        _currentTarget = null;
+        ClearTarget();
 
         Collider[] detectedColliders = Physics.OverlapSphere(transform.position, _detectionRadius, _targetLayer);
 
-        float halfFieldOfViewAngle = _fieldOfViewAngle * 0.5f;
-
-        float minimumViewDot = Mathf.Cos(halfFieldOfViewAngle * Mathf.Deg2Rad);
-
+        float minimumViewDot = GetMinimumViewDot();
         float closestDistance = float.MaxValue;
 
-        for (int i = 0; i < detectedColliders.Length; i++)
+        foreach (Collider targetCollider in detectedColliders)
         {
-            Collider targetCollider = detectedColliders[i];
-
-            // 죽은 플레이어는 감지 대상에서 제외
-            if (targetCollider.TryGetComponent(out IDamageable actor))
+            if (!IsDetectableTarget(targetCollider, out Transform targetTransform))
             {
-                if (actor.IsDead)
-                {
-                    continue;
-                }
+                continue;
             }
 
-            Transform targetTransform = targetCollider.transform;
-
             Vector3 directionToTarget = targetTransform.position - transform.position;
-
             float distanceToTarget = directionToTarget.magnitude;
 
             if (distanceToTarget <= Mathf.Epsilon)
@@ -98,28 +112,18 @@ public class FieldOfView : MonoBehaviour
 
             directionToTarget /= distanceToTarget;
 
-            // 1. 시야각 판정
-            float viewDot = Vector3.Dot(transform.forward, directionToTarget);
-
-            if (viewDot < minimumViewDot)
+            if (!IsWithinFieldOfView(directionToTarget, minimumViewDot))
             {
                 continue;
             }
 
-            // 2. 장애물 판정
-            Vector3 rayOrigin = transform.position + Vector3.up;
-
-            bool isBlocked = Physics.Raycast(rayOrigin, directionToTarget, distanceToTarget, _obstacleLayer);
-
-            if (isBlocked)
+            if (IsViewBlocked(directionToTarget, distanceToTarget))
             {
                 continue;
             }
 
-            // 3. 감지된 타겟 등록
             _visibleTargets.Add(targetTransform);
 
-            // 가장 가까운 타겟을 현재 타겟으로 설정
             if (distanceToTarget < closestDistance)
             {
                 closestDistance = distanceToTarget;
@@ -128,15 +132,58 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
-    /// <summary> 현재 감지 중인 타겟을 즉시 제거한다. </summary>
+    /// <summary> 감지 대상이 유효하고 살아있는지 확인한다. </summary>
+    private bool IsDetectableTarget(Collider targetCollider, out Transform targetTransform)
+    {
+        targetTransform = null;
+
+        if (targetCollider == null)
+        {
+            return false;
+        }
+
+        if (targetCollider.TryGetComponent(out IDamageable damageable) && damageable.IsDead)
+        {
+            return false;
+        }
+
+        targetTransform = targetCollider.transform;
+        return true;
+    }
+
+    /// <summary> 현재 시야각의 최소 내적 값을 계산한다. </summary>
+    private float GetMinimumViewDot()
+    {
+        float halfFieldOfViewAngle = _fieldOfViewAngle * 0.5f;
+        return Mathf.Cos(halfFieldOfViewAngle * Mathf.Deg2Rad);
+    }
+
+    /// <summary> 지정된 방향이 현재 시야각 안에 있는지 확인한다. </summary>
+    private bool IsWithinFieldOfView(Vector3 directionToTarget, float minimumViewDot)
+    {
+        float viewDot = Vector3.Dot(transform.forward, directionToTarget);
+        return viewDot >= minimumViewDot;
+    }
+
+    /// <summary> 타겟까지의 시야가 장애물에 의해 가려졌는지 확인한다. </summary>
+    private bool IsViewBlocked(Vector3 directionToTarget, float distanceToTarget)
+    {
+        Vector3 rayOrigin = transform.position + Vector3.up;
+
+        return Physics.Raycast(rayOrigin, directionToTarget, distanceToTarget, _obstacleLayer,
+            QueryTriggerInteraction.Ignore);
+    }
+
+    /// <summary> 현재 감지 중인 모든 타겟 정보를 초기화한다. </summary>
     public void ClearTarget()
     {
         _currentTarget = null;
         _visibleTargets.Clear();
     }
 
-    
-    #region -----Gizmos-----
+    #endregion ===== 감지 =====
+
+    #region ===== Gizmos =====
 
     private void OnDrawGizmos()
     {
@@ -147,23 +194,25 @@ public class FieldOfView : MonoBehaviour
         DrawVisibleTargets(origin);
     }
 
+    /// <summary> 감지 범위를 표시한다. </summary>
     private void DrawDetectionRadius(Vector3 origin)
     {
         Gizmos.color = Color.blue;
-
         Gizmos.DrawWireSphere(origin, _detectionRadius);
     }
 
+    /// <summary> 시야각 범위를 표시한다. </summary>
     private void DrawFieldOfView(Vector3 origin)
     {
-        Vector3 leftBoundaryDirection = GetDirectionFromAngle(-_fieldOfViewAngle * 0.5f);
-        Vector3 rightBoundaryDirection = GetDirectionFromAngle(_fieldOfViewAngle * 0.5f);
+        Vector3 leftDirection = GetDirectionFromAngle(-_fieldOfViewAngle * 0.5f);
+        Vector3 rightDirection = GetDirectionFromAngle(_fieldOfViewAngle * 0.5f);
 
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(origin, origin + leftBoundaryDirection * _detectionRadius);
-        Gizmos.DrawLine(origin, origin + rightBoundaryDirection * _detectionRadius);
+        Gizmos.DrawLine(origin, origin + leftDirection * _detectionRadius);
+        Gizmos.DrawLine(origin, origin + rightDirection * _detectionRadius);
     }
 
+    /// <summary> 현재 감지 중인 타겟을 표시한다. </summary>
     private void DrawVisibleTargets(Vector3 origin)
     {
         Gizmos.color = Color.red;
@@ -179,6 +228,7 @@ public class FieldOfView : MonoBehaviour
         }
     }
 
+    /// <summary> 로컬 시야각을 월드 방향 벡터로 변환한다. </summary>
     private Vector3 GetDirectionFromAngle(float angle)
     {
         float worldAngle = angle + transform.eulerAngles.y;
@@ -187,5 +237,5 @@ public class FieldOfView : MonoBehaviour
         return new Vector3(Mathf.Sin(angleInRadians), 0f, Mathf.Cos(angleInRadians));
     }
 
-    #endregion
+    #endregion ===== Gizmos =====
 }

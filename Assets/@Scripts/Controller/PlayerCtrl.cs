@@ -425,6 +425,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         int dieHash = AnimatorKey.Hash.Die;
         _animator.CrossFade(dieHash, 0.02f, _reactionLayerIndex, 0f);
 
+        _rigid.isKinematic = true;
+        _capsuleCollider.enabled = false;
+        
         Managers.Event.RaisePlayerDead();
     }
 

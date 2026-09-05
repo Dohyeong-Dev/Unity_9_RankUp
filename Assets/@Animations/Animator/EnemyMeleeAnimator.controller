@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8086201a6e844fba92da108f742434a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackTimeDelay: 0.2
+  _attackDelay: 0.2
 --- !u!1102 &-6840534601205727699
 AnimatorState:
   serializedVersion: 6
@@ -540,7 +540,7 @@ AnimatorState:
   m_PrefabAsset: {fileID: 0}
   m_Name: Hit
   m_Speed: 1
-  m_CycleOffset: 0
+  m_CycleOffset: 0.3
   m_Transitions:
   - {fileID: 6873728155193678588}
   m_StateMachineBehaviours:
@@ -593,7 +593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8086201a6e844fba92da108f742434a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackTimeDelay: 0.2
+  _attackDelay: 0.2
 --- !u!114 &8330250279342117578
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -606,7 +606,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8086201a6e844fba92da108f742434a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackTimeDelay: 0.5
+  _attackDelay: 0.2
 --- !u!1101 &8788196233709435880
 AnimatorStateTransition:
   m_ObjectHideFlags: 1

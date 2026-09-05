@@ -1,12 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> 프리팹별 오브젝트 풀의 생성, 대여 및 반환을 관리한다. </summary>
 public class PoolManager
 {
-    private readonly Dictionary<string, Pool> _pools = new();
+    private readonly Dictionary<string, Pool> _poolMap = new();
 
     private GameObject _rootObject;
-    public GameObject RootObject
+
+    #region ===== 루트 =====
+
+    /// <summary> 모든 오브젝트 풀을 관리하는 루트 오브젝트를 반환한다. </summary>
+    private GameObject RootObject
     {
         get
         {
@@ -19,36 +24,75 @@ public class PoolManager
         }
     }
 
+    #endregion ===== 루트 =====
 
-    /// <summary> 프리팹 경로를 통해 Pool을 생성한다. Pool은 프리팹의 GameObject 이름으로 관리한다. </summary>
+    #region ===== 풀 생성 =====
+
+    /// <summary> 지정한 프리팹 경로의 오브젝트 풀을 생성한다. </summary>
     public void CreatePool(string prefabPath, int initialSize = 0)
     {
+        if (string.IsNullOrWhiteSpace(prefabPath))
+        {
+            CPrint.Warning("[PoolManager] Pool prefab path가 비어 있습니다.");
+            return;
+        }
+
+        if (_poolMap.ContainsKey(prefabPath))
+        {
+            return;
+        }
+
         GameObject prefab = Managers.Resource.Load<GameObject>(prefabPath);
 
         if (prefab == null)
         {
-            CPrint.Error($"[PoolManager] Pool 프리팹을 찾을 수 없습니다. Path : {prefabPath}");
-
-            return;
-        }
-
-        string poolName = prefab.name;
-
-        // 이미 Pool이 존재하면 생성하지 않는다.
-        if (_pools.ContainsKey(poolName))
-        {
+            CPrint.Error($"[PoolManager] Pool 프리팹을 찾을 수 없습니다. Path: {prefabPath}");
             return;
         }
 
         Pool pool = new Pool();
+        pool.Initialize(prefab, prefabPath, initialSize);
+        pool.RootObject.transform.SetParent(RootObject.transform, false);
 
-        pool.Initialize(prefab, initialSize);
-        pool.RootObject.transform.SetParent(RootObject.transform);
-
-        _pools.Add(poolName, pool);
+        _poolMap.Add(prefabPath, pool);
     }
 
-    /// <summary> PoolObj를 해당 Pool에 반환한다. GameObject 이름을 기준으로 Pool을 찾는다. </summary>
+    /// <summary> 지정한 프리팹 경로의 풀을 반환하고 없으면 새로 생성한다. </summary>
+    private Pool GetOrCreatePool(string prefabPath)
+    {
+        if (_poolMap.TryGetValue(prefabPath, out Pool pool))
+        {
+            return pool;
+        }
+
+        CreatePool(prefabPath);
+
+        return _poolMap.TryGetValue(prefabPath, out pool) ? pool : null;
+    }
+
+    #endregion ===== 풀 생성 =====
+
+    #region ===== 대여 =====
+
+    /// <summary> 지정한 프리팹 경로의 풀 오브젝트를 대여한다. </summary>
+    public PoolObj Get(string prefabPath)
+    {
+        if (string.IsNullOrWhiteSpace(prefabPath))
+        {
+            CPrint.Warning("[PoolManager] Pool prefab path가 비어 있습니다.");
+            return null;
+        }
+
+        Pool pool = GetOrCreatePool(prefabPath);
+
+        return pool != null ? pool.Get() : null;
+    }
+
+    #endregion ===== 대여 =====
+
+    #region ===== 반환 =====
+
+    /// <summary> 풀 오브젝트가 기록한 소유 풀로 반환한다. </summary>
     public bool Return(PoolObj poolObject)
     {
         if (poolObject == null)
@@ -56,24 +100,17 @@ public class PoolManager
             return false;
         }
 
-        string poolName = poolObject.gameObject.name;
+        string poolKey = poolObject.PoolKey;
 
-        int lastUnderscoreIndex = poolName.LastIndexOf('_');
-
-        if (lastUnderscoreIndex >= 0)
+        if (string.IsNullOrWhiteSpace(poolKey))
         {
-            string suffix = poolName.Substring(lastUnderscoreIndex + 1);
-
-            if (int.TryParse(suffix, out _))
-            {
-                poolName = poolName.Substring(0, lastUnderscoreIndex);
-            }
+            CPrint.Warning("[PoolManager] PoolKey가 설정되지 않은 오브젝트입니다.");
+            return false;
         }
 
-        if (!_pools.TryGetValue(poolName, out Pool pool))
+        if (!_poolMap.TryGetValue(poolKey, out Pool pool))
         {
-            CPrint.Warning($"반환할 Pool을 찾을 수 없습니다. Name : {poolName}");
-
+            CPrint.Warning($"[PoolManager] 반환할 Pool을 찾을 수 없습니다. Key: {poolKey}");
             return false;
         }
 
@@ -82,36 +119,11 @@ public class PoolManager
         return true;
     }
 
-    /// <summary> 프리팹 경로를 통해 PoolObj를 가져온다. Pool은 내부적으로 프리팹 이름으로 관리된다. </summary>
-    public PoolObj Get(string prefabPath)
-    {
-        GameObject prefab = Managers.Resource.Load<GameObject>(prefabPath);
+    #endregion ===== 반환 =====
 
-        if (prefab == null)
-        {
-            CPrint.Error($"Pool 프리팹을 찾을 수 없습니다. Path : {prefabPath}");
+    #region ===== 정리 =====
 
-            return null;
-        }
-
-        string poolName = prefab.name;
-
-        // Pool이 없으면 새로 생성
-        if (!_pools.TryGetValue(poolName, out Pool pool))
-        {
-            CreatePool(prefabPath);
-
-            // 생성 실패를 대비해 다시 확인
-            if (!_pools.TryGetValue(poolName, out pool))
-            {
-                return null;
-            }
-        }
-
-        return pool.Get();
-    }
-
-    /// <summary> 모든 Pool을 제거한다. </summary>
+    /// <summary> 모든 풀 오브젝트와 관리 정보를 제거한다. </summary>
     public void Clear()
     {
         if (_rootObject != null)
@@ -120,6 +132,8 @@ public class PoolManager
             _rootObject = null;
         }
 
-        _pools.Clear();
+        _poolMap.Clear();
     }
+
+    #endregion ===== 정리 =====
 }
