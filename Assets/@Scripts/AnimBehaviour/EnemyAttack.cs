@@ -1,30 +1,32 @@
 using UnityEngine;
 
+/// <summary> 적 공격 애니메이션 State에서 일정 시간 후 실제 공격을 실행한다. </summary>
 public class EnemyAttack : StateMachineBehaviour
 {
+    #region ===== 참조 =====
+
     private EnemyCtrl _enemy;
 
-    // 현재 State에 진입한 후 경과 시간
-    private float _stateElapsedTime;
+    #endregion ===== 참조 =====
 
-    // 현재 State에서 공격 실행 여부
+    #region ===== 상태 =====
+
+    private float _stateElapsedTime;
     private bool _isAttackExecuted;
+
+    #endregion ===== 상태 =====
+
+    #region ===== 설정 =====
 
     [Header("공격 실행")]
     [Tooltip("State 진입 후 실제 공격을 실행하기까지 대기하는 시간")]
     [SerializeField] private float _attackDelay = 0.2f;
 
+    #endregion ===== 설정 =====
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (!animator.TryGetComponent(out _enemy))
-        {
-            CPrint.Error("EnemyCtrl를 찾을 수 없습니다.");
-            return;
-        }
-
-        _stateElapsedTime = 0f;
-        _isAttackExecuted = false;
+        InitializeState(animator);
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -54,10 +56,31 @@ public class EnemyAttack : StateMachineBehaviour
         _enemy.RaiseAttackFinished();
     }
 
-    /// <summary> 적의 실제 공격을 실행하고 현재 State의 공격 실행 상태를 갱신한다. </summary>
+    #region ===== 초기화 =====
+
+    /// <summary> 적 참조와 공격 실행 상태를 초기화한다. </summary>
+    private void InitializeState(Animator animator)
+    {
+        if (!animator.TryGetComponent(out _enemy))
+        {
+            CPrint.Error("[EnemyAttack] EnemyCtrl를 찾을 수 없습니다.");
+            return;
+        }
+
+        _stateElapsedTime = 0f;
+        _isAttackExecuted = false;
+    }
+
+    #endregion ===== 초기화 =====
+
+    #region ===== 공격 =====
+
+    /// <summary> 적의 실제 공격을 실행하고 공격 실행 상태를 갱신한다. </summary>
     private void ExecuteAttack()
     {
         _enemy.ExecuteAttack();
         _isAttackExecuted = true;
     }
+
+    #endregion ===== 공격 =====
 }

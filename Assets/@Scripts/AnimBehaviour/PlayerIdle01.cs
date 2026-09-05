@@ -1,42 +1,52 @@
 using UnityEngine;
 
+/// <summary> 플레이어가 일정 시간 동안 Idle 상태를 유지하면 Idle02 전환을 요청한다. </summary>
 public class PlayerIdle01 : StateMachineBehaviour
 {
+    #region ===== 참조 =====
+
     private PlayerCtrl _player;
+
+    #endregion ===== 참조 =====
+
+    #region ===== 설정 =====
 
     [Header("Idle02 랜덤 전환")]
     [SerializeField] private float _randomMinTime = 8f;
     [SerializeField] private float _randomMaxTime = 15f;
 
-    private float _idleStartTime;
+    #endregion ===== 설정 =====
+
+    #region ===== 상태 =====
+
+    private float _idleWaitingStartTime;
     private float _randomIdleTime;
+
+    #endregion ===== 상태 =====
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_player == null)
+        if (!TryResolvePlayer(animator))
         {
-            _player = animator.GetComponent<PlayerCtrl>();
+            return;
         }
 
-        // 이전 Idle02 전환 Trigger가 남아있는 것을 방지
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
 
         _randomIdleTime = Random.Range(_randomMinTime, _randomMaxTime);
-        _idleStartTime = Time.time;
+        _idleWaitingStartTime = Time.time;
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (_player == null)
         {
-            CPrint.Error("PlayerCtrl no found!");
             return;
         }
 
-        // 움직이거나 공격 중이면 Idle02 대기 시간을 다시 시작
         if (_player.IsMoving || _player.IsAttacking)
         {
-            _idleStartTime = Time.time;
+            ResetIdleWaitingTime();
             return;
         }
 
@@ -45,17 +55,56 @@ public class PlayerIdle01 : StateMachineBehaviour
             return;
         }
 
-        if (Time.time - _idleStartTime >= _randomIdleTime)
+        if (Time.time - _idleWaitingStartTime < _randomIdleTime)
         {
-            animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
-
-            _idleStartTime = Time.time;
+            return;
         }
+
+        animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
+        ResetIdleWaitingTime();
     }
 
+    #region ===== 대기 시간 =====
+
+    /// <summary> Idle02 전환을 위한 대기 시간을 초기화한다. </summary>
+    private void ResetIdleWaitingTime()
+    {
+        _idleWaitingStartTime = Time.time;
+    }
+
+    #endregion ===== 대기 시간 =====
+
+    #region ===== 전환 조건 =====
+
+    /// <summary> 현재 Idle02로 전환할 수 있는 상태인지 반환한다. </summary>
     private bool IsIdleTransitionReady(Animator animator)
     {
-        return !animator.IsInTransition(0) && !_player.IsMoving && !_player.IsAttacking &&
-               _player.IsDefaultBehaviour;
+        return !animator.IsInTransition(0)
+               && !_player.IsMoving
+               && !_player.IsAttacking
+               && _player.IsDefaultBehaviour;
     }
+
+    #endregion ===== 전환 조건 =====
+
+    #region ===== 참조 확인 =====
+
+    /// <summary> PlayerCtrl 참조를 반환하고 없으면 Animator에서 찾는다. </summary>
+    private bool TryResolvePlayer(Animator animator)
+    {
+        if (_player != null)
+        {
+            return true;
+        }
+
+        if (animator.TryGetComponent(out _player))
+        {
+            return true;
+        }
+
+        CPrint.Error("[PlayerIdle01] PlayerCtrl을 찾을 수 없습니다.");
+        return false;
+    }
+
+    #endregion ===== 참조 확인 =====
 }
