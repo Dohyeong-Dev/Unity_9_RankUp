@@ -12,6 +12,7 @@ public class PlayerAttack : StateMachineBehaviour
     #region ===== 공격 판정 =====
 
     [Header("공격 판정")]
+    
     [Tooltip("공격 애니메이션 전체 진행률 기준으로 공격 판정을 발생시킬 시점")]
     [Range(0f, 1f)]
     [SerializeField] private float _attackRangeProgress = 0.5f;
@@ -23,6 +24,7 @@ public class PlayerAttack : StateMachineBehaviour
     #region ===== 콤보 전환 =====
 
     [Header("콤보 전환")]
+    
     [Tooltip("입력 버퍼를 확인하여 다음 콤보로 전환할 시점")]
     [Range(0f, 1f)]
     [SerializeField] private float _comboTransitionProgress = 0.6f;
@@ -34,6 +36,7 @@ public class PlayerAttack : StateMachineBehaviour
     #region ===== 검 궤적 =====
 
     [Header("검 궤적")]
+    
     [Tooltip("검 궤적을 시작할 공격 애니메이션 진행률")]
     [Range(0f, 1f)]
     [SerializeField] private float _slashStartProgress = 0.1f;

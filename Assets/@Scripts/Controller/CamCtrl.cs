@@ -1,25 +1,47 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary> 플레이어를 중심으로 회전, 줌, 충돌 보정 및 셰이킹을 처리하는 카메라 컨트롤러다. </summary>
 public class CamCtrl : MonoBehaviour
 {
+    #region ===== 참조 =====
+
     private Transform _target;
     private CapsuleCollider _targetCol;
-    
+
+    #endregion ===== 참조 =====
+
+    #region ===== 상태 =====
+
     private float _eulerY;
     private float _eulerX;
-    
-    
-    #region ===== 카메라 세팅 =====
-    
-    [Header("카메라 세팅")]
 
+    private Vector3 _targetFocusPos;
+    private Vector3 _zoomFocusPos;
+
+    private float _currentTopViewDistance;
+    private float _topViewDistanceVelocity;
+
+    private float _currentCollisionDistance;
+    private float _collisionDistanceVelocity;
+
+    private float _targetZoomDistance;
+    private float _currentZoomDistance;
+    private float _zoomVelocity;
+
+    private Vector3 _shakeOffset;
+    private bool _isShake;
+
+    #endregion ===== 상태 =====
+
+    #region ===== 카메라 설정 =====
+
+    [Header("카메라 세팅")]
     [SerializeField] private float _horizontalSpeed = 3f;
     [SerializeField] private float _verticalSpeed = 2f;
 
     [Tooltip("게임 시작 시 카메라의 초기 상하 각도")]
-    [SerializeField, Range(-90f, 90f)]
-    private float _initialXAngle = 20f;
+    [SerializeField, Range(-90f, 90f)] private float _initialXAngle = 20f;
 
     [Tooltip("카메라 위로 보는 각도")]
     [SerializeField] private float _limitUpAngle = 60f;
@@ -29,30 +51,23 @@ public class CamCtrl : MonoBehaviour
 
     [Tooltip("X = 숄더 뷰, Y = 카메라 높이, Z = 기본 카메라 거리")]
     [SerializeField] private Vector3 _camOffset = new(0f, 0f, -4f);
-    
-    #endregion ===== 카메라 세팅 =====
-    
-    
+
+    #endregion ===== 카메라 설정 =====
+
     #region ===== 카메라 초점 =====
-    
+
     [Header("카메라 초점")]
 
-    private Vector3 _targetFocusPos;
-    private Vector3 _zoomFocusPos;
-    
-    [Tooltip("일반 Orbit 카메라 초점 높이")] // 1이 가까워질수록 플레이어의 콜라이더 위에 가까워진다.
-    [SerializeField, Range(0f, 1f)]
-    private float _orbitFocusHeightRatio = 0.65f;
+    [Tooltip("일반 Orbit 카메라 초점 높이")]
+    [SerializeField, Range(0f, 1f)] private float _orbitFocusHeightRatio = 0.65f;
 
-    [Tooltip("Zoom 시 사용하는 카메라 초점 높이")] // 1이 가까워질수록 플레이어의 콜라이더 위에 가까워진다.
-    [SerializeField, Range(0f, 1f)]
-    private float _zoomFocusHeightRatio = 0.5f;
-    
+    [Tooltip("Zoom 시 사용하는 카메라 초점 높이")]
+    [SerializeField, Range(0f, 1f)] private float _zoomFocusHeightRatio = 0.5f;
+
     #endregion ===== 카메라 초점 =====
 
-    
-    #region ===== 거리 보정 ======
-    
+    #region ===== 거리 보정 =====
+
     [Header("정수리 뷰 보정")]
 
     [Tooltip("카메라가 위에서 내려다볼수록 추가로 확보할 카메라 거리")]
@@ -60,30 +75,9 @@ public class CamCtrl : MonoBehaviour
 
     [Tooltip("정수리 뷰 보정이 부드럽게 적용되는 시간")]
     [SerializeField] private float _topViewSmoothTime = 0.08f;
-    private float _topViewDistanceVelocity;
 
-    private float _currentTopViewDistance;
+    #endregion ===== 거리 보정 =====
 
-    #endregion ===== 거리 보정 ======
-
-    
-    #region ===== 카메라 셰이킹 ======
-
-    [Header("카메라 셰이킹")]
-
-    [Tooltip("카메라 흔들림이 유지되는 시간")]
-    [SerializeField] private float _shakeTime = 0.05f;
-
-    [Tooltip("카메라 흔들림의 최대 거리")]
-    [SerializeField] private float _shakeStrength = 0.5f;
-
-    private Vector3 _shakeOffset;
-    
-    private bool _isShake;
-    
-    #endregion ===== 카메라 셰이킹 ======
-
-    
     #region ===== 카메라 충돌 =====
 
     [Header("카메라 충돌")]
@@ -103,12 +97,8 @@ public class CamCtrl : MonoBehaviour
     [Tooltip("카메라 충돌 보정이 부드럽게 적용되는 시간")]
     [SerializeField] private float _collisionSmoothTime = 0.08f;
 
-    private float _currentCollisionDistance;
-    private float _collisionDistanceVelocity;
-    
     #endregion ===== 카메라 충돌 =====
-    
-    
+
     #region ===== 카메라 줌 =====
 
     [Header("카메라 줌")]
@@ -124,45 +114,36 @@ public class CamCtrl : MonoBehaviour
 
     [Tooltip("줌이 부드럽게 따라오는 시간")]
     [SerializeField] private float _zoomSmoothTime = 0.08f;
-    private float _zoomVelocity;
-
-    private float _targetZoomDistance;
-    private float _currentZoomDistance;
 
     #endregion ===== 카메라 줌 =====
-    
+
+    #region ===== 카메라 셰이킹 =====
+
+    [Header("카메라 셰이킹")]
+
+    [Tooltip("카메라 흔들림이 유지되는 시간")]
+    [SerializeField] private float _shakeTime = 0.05f;
+
+    [Tooltip("카메라 흔들림의 최대 거리")]
+    [SerializeField] private float _shakeStrength = 0.5f;
+
+    #endregion ===== 카메라 셰이킹 =====
 
     private void Start()
     {
         if (_target == null)
         {
-            CPrint.Error("타겟 세팅이 필요합니다.");
+            CPrint.Error("[CamCtrl] 타겟 세팅이 필요합니다.");
             return;
         }
 
-        _targetCol = _target.GetComponent<CapsuleCollider>();
+        InitializeTargetCollider();
+        InitializeCameraState();
+
         UpdateTargetFocusPos();
-
-        // 기본 줌 거리
-        _currentZoomDistance = Mathf.Abs(_camOffset.z);
-        _currentZoomDistance = Mathf.Clamp(_currentZoomDistance, _minZoomDistance, _maxZoomDistance);
-        _targetZoomDistance = _currentZoomDistance;
-
-        // 초기 회전
-        _eulerX = Mathf.Clamp(_initialXAngle, -_limitUpAngle, _limitDownAngle);
-        _eulerY = _target.eulerAngles.y;
-
-        // 초기 정수리 뷰 거리 계산
-        // 시작 각도가 이미 위쪽을 보고 있다면 그 각도에 해당하는 TopView 거리도 처음부터 즉시 적용한다.
-        _currentTopViewDistance = GetTopViewDistance();
-        
-        // 초기 카메라 거리
-        _currentCollisionDistance = _currentZoomDistance + _currentTopViewDistance;
-        
-        // 시작 시 트랜스폼 즉시 적용
         UpdateCameraTransform();
     }
-    
+
     private void LateUpdate()
     {
         if (_target == null)
@@ -171,21 +152,100 @@ public class CamCtrl : MonoBehaviour
         }
 
         UpdateTargetFocusPos();
-
-        if (Managers.Input.CanReceiveInput)
-        {
-            _eulerY += Managers.Input.MouseAxisX * _horizontalSpeed;
-            _eulerX += Managers.Input.MouseAxisY * _verticalSpeed;
-
-            UpdateZoom();
-        }
-
-        // 상하 회전 제한
-        _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
-
+        UpdateCameraInput();
         UpdateCameraTransform();
     }
 
+    #region ===== 초기화 =====
+
+    /// <summary> 타겟의 CapsuleCollider 참조를 초기화한다. </summary>
+    private void InitializeTargetCollider()
+    {
+        _targetCol = _target.GetComponent<CapsuleCollider>();
+    }
+
+    /// <summary> 카메라의 초기 회전과 거리 상태를 설정한다. </summary>
+    private void InitializeCameraState()
+    {
+        _currentZoomDistance = Mathf.Clamp(Mathf.Abs(_camOffset.z), _minZoomDistance, _maxZoomDistance);
+        _targetZoomDistance = _currentZoomDistance;
+
+        _eulerX = Mathf.Clamp(_initialXAngle, -_limitUpAngle, _limitDownAngle);
+        _eulerY = _target.eulerAngles.y;
+
+        _currentTopViewDistance = GetTopViewDistance();
+        _currentCollisionDistance = _currentZoomDistance + _currentTopViewDistance;
+    }
+
+    /// <summary> 카메라 방향을 타겟이 바라보는 방향으로 초기화하고 지정한 줌 거리를 적용한다. </summary>
+    public void ResetRotationToTarget(float zoomDistance)
+    {
+        if (_target == null)
+        {
+            return;
+        }
+
+        _eulerY = _target.eulerAngles.y;
+        _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
+
+        float clampedZoomDistance = Mathf.Clamp(zoomDistance, _minZoomDistance, _maxZoomDistance);
+
+        _targetZoomDistance = clampedZoomDistance;
+        _currentZoomDistance = clampedZoomDistance;
+        _zoomVelocity = 0f;
+
+        UpdateTargetFocusPos();
+        UpdateCameraTransform();
+    }
+    
+    #endregion ===== 초기화 =====
+
+    #region ===== 타겟 =====
+
+    /// <summary> 카메라가 추적할 타겟을 설정하고 관련 참조를 갱신한다. </summary>
+    public void SetTarget(Transform target)
+    {
+        _target = target;
+        _targetCol = _target != null ? _target.GetComponent<CapsuleCollider>() : null;
+    }
+
+    /// <summary> 타겟 위치와 콜라이더를 기준으로 카메라 초점을 갱신한다. </summary>
+    private void UpdateTargetFocusPos()
+    {
+        if (_targetCol == null)
+        {
+            CPrint.Warning("[CamCtrl] Target CapsuleCollider를 찾을 수 없습니다.");
+
+            _targetFocusPos = _target.position + Vector3.up * 1.5f;
+            _zoomFocusPos = _target.position + Vector3.up;
+            return;
+        }
+
+        _targetFocusPos = _target.position + Vector3.up * _targetCol.height * _orbitFocusHeightRatio;
+        _zoomFocusPos = _target.position + Vector3.up * _targetCol.height * _zoomFocusHeightRatio;
+    }
+
+    #endregion ===== 타겟 =====
+
+    #region ===== 입력 =====
+
+    /// <summary> 플레이어 입력에 따라 카메라 회전과 줌을 갱신한다. </summary>
+    private void UpdateCameraInput()
+    {
+        if (!Managers.Input.CanReceiveInput)
+        {
+            return;
+        }
+
+        _eulerY += Managers.Input.MouseAxisX * _horizontalSpeed;
+        _eulerX += Managers.Input.MouseAxisY * _verticalSpeed;
+
+        _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
+
+        UpdateZoom();
+    }
+
+    /// <summary> 마우스 휠 입력에 따라 목표 줌 거리를 갱신한다. </summary>
     private void UpdateZoom()
     {
         float wheel = Managers.Input.MouseWheel;
@@ -198,144 +258,132 @@ public class CamCtrl : MonoBehaviour
         _targetZoomDistance -= wheel * _zoomSpeed;
         _targetZoomDistance = Mathf.Clamp(_targetZoomDistance, _minZoomDistance, _maxZoomDistance);
     }
-    
-    public void SetTarget(Transform target)
-    {
-        _target = target;
-        _targetCol = _target != null ? _target.GetComponent<CapsuleCollider>() : null;
-    }
 
-    /// <summary> 카메라 초점(타겟/줌) 계산 </summary>
-    private void UpdateTargetFocusPos()
-    {
-        if (_targetCol != null)
-        {
-            _targetFocusPos = _target.position + Vector3.up * _targetCol.height * _orbitFocusHeightRatio;
-            _zoomFocusPos = _target.position + Vector3.up * _targetCol.height * _zoomFocusHeightRatio;
-        }
-        else
-        {
-            CPrint.Warning("No target collider found.");
-            _targetFocusPos = _target.position + Vector3.up * 1.5f;
-            _zoomFocusPos = _target.position + Vector3.up * 1.0f;
-        }
-    }
+    #endregion ===== 입력 =====
 
-    /// <summary> 정수리 뷰 거리 보정 </summary>
-    private float GetTopViewDistance()
-    {
-        float topViewRatio = Mathf.InverseLerp(0f, _limitDownAngle, Mathf.Max(0f, _eulerX));
-        
-        return _topViewDistBonus * topViewRatio;
-    }
-    
-    /// <summary> 카메라 위치/회전 업데이트 </summary>
+    #region ===== 카메라 =====
+
+    /// <summary> 현재 카메라 상태를 기준으로 위치와 회전을 갱신한다. </summary>
     private void UpdateCameraTransform()
     {
-        // 카메라 회전
         Quaternion aimRotation = Quaternion.Euler(_eulerX, _eulerY, 0f);
         Quaternion camYRotation = Quaternion.Euler(0f, _eulerY, 0f);
 
-        // 줌 거리 보간
-        _currentZoomDistance = Mathf.SmoothDamp(_currentZoomDistance, _targetZoomDistance, ref _zoomVelocity,
-            _zoomSmoothTime);
-        
-        // 현재 줌 거리에 따라 타겟초점과 줌초점 사이의 피봇을 구한다. 
-        float zoomRatio = Mathf.InverseLerp(_maxZoomDistance, _minZoomDistance, _currentZoomDistance);
-        Vector3 cameraPivot = Vector3.Lerp(_targetFocusPos, _zoomFocusPos, zoomRatio);
+        UpdateZoomDistance();
+        UpdateTopViewDistance();
 
-        float targetTopViewDist = GetTopViewDistance();
+        Vector3 cameraPivot = GetCameraPivot();
+        Vector3 desiredPosition = GetDesiredCameraPosition(cameraPivot, aimRotation, camYRotation);
 
-        // 게임 중에는 부드럽게 이동
-        _currentTopViewDistance = Mathf.SmoothDamp(_currentTopViewDistance, targetTopViewDist,
-                ref  _topViewDistanceVelocity, _topViewSmoothTime);
+        UpdateCollisionDistance(desiredPosition, cameraPivot);
 
-        // 실제 카메라 거리
-        float cameraDist = _currentZoomDistance + _currentTopViewDistance;
+        Vector3 cameraDirection = desiredPosition - cameraPivot;
 
-        // 숄더 위치
-        Vector3 shoulderOffset = camYRotation * (Vector3.right * _camOffset.x);
-        // 카메라 높이 Offset
-        Vector3 heightOffset = aimRotation * (Vector3.up * _camOffset.y);
-        // 카메라 거리 방향
-        Vector3 distOffset = aimRotation * (Vector3.back * cameraDist);
-
-        // 최종 위치
-        Vector3 desiredPos = cameraPivot + shoulderOffset + heightOffset + distOffset;
-
-        // 충돌 체크 및 보간 이동
-        float safeDistance = GetSafeCamDistance(desiredPos, cameraPivot);
-
-        if (safeDistance < _currentCollisionDistance)
-        {
-            // 벽에 가까워지는 경우에는 즉시 당긴다.
-            _currentCollisionDistance = safeDistance;
-            _collisionDistanceVelocity = 0f;
-        }
-        else
-        {
-            // 벽에서 멀어지는 경우에만 부드럽게 복귀한다.
-            _currentCollisionDistance = Mathf.SmoothDamp(_currentCollisionDistance, safeDistance,
-                ref _collisionDistanceVelocity, _collisionSmoothTime);
-        }
-
-        Vector3 cameraDirection = (desiredPos - cameraPivot).normalized;
-        Vector3 safePos = cameraPivot + cameraDirection * _currentCollisionDistance;
-
-        transform.position = safePos + _shakeOffset;
-        transform.rotation = aimRotation;
-    }
-
-    /// <summary> 플레이어와 카메라 사이 오브젝트 충돌 시 안전 거리를 구한다 </summary>
-    private float GetSafeCamDistance(Vector3 desiredPos, Vector3 pivot)
-    {
-        Vector3 targetToCamVec = desiredPos - pivot;
-        float targetToCamDist = targetToCamVec.magnitude;
-        Debug.DrawLine(pivot, desiredPos, Color.white);
-        if (targetToCamDist < 0.1f)
-        {
-            return 0f;
-        }
-
-        Vector3 targetToCamDir = targetToCamVec.normalized;
-        
-        if (Physics.SphereCast(pivot, _collisionRadius, targetToCamDir, out RaycastHit hit,
-                targetToCamDist, _collisionCheckLayerMask, QueryTriggerInteraction.Ignore))
-        {
-            Debug.DrawLine(pivot, desiredPos, Color.red);
-            float safeDistance = hit.distance - _collisionOffset;
-            return Mathf.Max(safeDistance, _minCameraDistance);
-        }
-
-        return targetToCamDist;
-    }
-
-    /// <summary> 카메라 방향을 타겟이 바라보는 방향으로 초기화 </summary>
-    public void ResetRotationToTarget(float zoomDistance)
-    {
-        if (_target == null)
+        if (cameraDirection.sqrMagnitude <= Mathf.Epsilon)
         {
             return;
         }
 
-        _eulerY = _target.eulerAngles.y;
+        cameraDirection.Normalize();
 
-        // 기존 상하 각도는 유지
-        _eulerX = Mathf.Clamp(_eulerX, -_limitUpAngle, _limitDownAngle);
-
-        // 줌 거리 초기화
-        float clampedZoomDistance = Mathf.Clamp(zoomDistance, _minZoomDistance, _maxZoomDistance);
-
-        _targetZoomDistance = clampedZoomDistance;
-        _currentZoomDistance = clampedZoomDistance;
-
-        // SmoothDamp 진행 중이던 값 초기화
-        _zoomVelocity = 0f;
-
-        UpdateTargetFocusPos();
-        UpdateCameraTransform();
+        transform.position = cameraPivot + cameraDirection * _currentCollisionDistance + _shakeOffset;
+        transform.rotation = aimRotation;
     }
-    
+
+    /// <summary> 현재 줌 거리를 목표 줌 거리까지 부드럽게 이동시킨다. </summary>
+    private void UpdateZoomDistance()
+    {
+        _currentZoomDistance = Mathf.SmoothDamp(_currentZoomDistance, _targetZoomDistance, ref _zoomVelocity,
+            _zoomSmoothTime);
+    }
+
+    /// <summary> 카메라 상하 각도에 따른 정수리 뷰 거리 보정을 갱신한다. </summary>
+    private void UpdateTopViewDistance()
+    {
+        float targetTopViewDistance = GetTopViewDistance();
+
+        _currentTopViewDistance = Mathf.SmoothDamp(_currentTopViewDistance, targetTopViewDistance,
+            ref _topViewDistanceVelocity, _topViewSmoothTime);
+    }
+
+    /// <summary> 현재 줌 비율에 맞는 카메라 피벗 위치를 반환한다. </summary>
+    private Vector3 GetCameraPivot()
+    {
+        float zoomRatio = Mathf.InverseLerp(_maxZoomDistance, _minZoomDistance, _currentZoomDistance);
+        return Vector3.Lerp(_targetFocusPos, _zoomFocusPos, zoomRatio);
+    }
+
+    /// <summary> 카메라 회전과 오프셋을 적용한 목표 위치를 계산한다. </summary>
+    private Vector3 GetDesiredCameraPosition(Vector3 cameraPivot, Quaternion aimRotation, Quaternion camYRotation)
+    {
+        float cameraDistance = _currentZoomDistance + _currentTopViewDistance;
+
+        Vector3 shoulderOffset = camYRotation * (Vector3.right * _camOffset.x);
+        Vector3 heightOffset = aimRotation * (Vector3.up * _camOffset.y);
+        Vector3 distanceOffset = aimRotation * (Vector3.back * cameraDistance);
+
+        return cameraPivot + shoulderOffset + heightOffset + distanceOffset;
+    }
+
+    #endregion ===== 카메라 =====
+
+    #region ===== 거리 보정 =====
+
+    /// <summary> 현재 상하 회전에 따라 정수리 뷰 추가 거리를 계산한다. </summary>
+    private float GetTopViewDistance()
+    {
+        float topViewRatio = Mathf.InverseLerp(0f, _limitDownAngle, Mathf.Max(0f, _eulerX));
+        return _topViewDistBonus * topViewRatio;
+    }
+
+    /// <summary> 카메라 충돌 상태에 따라 실제 카메라 거리를 갱신한다. </summary>
+    private void UpdateCollisionDistance(Vector3 desiredPosition, Vector3 cameraPivot)
+    {
+        float safeDistance = GetSafeCamDistance(desiredPosition, cameraPivot);
+
+        if (safeDistance < _currentCollisionDistance)
+        {
+            _currentCollisionDistance = safeDistance;
+            _collisionDistanceVelocity = 0f;
+            return;
+        }
+
+        _currentCollisionDistance = Mathf.SmoothDamp(_currentCollisionDistance, safeDistance,
+            ref _collisionDistanceVelocity, _collisionSmoothTime);
+    }
+
+    /// <summary> 플레이어와 카메라 사이의 충돌 여부를 확인하고 안전한 카메라 거리를 반환한다. </summary>
+    private float GetSafeCamDistance(Vector3 desiredPosition, Vector3 cameraPivot)
+    {
+        Vector3 pivotToCamera = desiredPosition - cameraPivot;
+        float desiredDistance = pivotToCamera.magnitude;
+
+        Debug.DrawLine(cameraPivot, desiredPosition, Color.white);
+
+        if (desiredDistance < 0.1f)
+        {
+            return 0f;
+        }
+
+        Vector3 cameraDirection = pivotToCamera / desiredDistance;
+
+        if (!Physics.SphereCast(cameraPivot, _collisionRadius, cameraDirection, out RaycastHit hit,
+                desiredDistance, _collisionCheckLayerMask, QueryTriggerInteraction.Ignore))
+        {
+            return desiredDistance;
+        }
+
+        Debug.DrawLine(cameraPivot, desiredPosition, Color.red);
+
+        float safeDistance = hit.distance - _collisionOffset;
+        return Mathf.Max(safeDistance, _minCameraDistance);
+    }
+
+    #endregion ===== 거리 보정 =====
+
+    #region ===== 카메라 셰이킹 =====
+
+    /// <summary> 지정한 배율만큼 카메라 셰이킹을 시작한다. </summary>
     public void ShakeCamera(int factor = 1)
     {
         if (_isShake)
@@ -353,12 +401,14 @@ public class CamCtrl : MonoBehaviour
         StartCoroutine(Co_ShakeCamera());
     }
 
+    /// <summary> 지정된 시간 동안 카메라 셰이킹을 유지한 뒤 초기화한다. </summary>
     private IEnumerator Co_ShakeCamera()
     {
         yield return new WaitForSecondsRealtime(_shakeTime);
 
         _shakeOffset = Vector3.zero;
-
         _isShake = false;
     }
+
+    #endregion ===== 카메라 셰이킹 =====
 }

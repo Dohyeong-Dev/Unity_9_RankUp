@@ -19,6 +19,7 @@ public class EnemyAttack : StateMachineBehaviour
     #region ===== 설정 =====
 
     [Header("공격 실행")]
+    
     [Tooltip("State 진입 후 실제 공격을 실행하기까지 대기하는 시간")]
     [SerializeField] private float _attackDelay = 0.2f;
 

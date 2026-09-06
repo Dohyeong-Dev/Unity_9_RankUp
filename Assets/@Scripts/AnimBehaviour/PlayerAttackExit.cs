@@ -19,6 +19,7 @@ public class PlayerAttackExit : StateMachineBehaviour
     #region ===== 설정 =====
 
     [Header("칼집 모션 중 행동")]
+    
     [Tooltip("칼집 모션 시작 후 이 시간이 지나야 이동 가능")]
     [SerializeField, Min(0f)] private float _movementEnableDelay = 0.5f;
 

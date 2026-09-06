@@ -13,6 +13,7 @@ public abstract class EnemyAttackBehaviour : MonoBehaviour
     #region ===== 공격 정보 =====
 
     [Header("공격 정보")]
+    
     [Tooltip("애니메이터에서 설정된 공격 애니메이션 인덱스")]
     [SerializeField] private int _attackAnimationIndex;
     public int AttackAnimationIndex => _attackAnimationIndex;

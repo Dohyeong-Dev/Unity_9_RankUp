@@ -12,7 +12,6 @@ public static class CPrint
     // 공백 개수
     private const int IndentSize = 10;
 
-
     #region ===== Log =====
 
     public static void Log(object message)
@@ -36,7 +35,6 @@ public static class CPrint
     }
 
     #endregion
-
 
     /// <summary> 에디터 또는 Development Build에서만 로그를 출력한다. Release Build에서는 호출 코드 자체가 제거된다. </summary>
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
