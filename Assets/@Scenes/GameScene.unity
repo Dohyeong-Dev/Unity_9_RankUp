@@ -8846,18 +8846,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.4696986
-      objectReference: {fileID: 0}
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0417829
-      objectReference: {fileID: 0}
-    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.02606541
-      objectReference: {fileID: 0}
     - target: {fileID: 1286639632634062274, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.52
@@ -8898,33 +8886,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.50437343
-      objectReference: {fileID: 0}
-    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.19181892
-      objectReference: {fileID: 0}
     - target: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_Name
       value: KatanaGirl_FullBody
-      objectReference: {fileID: 0}
-    - target: {fileID: 3371973297619674496, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: moveWithTransform
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3690553982505492406, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3690553982505492406, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3690553982505492406, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
-      propertyPath: color.r
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16618,7 +16582,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 1
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
