@@ -1,25 +1,34 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/// <summary> 플레이어의 기본 이동, 회전 및 달리기 상태를 관리한다. </summary>
 public class MoveBehaviour : BaseLocomotionBehaviour
 {
+    #region ===== 상태 =====
+
+    private float _currentRunFactor = DefaultMoveFactor;
+
+    private bool _canRunInCurrentState = true;
+
+    private Coroutine _runStateCoroutine;
+
+    #endregion ===== 상태 =====
+
+    #region ===== 설정 =====
+
     private const float DefaultMoveFactor = 1f;
 
     [Header("이동")]
     [SerializeField] private float _moveSpeed = 5f;
 
     [Header("달리기 설정")]
-    private float _currentRunFactor = DefaultMoveFactor;
-
     [Tooltip("달리기 시 기본 이동 속도에 적용되는 배율")]
     [SerializeField] private float _runFactor = 2f;
 
     [Tooltip("달리기 시 기본 SP 소비량에 적용되는 배율")]
     [SerializeField] private float _runSpFactor = 2f;
 
-    private bool _canRunInCurrentState = true;
-    private Coroutine _runStateCoroutine;
-
+    #endregion ===== 설정 =====
 
     private void Start()
     {
@@ -65,6 +74,9 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         AdjustRunSpeed();
     }
 
+    #region ===== 이동 =====
+
+    /// <summary> Rigidbody의 수평 이동 속도를 제거하고 이동 애니메이션을 정지한다. </summary>
     private void RemoveHorizontalVelocity()
     {
         Vector3 velocity = Player.Rigid.velocity;
@@ -74,6 +86,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f, 0.01f, Time.fixedDeltaTime);
     }
 
+    /// <summary> Rigidbody의 수직 이동 속도를 제거한다. </summary>
     private void RemoveVerticalVelocity()
     {
         Vector3 velocity = Player.Rigid.velocity;
@@ -82,21 +95,17 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Rigid.velocity = velocity;
     }
 
+    /// <summary> 현재 카메라와 입력 방향을 기준으로 플레이어의 회전을 갱신한다. </summary>
     private void UpdateRotate()
     {
-        if (!Player.IsMoving)
+        if (!Player.IsMoving || Player.Cam == null)
         {
             return;
         }
 
-        if (Player.Cam == null)
-        {
-            return;
-        }
+        Transform camTransform = Player.Cam.transform;
 
-        Transform camTr = Player.Cam.transform;
-
-        Vector3 forward = camTr.forward;
+        Vector3 forward = camTransform.forward;
         forward.y = 0f;
 
         if (forward.sqrMagnitude <= Mathf.Epsilon)
@@ -106,7 +115,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         forward.Normalize();
 
-        Vector3 right = camTr.right;
+        Vector3 right = camTransform.right;
         right.y = 0f;
 
         if (right.sqrMagnitude <= Mathf.Epsilon)
@@ -131,6 +140,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.Rigid.MoveRotation(viewRotation);
     }
 
+    /// <summary> 현재 입력과 이동 상태를 기준으로 플레이어의 이동 속도를 갱신한다. </summary>
     private void UpdateMove()
     {
         if (Managers.Input.KeyVecSqrMagnitude <= Mathf.Epsilon)
@@ -144,8 +154,6 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             _currentRunFactor = DefaultMoveFactor;
         }
 
-        float speed = _moveSpeed * _currentRunFactor;
-
         Vector3 moveDirection = Player.Tr.forward;
         moveDirection.y = 0f;
 
@@ -157,20 +165,24 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         moveDirection.Normalize();
 
-        float movementInput = Managers.Input.KeyVecSqrMagnitude;
-        Vector3 horizontalVelocity = moveDirection * speed * movementInput;
+        float speed = _moveSpeed * _currentRunFactor;
+        float inputMagnitude = Managers.Input.KeyVecSqrMagnitude;
+
+        Vector3 horizontalVelocity = moveDirection * speed * inputMagnitude;
 
         Player.Rigid.velocity = new Vector3(horizontalVelocity.x, Player.Rigid.velocity.y, horizontalVelocity.z);
 
         ConsumeRunSp();
 
-        float animationSpeed = movementInput * _currentRunFactor;
+        float animationSpeed = inputMagnitude * _currentRunFactor;
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, 0.01f, Time.fixedDeltaTime);
     }
 
+    #endregion ===== 이동 =====
 
-    #region =====RUN=====
+    #region ===== 달리기 =====
 
+    /// <summary> 달리는 동안 매 FixedUpdate마다 SP를 소비한다. </summary>
     private void ConsumeRunSp()
     {
         if (_currentRunFactor <= DefaultMoveFactor)
@@ -182,10 +194,11 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Player.SetSp(-spCost);
     }
 
+    /// <summary> 현재 입력과 상태를 기준으로 달리기 상태와 이동 배율을 갱신한다. </summary>
     private void AdjustRunSpeed()
     {
         Player.UnsetState(PlayerCtrl.PlayerState.Running);
-        
+
         _currentRunFactor = DefaultMoveFactor;
 
         if (!_canRunInCurrentState)
@@ -207,13 +220,14 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         _currentRunFactor = _runFactor;
     }
 
+    /// <summary> 현재 State에서 달리기 가능 여부를 설정한다. </summary>
     public void SetRunStateAllowed(bool allowed, float delay = 0f)
     {
         if (_canRunInCurrentState == allowed)
         {
             return;
         }
-        
+
         if (_runStateCoroutine != null)
         {
             StopCoroutine(_runStateCoroutine);
@@ -229,6 +243,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         _runStateCoroutine = StartCoroutine(Co_SetRunStateAllowed(allowed, delay));
     }
 
+    /// <summary> 지정된 시간 이후 현재 State에서의 달리기 가능 여부를 변경한다. </summary>
     private IEnumerator Co_SetRunStateAllowed(bool allowed, float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -237,5 +252,5 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         _runStateCoroutine = null;
     }
 
-    #endregion =====RUN=====
+    #endregion ===== 달리기 =====
 }

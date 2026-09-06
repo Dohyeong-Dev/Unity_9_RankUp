@@ -1,15 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary> 플레이어의 대시 입력, 이동, 지속 시간 및 쿨타임을 관리한다. </summary>
 [RequireComponent(typeof(PlayerCtrl))]
 public class DashBehaviour : BaseLocomotionBehaviour
 {
-    [Header("대시")]
-    [SerializeField] private float _dashSpeed = 10f;
-    [SerializeField] private float _dashDuration = 0.15f;
-    [SerializeField] private float _dashCoolTime = 1f;
+    #region ===== 상태 =====
 
-    private float _dashTimer;
+    private float _dashDurationTimer;
     private float _dashCoolTimer;
 
     private Vector3 _dashDirection;
@@ -20,10 +18,20 @@ public class DashBehaviour : BaseLocomotionBehaviour
 
     private Coroutine _dashStateCoroutine;
 
+    #endregion ===== 상태 =====
+
+    #region ===== 설정 =====
+
+    [Header("대시")]
+    [SerializeField] private float _dashSpeed = 10f;
+    [SerializeField] private float _dashDuration = 0.15f;
+    [SerializeField] private float _dashCoolTime = 1f;
+
+    #endregion ===== 설정 =====
 
     private void Start()
     {
-        _dashCoolTimer = _dashCoolTime;
+        _dashCoolTimer = 0f;
         _canDash = true;
     }
 
@@ -39,19 +47,14 @@ public class DashBehaviour : BaseLocomotionBehaviour
 
     protected override void OnUpdateBeforeInput()
     {
-        CalculateDashCoolTime();
+        UpdateDashCoolTime();
 
         if (!Player.IsDashing || !_isDashMovementStarted)
         {
             return;
         }
 
-        _dashTimer += Time.deltaTime;
-
-        if (_dashTimer >= _dashDuration)
-        {
-            EndDash();
-        }
+        UpdateDashDuration();
     }
 
     protected override void OnUpdateAfterInput()
@@ -62,6 +65,9 @@ public class DashBehaviour : BaseLocomotionBehaviour
         }
     }
 
+    #region ===== 대시 =====
+
+    /// <summary> 현재 상태와 자원을 확인한 후 대시를 시작한다. </summary>
     private void TryDash()
     {
         if (!Player.IsGrounded || !Player.IsDefaultBehaviour || Player.IsAttacking)
@@ -89,20 +95,15 @@ public class DashBehaviour : BaseLocomotionBehaviour
         Player.SetSp(-RequiredSpRate);
 
         _canDash = false;
-        _dashCoolTimer = 0f;
+        _dashCoolTimer = _dashCoolTime;
         _isDashMovementStarted = false;
 
-        // 현재 Locomotion을 DashBehaviour로 변경
         Player.SetCurLocomotionBehaviour(BehaviourHash);
-
-        // 대시 상태 시작
         Player.SetState(PlayerCtrl.PlayerState.Dashing);
-
-        // Dash 애니메이션 재생
         Player.Animator.SetBool(AnimatorKey.Hash.IsDash, true);
     }
 
-    /// <summary> Animator가 실제 Dash State에 진입했을 때 호출된다. 이 시점부터 실제 대시 이동과 대시 시간이 시작된다. </summary>
+    /// <summary> Animator가 실제 Dash State에 진입했을 때 대시 이동과 지속 시간을 시작한다. </summary>
     public void StartDashMovement()
     {
         if (!Player.IsDashing || _isDashMovementStarted)
@@ -110,16 +111,33 @@ public class DashBehaviour : BaseLocomotionBehaviour
             return;
         }
 
-        _dashTimer = 0f;
+        _dashDurationTimer = _dashDuration;
         _isDashMovementStarted = true;
     }
 
+    /// <summary> 대시 지속 시간을 감소시키고 시간이 끝나면 대시를 종료한다. </summary>
+    private void UpdateDashDuration()
+    {
+        _dashDurationTimer -= Time.deltaTime;
+
+        if (_dashDurationTimer > 0f)
+        {
+            return;
+        }
+
+        _dashDurationTimer = 0f;
+
+        EndDash();
+    }
+
+    /// <summary> 현재 대시 방향으로 이동한다. </summary>
     private void UpdateDashMove()
     {
         Vector3 velocity = _dashDirection * _dashSpeed;
         Player.Rigid.velocity = new Vector3(velocity.x, Player.Rigid.velocity.y, velocity.z);
     }
 
+    /// <summary> 플레이어가 바라보는 방향을 기준으로 대시 방향을 반환한다. </summary>
     private Vector3 GetDashDirection()
     {
         Vector3 direction = Player.Tr.forward;
@@ -133,23 +151,27 @@ public class DashBehaviour : BaseLocomotionBehaviour
         return direction.normalized;
     }
 
-    private void CalculateDashCoolTime()
+    /// <summary> 대시 쿨타임을 감소시키고 완료되면 다시 대시를 허용한다. </summary>
+    private void UpdateDashCoolTime()
     {
-        if (_dashCoolTimer >= _dashCoolTime)
+        if (_dashCoolTimer <= 0f)
         {
             _canDash = true;
             return;
         }
 
-        _dashCoolTimer += Time.deltaTime;
+        _dashCoolTimer -= Time.deltaTime;
 
-        if (_dashCoolTimer >= _dashCoolTime)
+        if (_dashCoolTimer > 0f)
         {
-            _dashCoolTimer = _dashCoolTime;
-            _canDash = true;
+            return;
         }
+
+        _dashCoolTimer = 0f;
+        _canDash = true;
     }
 
+    /// <summary> 현재 대시를 종료하고 플레이어 상태를 복구한다. </summary>
     public void EndDash()
     {
         if (!Player.IsDashing)
@@ -157,15 +179,19 @@ public class DashBehaviour : BaseLocomotionBehaviour
             return;
         }
 
-        _dashTimer = 0f;
+        _dashDurationTimer = 0f;
         _isDashMovementStarted = false;
 
         Player.UnsetState(PlayerCtrl.PlayerState.Dashing);
         Player.UnsetCurLocomotionBehaviour(BehaviourHash);
-
         Player.Animator.SetBool(AnimatorKey.Hash.IsDash, false);
     }
 
+    #endregion ===== 대시 =====
+
+    #region ===== 상태 제어 =====
+
+    /// <summary> 현재 Animator State에서 대시 가능 여부를 설정한다. </summary>
     public void SetDashStateAllowed(bool allowed, float delay = 0f)
     {
         if (_canDashInCurrentState == allowed)
@@ -188,6 +214,7 @@ public class DashBehaviour : BaseLocomotionBehaviour
         _dashStateCoroutine = StartCoroutine(Co_SetDashStateAllowed(allowed, delay));
     }
 
+    /// <summary> 지정된 시간 이후 현재 State에서의 대시 가능 여부를 변경한다. </summary>
     private IEnumerator Co_SetDashStateAllowed(bool allowed, float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -195,4 +222,6 @@ public class DashBehaviour : BaseLocomotionBehaviour
         _canDashInCurrentState = allowed;
         _dashStateCoroutine = null;
     }
+
+    #endregion ===== 상태 제어 =====
 }

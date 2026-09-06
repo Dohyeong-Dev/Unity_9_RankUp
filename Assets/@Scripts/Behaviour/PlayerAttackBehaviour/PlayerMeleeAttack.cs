@@ -1,5 +1,6 @@
 using UnityEngine;
 
+/// <summary> 플레이어의 근접 공격, 콤보, 공격 방향 및 슬래시 이펙트를 관리한다. </summary>
 public class PlayerMeleeAttack : PlayerAttackBehaviour
 {
     private enum ComboStep
@@ -9,28 +10,32 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         Third,
     }
 
+    #region ===== 상태 =====
+
     private ComboStep _currentComboStep;
 
-    // 콤보 입력 여부
+    // 다음 콤보 공격 입력이 예약되었는지 여부
     private bool _isComboInputBuffered;
 
-    // 시즈 상태
+    // 칼집 상태
     private bool _isSheathing;
     private bool _isSheatheCancelled;
 
+    #endregion ===== 상태 =====
 
-    #region ===== 방향 =====
+    #region ===== 회전 =====
 
     // 다음 콤보 공격에 사용할 방향
     private Vector3 _nextComboDirection;
     private bool _hasNextComboDirection;
 
-    // FixedUpdate에서 적용할 공격 회전
+    // FixedUpdate에서 적용할 공격 방향 회전
     private Quaternion _targetAttackRotation;
     private bool _isAttackRotationRequested;
 
-    #endregion
+    #endregion ===== 회전 =====
 
+    #region ===== 설정 =====
 
     [Header("공격 판정")]
     [SerializeField] private AttackRange _meleeAttackRange;
@@ -38,6 +43,8 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
 
     [Header("이펙트")]
     [SerializeField] private ParticleSystem _slashVFX;
+
+    #endregion ===== 설정 =====
 
 
     protected override void OnFixedUpdate()
@@ -47,7 +54,6 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
 
     protected override void OnUpdate()
     {
-        // 현재 WASD 입력 방향을 계속 저장
         UpdateNextComboDirection();
 
         if (Managers.Input.MouseDown_Left)
@@ -56,7 +62,9 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         }
     }
 
-    /// <summary> 현재 공격 상태를 초기화한다. 피격, 사망 등 공격을 강제로 취소해야 할 때 사용한다. </summary>
+    #region ===== 초기화 =====
+
+    /// <summary> 현재 공격 상태를 초기화한다. 피격이나 사망 등 공격을 강제로 취소해야 할 때 사용한다. </summary>
     public override void Clear()
     {
         Player.UnsetCurAttack();
@@ -75,10 +83,11 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, 0);
     }
 
+    #endregion ===== 초기화 =====
 
-    #region ===== 방향 =====
+    #region ===== 회전 =====
 
-    /// <summary> 현재 입력된 방향을 다음 공격 방향으로 저장한다. 공격 중에도 계속 갱신한다. </summary>
+    /// <summary> 현재 입력 방향을 다음 콤보 공격에 사용할 방향으로 저장한다. </summary>
     private void UpdateNextComboDirection()
     {
         Vector3 inputDirection = GetInputDirection();
@@ -88,11 +97,11 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
             return;
         }
 
-        _nextComboDirection = inputDirection.normalized;
+        _nextComboDirection = inputDirection;
         _hasNextComboDirection = true;
     }
 
-    /// <summary> 카메라가 바라보는 방향을 기준으로 현재 입력된 이동 방향을 계산한다. </summary>
+    /// <summary> 카메라 방향을 기준으로 현재 플레이어의 이동 입력 방향을 계산한다. </summary>
     private Vector3 GetInputDirection()
     {
         if (Player.Cam == null)
@@ -107,32 +116,30 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
             return Vector3.zero;
         }
 
-        Transform camTr = Player.Cam.transform;
+        Transform cameraTransform = Player.Cam.transform;
 
-        Vector3 forward = camTr.forward;
-        Vector3 right = camTr.right;
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
 
-        // 카메라의 위아래 기울기는 제거
+        // 카메라의 위아래 기울기를 제거하여 수평 방향만 사용
         forward.y = 0f;
         right.y = 0f;
+
+        if (forward.sqrMagnitude <= Mathf.Epsilon || right.sqrMagnitude <= Mathf.Epsilon)
+        {
+            return Vector3.zero;
+        }
 
         forward.Normalize();
         right.Normalize();
 
-        Vector3 direction = forward * input.y + right * input.x;
-
-        return direction.normalized;
+        return (forward * input.y + right * input.x).normalized;
     }
 
-    /// <summary> 저장된 방향으로 회전을 요청한다. 실제 회전은 FixedUpdate에서 처리한다. </summary>
+    /// <summary> 저장된 다음 콤보 방향을 기준으로 공격 회전을 요청한다. </summary>
     private void RotateTowardsNextComboDirection()
     {
-        if (!_hasNextComboDirection)
-        {
-            return;
-        }
-
-        if (_nextComboDirection.sqrMagnitude <= Mathf.Epsilon)
+        if (!_hasNextComboDirection || _nextComboDirection.sqrMagnitude <= Mathf.Epsilon)
         {
             return;
         }
@@ -144,7 +151,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         _hasNextComboDirection = false;
     }
 
-    /// <summary> Rigidbody를 통해 공격 방향 회전을 적용한다. </summary>
+    /// <summary> 요청된 공격 방향 회전을 Rigidbody에 적용한다. </summary>
     private void ApplyAttackRotation()
     {
         if (!_isAttackRotationRequested)
@@ -157,44 +164,44 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         _isAttackRotationRequested = false;
     }
 
-    #endregion
-
+    #endregion ===== 회전 =====
 
     #region ===== 공격 =====
 
-    /// <summary> 현재 상태에 따라 공격을 시작하거나 다음 콤보 공격을 예약한다. </summary>
+    /// <summary> 현재 상태에 따라 첫 공격을 시작하거나 다음 콤보 공격을 예약한다. </summary>
     private void TryAttack()
     {
-        // 현재 기본 로코모션 상태가 아니면 공격 불가
         if (!Player.IsDefaultBehaviour)
         {
             return;
         }
 
-        // 공격 중이 아니라면 첫 공격 시작
-        if (!Player.IsAttacking)
+        if (Player.IsAttacking)
         {
-            if (!Player.HasEnoughSp(RequiredSp))
-            {
-                return;
-            }
-
-            StartAttack(ComboStep.First);
-
+            BufferNextComboInput();
             return;
         }
 
-        // 이미 다음 콤보 입력이 저장되어 있다면 무시
+        if (!Player.HasEnoughSp(RequiredSp))
+        {
+            return;
+        }
+
+        StartAttack(ComboStep.First);
+    }
+
+    /// <summary> 다음 콤보 공격 입력을 예약한다. </summary>
+    private void BufferNextComboInput()
+    {
         if (_isComboInputBuffered)
         {
             return;
         }
 
-        // 다음 콤보 예약
         _isComboInputBuffered = true;
     }
 
-    /// <summary> 공격을 시작한다. 공격 시작 직전에 현재 입력 방향을 회전 요청으로 저장한다. </summary>
+    /// <summary> 지정한 콤보 단계의 공격을 시작한다. </summary>
     private void StartAttack(ComboStep comboStep)
     {
         RotateTowardsNextComboDirection();
@@ -203,21 +210,15 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         Player.SetSp(-RequiredSp);
 
         _currentComboStep = comboStep;
+        _isComboInputBuffered = false;
 
         Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, (int)_currentComboStep);
-
-        _isComboInputBuffered = false;
     }
 
-    /// <summary> Animation Event에서 호출하며 예약된 다음 콤보가 있으면 다음 공격으로 전환한다. </summary>
+    /// <summary> 예약된 콤보 입력이 있으면 다음 콤보 공격으로 전환한다. </summary>
     public void TryTransitionCombo()
     {
-        if (!_isComboInputBuffered)
-        {
-            return;
-        }
-
-        if (!Player.IsAttacking)
+        if (!_isComboInputBuffered || !Player.IsAttacking)
         {
             return;
         }
@@ -244,7 +245,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         return _currentComboStep;
     }
 
-    /// <summary> Animation Event에서 호출하며 현재 공격 범위 내 적에게 데미지를 적용한다. </summary>
+    /// <summary> 현재 공격 범위 안의 적에게 데미지를 적용한다. </summary>
     public void CheckMeleeAttackRange()
     {
         if (_meleeAttackRange == null)
@@ -261,33 +262,34 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
 
         Player.Cam?.ShakeCamera((int)_currentComboStep);
 
-        foreach (Collider col in colliders)
+        foreach (Collider collider in colliders)
         {
-            if (col.TryGetComponent(out IDamageable damageable))
+            if (!collider.TryGetComponent(out IDamageable damageable))
             {
-                damageable.TakeDamage(GetRandomDamage());
+                continue;
             }
+
+            damageable.TakeDamage(GetRandomDamage());
         }
     }
 
-    #endregion
+    #endregion ===== 공격 =====
 
+    #region ===== 칼집 =====
 
-    #region ===== 시즈 =====
-
-    /// <summary> 시즈 상태를 설정한다. </summary>
+    /// <summary> 칼집 상태를 설정한다. </summary>
     public void SetSheathing(bool value)
     {
         _isSheathing = value;
     }
 
-    /// <summary> 시즈 취소 상태를 설정한다. </summary>
+    /// <summary> 칼집 취소 상태를 설정한다. </summary>
     private void SetSheathingCancelled(bool value)
     {
         _isSheatheCancelled = value;
     }
 
-    /// <summary> 현재 시즈 상태를 취소하고 공격 상태를 초기화한다. </summary>
+    /// <summary> 현재 칼집 상태를 취소하고 공격 상태를 초기화한다. </summary>
     public void CancelSheathe()
     {
         if (!_isSheathing || _isSheatheCancelled)
@@ -302,8 +304,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         Clear();
     }
 
-    #endregion
-
+    #endregion ===== 칼집 =====
 
     #region ===== 이펙트 =====
 
@@ -315,10 +316,10 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
             return;
         }
 
-        Transform tr = _slashVFX.transform;
+        Transform slashTransform = _slashVFX.transform;
 
-        tr.localPosition = localPosition;
-        tr.localEulerAngles = localEulerAngles;
+        slashTransform.localPosition = localPosition;
+        slashTransform.localEulerAngles = localEulerAngles;
     }
 
     /// <summary> 슬래시 이펙트를 재생한다. </summary>
@@ -326,12 +327,12 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
     {
         if (_slashVFX == null)
         {
-            CPrint.Warning("슬래시 파티클 없음");
+            CPrint.Warning("[PlayerMeleeAttack] 슬래시 파티클을 찾을 수 없습니다.");
             return;
         }
 
         _slashVFX.Play();
     }
 
-    #endregion
+    #endregion ===== 이펙트 =====
 }
