@@ -1,9 +1,8 @@
-using UnityEngine;
-
+/// <summary> 화면 단위 UI의 공통 초기화, 입력 처리 및 닫기 기능을 제공하는 기본 클래스다. </summary>
 public abstract class BaseScreen : BaseUI
 {
     public override int SortingOrder => 1;
-    
+
     protected bool IsClosing;
 
     private void Awake()
@@ -30,12 +29,15 @@ public abstract class BaseScreen : BaseUI
 
     protected abstract void OnUpdate();
 
+    /// <summary> Screen에서 처리할 입력을 확인한다. </summary>
     public virtual void OnInputKey()
     {
-        if (Managers.Input.KeyDown_Esc)
+        if (!Managers.Input.KeyDown_Esc)
         {
-            Close();
+            return;
         }
+
+        Close();
     }
 
     public virtual void Close()

@@ -1,9 +1,11 @@
 using TMPro;
-using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary> 게임 종료 또는 게임 클리어 결과를 표시하고 게임 재시작을 처리하는 Screen UI다. </summary>
 public class EndScreen : BaseScreen
 {
+    #region ===== UI 바인딩 =====
+
     private enum Texts
     {
         OverTxt,
@@ -17,12 +19,10 @@ public class EndScreen : BaseScreen
 
     private enum Images
     {
-        Bg
+        Bg,
     }
 
-    public override void OnInputKey()
-    {
-    }
+    #endregion ===== UI 바인딩 =====
 
     protected override void OnAwake()
     {
@@ -39,30 +39,33 @@ public class EndScreen : BaseScreen
         Managers.Input.SetCursorLock(false);
     }
 
-    public void Open(bool isGameOver)
-    {
-        Get<Image>(Images.Bg).gameObject.SetActive(true);
-
-        if (isGameOver)
-        {
-            Get<TMP_Text>(Texts.ClearTxt).gameObject.SetActive(false);
-            Get<TMP_Text>(Texts.OverTxt).gameObject.SetActive(true);
-        }
-        else
-        {
-            Get<TMP_Text>(Texts.ClearTxt).gameObject.SetActive(true);
-            Get<TMP_Text>(Texts.OverTxt).gameObject.SetActive(false);
-        }
-    }
-
     protected override void OnUpdate()
     {
     }
 
+    public override void OnInputKey()
+    {
+    }
+
+    /// <summary> 게임 종료 여부에 따라 결과 화면을 표시한다. </summary>
+    public void Open(bool isGameOver)
+    {
+        Get<Image>(Images.Bg).gameObject.SetActive(true);
+
+        SetResultText(isGameOver);
+    }
+
+    /// <summary> 게임 결과에 맞는 텍스트를 표시한다. </summary>
+    private void SetResultText(bool isGameOver)
+    {
+        Get<TMP_Text>(Texts.OverTxt).gameObject.SetActive(isGameOver);
+        Get<TMP_Text>(Texts.ClearTxt).gameObject.SetActive(!isGameOver);
+    }
+
+    /// <summary> 현재 게임을 종료하고 처음부터 다시 시작한다. </summary>
     public void Restart()
     {
         Managers.UI.OpenLoadingUI();
-
         Managers.Scene.LoadSceneWithLoading(SceneType.GameScene);
     }
 }

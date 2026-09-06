@@ -630,3 +630,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentAnimation: 2
+  _contentsUpOffsetY: 10
+  _bgUpOffsetY: 20
+  _bgDownDistance: 0

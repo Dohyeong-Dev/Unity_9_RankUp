@@ -3,10 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary> 사용자에게 선택을 요청하고 결과에 따라 지정된 동작을 실행하는 알림 팝업이다. </summary>
 public class AlertPopup : BasePopup
 {
-    private Action _yesAction;
-
     private enum Buttons
     {
         YesButton,
@@ -18,7 +17,8 @@ public class AlertPopup : BasePopup
         ContentText,
     }
 
-    
+    private Action _yesAction;
+
     protected override void OnAwake()
     {
         Bind<Button>(typeof(Buttons));
@@ -38,57 +38,44 @@ public class AlertPopup : BasePopup
 
     public override void OnInputKey()
     {
-        // Enter → Yes
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             OnClickYes();
             return;
         }
 
-        // Escape → No
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             OnClickNo();
         }
     }
 
-    /// <summary> 팝업 설정 </summary>
-    /// <param name="content">팝업 내용</param>
-    /// <param name="showCancelButton">Yes/No 버튼을 모두 표시할지 여부</param>
-    /// <param name="yesAction">Yes 선택 시 실행할 행동</param>
+    protected override void DestroyOverride()
+    {
+        _yesAction = null;
+
+        Get<Button>(Buttons.YesButton)?.onClick.RemoveAllListeners();
+        Get<Button>(Buttons.NoButton)?.onClick.RemoveAllListeners();
+    }
+    
+    /// <summary> 팝업의 내용과 선택 시 실행할 동작을 설정한다. </summary>
     public void Set(string content, bool showCancelButton = false, Action yesAction = null)
     {
         _yesAction = yesAction;
 
         Get<TMP_Text>(Texts.ContentText).text = content;
-
-        // Yes/No 팝업이면 No 버튼 활성화
         Get<Button>(Buttons.NoButton).gameObject.SetActive(showCancelButton);
     }
 
+    /// <summary> Yes 버튼을 선택했을 때 팝업을 닫고 지정된 동작을 실행한다. </summary>
     private void OnClickYes()
     {
-        Close(() =>
-        {
-            _yesAction?.Invoke();
-        });
+        Close(() => _yesAction?.Invoke());
     }
 
+    /// <summary> No 버튼을 선택했을 때 팝업을 닫는다. </summary>
     private void OnClickNo()
     {
         Close();
-    }
-
-    protected override void DestroyOverride()
-    {
-        if (Managers.Input == null)
-        {
-            return;
-        }
-        
-        _yesAction = null;
-        
-        Get<Button>(Buttons.YesButton).onClick.RemoveAllListeners();
-        Get<Button>(Buttons.NoButton).onClick.RemoveAllListeners();
     }
 }

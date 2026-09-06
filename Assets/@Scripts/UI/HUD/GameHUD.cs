@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary> 플레이어의 HP와 SP 상태를 화면에 표시하는 게임 HUD다. </summary>
 public class GameHUD : BaseHUD
 {
     private enum Sliders
@@ -22,60 +23,54 @@ public class GameHUD : BaseHUD
         HpSliderCover,
         SpSliderCover
     }
-    
+
+    #region ===== 참조 =====
+
+    private PlayerCtrl _player;
+
+    #endregion ===== 참조 =====
+
+    #region ===== 이펙트 =====
+
     private Tween _hpEmptyCoverTween;
     private Tween _spEmptyCoverTween;
+
     private Color _hpCoverDefaultColor;
     private Color _spCoverDefaultColor;
 
-    private PlayerCtrl _player;
+    #endregion ===== 이펙트 =====
 
     protected override void OnAwake()
     {
         Bind<Slider>(typeof(Sliders));
         Bind<TMP_Text>(typeof(Texts));
         Bind<Image>(typeof(Images));
-        
-        if (_hpCoverDefaultColor == default)
-        {
-            _hpCoverDefaultColor = Get<Image>(Images.HpSliderCover).color;
-        }
-        
-        if (_spCoverDefaultColor == default)
-        {
-            _spCoverDefaultColor = Get<Image>(Images.SpSliderCover).color;
-        }
+
+        InitializeCoverColors();
     }
 
     protected override void OnStart()
     {
         Managers.Input.SetCursorLock(true);
 
-        _player = FindFirstObjectByType<PlayerCtrl>();
-
-        if (_player == null)
+        if (!TryResolvePlayer())
         {
-            CPrint.Warning("Player를 찾을 수 없습니다.");
             return;
         }
 
-        _player.OnHpChanged += UpdateHpSlider;
-        _player.OnSpChanged += UpdateSpSlider;
-
-        // HUD가 생성된 시점의 초기값 반영
-        UpdateHpSlider(_player.HP, _player.MaxHP);
-        UpdateSpSlider(_player.SP, _player.MaxSP);
+        SubscribePlayerEvents();
+        UpdatePlayerStatus();
     }
 
     protected override void OnUpdate()
     {
     }
-
+    
     private void OnDestroy()
     {
         _hpEmptyCoverTween?.Kill();
         _spEmptyCoverTween?.Kill();
-        
+
         if (_player == null)
         {
             return;
@@ -84,7 +79,51 @@ public class GameHUD : BaseHUD
         _player.OnHpChanged -= UpdateHpSlider;
         _player.OnSpChanged -= UpdateSpSlider;
     }
+    
+    #region ===== 초기화 =====
 
+    /// <summary> HP와 SP 게이지 커버의 기본 색상을 저장한다. </summary>
+    private void InitializeCoverColors()
+    {
+        _hpCoverDefaultColor = Get<Image>(Images.HpSliderCover).color;
+        _spCoverDefaultColor = Get<Image>(Images.SpSliderCover).color;
+    }
+
+    #endregion ===== 초기화 =====
+    
+    #region ===== 참조 확인 =====
+
+    /// <summary> 플레이어 참조를 반환하고 없으면 현재 씬에서 찾는다. </summary>
+    private bool TryResolvePlayer()
+    {
+        if (_player != null)
+        {
+            return true;
+        }
+
+        _player = FindFirstObjectByType<PlayerCtrl>();
+
+        if (_player != null)
+        {
+            return true;
+        }
+
+        CPrint.Warning("Player를 찾을 수 없습니다.");
+        return false;
+    }
+
+    #endregion ===== 참조 확인 =====
+    
+    #region ===== 플레이어 =====
+
+    /// <summary> 플레이어의 현재 HP와 SP를 HUD에 반영한다. </summary>
+    private void UpdatePlayerStatus()
+    {
+        UpdateHpSlider(_player.HP, _player.MaxHP);
+        UpdateSpSlider(_player.SP, _player.MaxSP);
+    }
+
+    /// <summary> HP UI를 현재 HP 비율에 맞게 갱신한다. </summary>
     private void UpdateHpSlider(float currentHp, float maxHp)
     {
         Slider hpSlider = Get<Slider>(Sliders.HpSlider);
@@ -97,37 +136,18 @@ public class GameHUD : BaseHUD
         float sliderValue = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
 
         hpSlider.value = sliderValue;
-        Get<TMP_Text>(Texts.HpText).text = (sliderValue * 100f).ToString("F0") + "%";
-        
+        Get<TMP_Text>(Texts.HpText).text = $"{sliderValue * 100f:F0}%";
+
         if (sliderValue <= 0.1f)
         {
             PlayHpEmptyWarning();
-        }
-        else
-        {
-            StopHpEmptyWarning();
-        }
-    }
-
-    private void PlayHpEmptyWarning()
-    {
-        if (_hpEmptyCoverTween != null && _hpEmptyCoverTween.IsActive())
-        {
             return;
         }
 
-        _hpEmptyCoverTween = Get<Image>(Images.HpSliderCover).DOColor(Color.red, 0.25f)
-            .SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        StopHpEmptyWarning();
     }
-    
-    private void StopHpEmptyWarning()
-    {
-        _hpEmptyCoverTween?.Kill();
-        _hpEmptyCoverTween = null;
 
-        Get<Image>(Images.HpSliderCover).color = _hpCoverDefaultColor;
-    }
-    
+    /// <summary> SP UI를 현재 SP 비율에 맞게 갱신한다. </summary>
     private void UpdateSpSlider(float currentSp, float maxSp)
     {
         Slider spSlider = Get<Slider>(Sliders.SpSlider);
@@ -140,18 +160,46 @@ public class GameHUD : BaseHUD
         float sliderValue = maxSp > 0f ? Mathf.Clamp01(currentSp / maxSp) : 0f;
 
         spSlider.value = sliderValue;
-        Get<TMP_Text>(Texts.SpText).text = (sliderValue * 100f).ToString("F0") + "%";
+        Get<TMP_Text>(Texts.SpText).text = $"{sliderValue * 100f:F0}%";
 
         if (currentSp >= _player.SpRecoveryThreshold)
         {
             StopSpEmptyWarning();
+            return;
         }
-        else
-        {
-            PlaySpEmptyWarning();
-        }
+
+        PlaySpEmptyWarning();
     }
-    
+
+    #endregion ===== 플레이어 =====
+
+
+    #region ===== 이펙트 =====
+
+    /// <summary> HP가 낮을 때 HP 게이지의 경고 효과를 재생한다. </summary>
+    private void PlayHpEmptyWarning()
+    {
+        if (_hpEmptyCoverTween != null && _hpEmptyCoverTween.IsActive())
+        {
+            return;
+        }
+
+        Image hpCover = Get<Image>(Images.HpSliderCover);
+
+        _hpEmptyCoverTween = hpCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
+    }
+
+    /// <summary> HP 게이지의 경고 효과를 중지하고 기본 색상으로 복원한다. </summary>
+    private void StopHpEmptyWarning()
+    {
+        _hpEmptyCoverTween?.Kill();
+        _hpEmptyCoverTween = null;
+
+        Get<Image>(Images.HpSliderCover).color = _hpCoverDefaultColor;
+    }
+
+    /// <summary> SP가 부족할 때 SP 게이지의 경고 효과를 재생한다. </summary>
     private void PlaySpEmptyWarning()
     {
         if (_spEmptyCoverTween != null && _spEmptyCoverTween.IsActive())
@@ -159,10 +207,13 @@ public class GameHUD : BaseHUD
             return;
         }
 
-        _spEmptyCoverTween = Get<Image>(Images.SpSliderCover).DOColor(Color.red, 0.25f)
-            .SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
+        Image spCover = Get<Image>(Images.SpSliderCover);
+
+        _spEmptyCoverTween = spCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
     }
-    
+
+    /// <summary> SP 게이지의 경고 효과를 중지하고 기본 색상으로 복원한다. </summary>
     private void StopSpEmptyWarning()
     {
         _spEmptyCoverTween?.Kill();
@@ -170,4 +221,19 @@ public class GameHUD : BaseHUD
 
         Get<Image>(Images.SpSliderCover).color = _spCoverDefaultColor;
     }
+
+    #endregion ===== 이펙트 =====
+
+    #region ===== 이벤트 =====
+
+    /// <summary> 플레이어 이벤트를 등록하고 현재 스탯을 HUD에 반영한다. </summary>
+    private void SubscribePlayerEvents()
+    {
+        _player.OnHpChanged += UpdateHpSlider;
+        _player.OnSpChanged += UpdateSpSlider;
+    }
+
+    #endregion ===== 이벤트 =====
+    
+    
 }
