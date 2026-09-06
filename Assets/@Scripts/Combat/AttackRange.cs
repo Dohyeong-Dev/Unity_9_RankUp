@@ -1,12 +1,11 @@
 using UnityEngine;
 
+/// <summary> 공격 범위를 Box 형태로 검사한다. </summary>
 public class AttackRange : MonoBehaviour
 {
-    [SerializeField]
-    private Color _gizmoColor = new(1f, 0f, 0f, 0.3f);
+    [SerializeField] private Color _gizmoColor = new(1f, 0f, 0f, 0.3f);
 
-
-    /// <summary> 공격 범위 안의 Collider를 반환합니다. </summary>
+    /// <summary> 지정된 레이어 중 현재 공격 범위 안에 있는 Collider를 반환한다. </summary>
     public Collider[] GetColliders(LayerMask targetLayer)
     {
         Vector3 halfExtents = transform.lossyScale * 0.5f;

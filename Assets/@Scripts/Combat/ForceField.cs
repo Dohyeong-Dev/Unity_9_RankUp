@@ -1,30 +1,26 @@
 using UnityEngine;
 
-/// <summary> 페이즈별 시련 시작 지점과 스폰 진행 상태를 관리한다. </summary>
+/// <summary> 페이즈별 시련 시작 지점과 시련 진행 상태를 관리한다. </summary>
 public class ForceField : MonoBehaviour
 {
-    #region ===== 컴포넌트 =====
+    #region ===== 참조 =====
 
     private PlayerCtrl _player;
     private Renderer _renderer;
     private Spawner _spawner;
 
-    #endregion ===== 컴포넌트 =====
+    #endregion ===== 참조 =====
 
-    #region ===== 마테리얼 =====
+    #region ===== 설정 =====
 
     [Header("마테리얼")]
     [SerializeField] private Material _redMaterial;
     [SerializeField] private Material _blueMaterial;
 
-    #endregion ===== 마테리얼 =====
-
-    #region ===== 가이드 =====
-
     [Header("가이드")]
     [SerializeField] private ParticleSystem _arrow;
 
-    #endregion ===== 가이드 =====
+    #endregion ===== 설정 =====
 
     #region ===== 상태 =====
 
@@ -63,7 +59,12 @@ public class ForceField : MonoBehaviour
             return;
         }
 
-        TryResolvePlayer(other);
+        if (!TryResolvePlayer(other))
+        {
+            CPrint.Error("[ForceField] Player를 찾을 수 없습니다.");
+            return;
+        }
+
         OpenAlertPopup();
     }
 
@@ -74,7 +75,7 @@ public class ForceField : MonoBehaviour
 
     #region ===== 초기화 =====
 
-    /// <summary> ForceField가 사용하는 컴포넌트를 초기화한다. </summary>
+    /// <summary> ForceField가 사용하는 컴포넌트 참조를 초기화한다. </summary>
     private void InitializeComponents()
     {
         _renderer = GetComponentInChildren<Renderer>(true);
@@ -89,9 +90,9 @@ public class ForceField : MonoBehaviour
 
     #endregion ===== 초기화 =====
 
-    #region ===== 플레이어 =====
+    #region ===== 참조 확인 =====
 
-    /// <summary> 현재 씬 또는 충돌한 오브젝트에서 플레이어 참조를 확보한다. </summary>
+    /// <summary> 기존 플레이어 참조를 반환하고 없으면 충돌 오브젝트나 현재 씬에서 찾는다. </summary>
     private bool TryResolvePlayer(Collider other = null)
     {
         if (_player != null)
@@ -105,8 +106,8 @@ public class ForceField : MonoBehaviour
             return true;
         }
 
-        if (Managers.Scene != null 
-            && Managers.Scene.TryGetCurrentScene(out GameScene gameScene) && gameScene.Player != null)
+        if (Managers.Scene != null && Managers.Scene.TryGetCurrentScene(out GameScene gameScene) &&
+            gameScene.Player != null)
         {
             _player = gameScene.Player;
             return true;
@@ -115,7 +116,7 @@ public class ForceField : MonoBehaviour
         return false;
     }
 
-    #endregion ===== 플레이어 =====
+    #endregion ===== 참조 확인 =====
 
     #region ===== 시련 =====
 
@@ -154,6 +155,7 @@ public class ForceField : MonoBehaviour
         }
 
         _isStarted = true;
+
         UpdateVisualState();
 
         _player.TeleportToTarget(_spawner.transform, _spawner.SpawnEnemies);
@@ -200,7 +202,7 @@ public class ForceField : MonoBehaviour
     {
         if (_spawner != null)
         {
-            _spawner.OnAllEnemiesDefeated += HandleAllEnemiesDefeated;
+            _spawner.OnAllEnemiesDead += HandleAllEnemiesDead;
         }
         else
         {
@@ -223,16 +225,17 @@ public class ForceField : MonoBehaviour
 
         if (_spawner != null)
         {
-            _spawner.OnAllEnemiesDefeated -= HandleAllEnemiesDefeated;
+            _spawner.OnAllEnemiesDead -= HandleAllEnemiesDead;
         }
     }
-    
+
     /// <summary> 현재 페이즈가 변경되면 자신의 활성 상태를 갱신한다. </summary>
     private void HandlePhaseUpdated()
     {
         if (!Managers.Scene.TryGetCurrentScene(out GameScene gameScene))
         {
             CPrint.Error("[ForceField] GameScene을 찾을 수 없습니다.");
+
             gameObject.SetActive(false);
             return;
         }
@@ -241,7 +244,7 @@ public class ForceField : MonoBehaviour
     }
 
     /// <summary> 모든 적이 처치되면 현재 시련 완료 처리를 수행한다. </summary>
-    private void HandleAllEnemiesDefeated()
+    private void HandleAllEnemiesDead()
     {
         CompleteChallenge();
     }

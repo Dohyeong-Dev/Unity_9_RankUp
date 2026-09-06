@@ -5,14 +5,26 @@ using UnityEngine;
 /// <summary> 일정 주기로 시야 범위 내의 타겟을 감지하고 가장 가까운 타겟을 관리한다. </summary>
 public class FieldOfView : MonoBehaviour
 {
-    #region ===== 감지 설정 =====
+    #region ===== 상태 =====
+
+    private readonly List<Transform> _visibleTargets = new();
+
+    private Transform _currentTarget;
+    public Transform CurrentTarget => _currentTarget;
+
+    private Coroutine _detectionCoroutine;
+
+    #endregion ===== 상태 =====
+    
+    #region ===== 설정 =====
 
     [Header("감지 설정")]
     [Tooltip("타겟을 감지할 수 있는 최대 거리")]
     [SerializeField] private float _detectionRadius = 5f;
 
     [Tooltip("감지 가능한 시야각")]
-    [SerializeField, Range(0f, 360f)] private float _fieldOfViewAngle = 180f;
+    [Range(0f, 360f)]
+    [SerializeField] private float _fieldOfViewAngle = 180f;
 
     [Tooltip("타겟 탐색 주기")]
     [SerializeField] private float _detectionInterval = 0.2f;
@@ -23,18 +35,7 @@ public class FieldOfView : MonoBehaviour
     [Tooltip("시야를 가리는 장애물 레이어")]
     [SerializeField] private LayerMask _obstacleLayer;
 
-    #endregion ===== 감지 설정 =====
-
-    #region ===== 감지 결과 =====
-
-    private readonly List<Transform> _visibleTargets = new();
-
-    private Transform _currentTarget;
-    public Transform CurrentTarget => _currentTarget;
-
-    private Coroutine _detectionCoroutine;
-
-    #endregion ===== 감지 결과 =====
+    #endregion ===== 설정 =====
 
     private void OnEnable()
     {
@@ -61,7 +62,7 @@ public class FieldOfView : MonoBehaviour
     }
 
     /// <summary> 실행 중인 타겟 감지를 중지한다. </summary>
-    private void StopDetection()
+    public void StopDetection()
     {
         if (_detectionCoroutine == null)
         {

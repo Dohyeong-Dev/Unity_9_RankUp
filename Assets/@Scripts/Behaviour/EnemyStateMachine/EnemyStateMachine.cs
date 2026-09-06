@@ -77,11 +77,13 @@ public class EnemyStateMachine
 
         if (_currentState == nextState)
         {
+            CPrint.Warning($"{nextState?.Enemy.name} : {_currentState} => {nextState}");
             return;
         }
 
         _currentState?.Exit();
 
+        //CPrint.Log($"{nextState?.Enemy.name} : {_currentState} => {nextState}");
         _currentState = nextState;
         _stateElapsedTime = 0f;
 

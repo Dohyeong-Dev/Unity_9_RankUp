@@ -187,8 +187,6 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         InitializeSpawnTransform();
         InitializeMaterials();
         InitializeStateMachine();
-
-        ResetEnemy();
     }
 
     private void Update()
@@ -393,8 +391,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        ClearCombatTarget();
+        _fieldOfView?.StopDetection();
         _fieldOfView?.ClearTarget();
+        ClearCombatTarget();
 
         StopMovement();
 
@@ -485,7 +484,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         Vector3 direction = targetPosition - transform.position;
         direction.y = 0f;
 
-        if (direction.sqrMagnitude <= Mathf.Epsilon)
+        if (direction.sqrMagnitude < 0.0001f)
         {
             return;
         }

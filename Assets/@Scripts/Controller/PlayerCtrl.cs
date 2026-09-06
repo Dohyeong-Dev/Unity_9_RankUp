@@ -427,7 +427,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         _rigid.isKinematic = true;
         _capsuleCollider.enabled = false;
-        transform.position += Vector3.up * 0.1f;
+        transform.position += Vector3.up * 0.15f;
         
         Managers.Event.RaisePlayerDead();
     }

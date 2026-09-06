@@ -2,7 +2,7 @@
 public abstract class BaseEnemyState
 {
     protected readonly EnemyStateMachine StateMachine;
-    protected readonly EnemyCtrl Enemy;
+    public EnemyCtrl Enemy { get; private set; }
 
     protected BaseEnemyState(EnemyStateMachine stateMachine, EnemyCtrl enemy)
     {
