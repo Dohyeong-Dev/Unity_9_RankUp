@@ -114,6 +114,10 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary> 현재 공격 행동을 실행할 수 있는 상태인지 확인한다. </summary>
+    public bool CanAttack => IsAttackableDistance && CurrentAttackBehaviour != null &&
+                              CurrentAttackBehaviour.IsAvailable;
+
     #endregion ===== 행동 =====
 
     #region ===== 스탯 =====
@@ -283,7 +287,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             }
         }
     }
-    
+
     /// <summary> 적의 모든 상태를 초기값으로 되돌린다. </summary>
     public void ResetEnemy()
     {
@@ -407,7 +411,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         OnAttackFinished?.Invoke();
     }
-    
+
     #endregion ===== 이벤트 =====
 
     #region ===== 타겟 =====
@@ -657,7 +661,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        if (_stateMachine.TryGetCurrentState<HitState>(out HitState hitState))
+        if (_stateMachine.TryGetCurrentState(out HitState hitState))
         {
             hitState.SetAnimationFinished();
         }
@@ -885,9 +889,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 디졸브 및 풀링 =====
-    
+
     #region ===== 트윈 =====
-    
+
     /// <summary> 실행 중인 DOTween을 모두 종료한다. </summary>
     private void KillTweens()
     {
@@ -906,6 +910,6 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _knockbackTween?.Kill();
         _knockbackTween = null;
     }
-    
+
     #endregion ===== 트윈 =====
 }

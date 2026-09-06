@@ -1,5 +1,6 @@
 using UnityEngine;
 
+/// <summary> 공격 가능한 타겟을 향해 공격 애니메이션과 실제 공격을 처리하는 상태다. </summary>
 public class AttackState : BaseEnemyState
 {
     public AttackState(EnemyStateMachine stateMachine, EnemyCtrl enemy) : base(stateMachine, enemy)
@@ -8,19 +9,16 @@ public class AttackState : BaseEnemyState
 
     public override void Enter()
     {
-        Enemy.OnAttackFinished += HandleAttackFinished;
-
-        if (!Enemy.IsAttackableDistance ||
-            Enemy.CurrentAttackBehaviour == null || !Enemy.CurrentAttackBehaviour.IsAvailable)
+        if (!Enemy.CanAttack)
         {
             StateMachine.ChangeState<ChaseState>();
             return;
         }
 
-        Enemy.StopMovement();
+        Enemy.OnAttackFinished += HandleAttackFinished;
 
-        Enemy.Animator.SetTrigger(AnimatorKey.Hash.DoAttack);
-        Enemy.Animator.SetInteger(AnimatorKey.Hash.AttackIndex, Enemy.CurrentAttackBehaviour.AttackAnimationIndex);
+        Enemy.StopMovement();
+        StartAttackAnimation();
     }
 
     public override void Update(float deltaTime)
@@ -40,6 +38,14 @@ public class AttackState : BaseEnemyState
         Enemy.OnAttackFinished -= HandleAttackFinished;
     }
 
+    /// <summary> 현재 선택된 공격 행동에 맞는 공격 애니메이션을 실행한다. </summary>
+    private void StartAttackAnimation()
+    {
+        Enemy.Animator.SetInteger(AnimatorKey.Hash.AttackIndex, Enemy.CurrentAttackBehaviour.AttackAnimationIndex);
+        Enemy.Animator.SetTrigger(AnimatorKey.Hash.DoAttack);
+    }
+
+    /// <summary> 공격 애니메이션이 종료된 후 다음 행동을 결정한다. </summary>
     private void HandleAttackFinished()
     {
         Enemy.Animator.SetInteger(AnimatorKey.Hash.AttackIndex, 0);

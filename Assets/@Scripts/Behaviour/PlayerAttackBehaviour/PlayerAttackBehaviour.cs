@@ -49,8 +49,8 @@ public abstract class PlayerAttackBehaviour : MonoBehaviour
     
     protected float GetRandomDamage()
     {
-        float minDamage = Player.STR * 0.8f;
-        float maxDamage = Player.STR;
+        float minDamage = Player.STR * 0.5f;
+        float maxDamage = Player.STR * 1.5f;
 
         return Random.Range(minDamage, maxDamage) * _damageFactor;
     }
