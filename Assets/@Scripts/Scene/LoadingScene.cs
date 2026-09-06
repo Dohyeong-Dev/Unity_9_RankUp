@@ -2,13 +2,19 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary> 로딩 화면을 표시하고 다음 Scene을 비동기로 로드한다. </summary>
 public class LoadingScene : BaseScene
 {
+    #region ===== 참조 =====
+
     private LoadingHUD _hud;
-    
+
+    #endregion ===== 참조 =====
+
     protected override void OnAwake()
     {
         _hud = GetComponentInChildren<LoadingHUD>(true);
+
         if (_hud == null)
         {
             CPrint.Error("LoadingHUD를 찾을 수 없습니다.");
@@ -30,11 +36,15 @@ public class LoadingScene : BaseScene
     {
     }
 
+    #region ===== Scene 로딩 =====
+
+    /// <summary> 지정된 Scene을 비동기로 로드하고 로딩 진행도를 HUD에 반영한다. </summary>
     private IEnumerator LoadSceneAsync(SceneType nextScene)
     {
         yield return null;
 
         AsyncOperation operation = SceneManager.LoadSceneAsync(nextScene.ToString());
+
         if (operation == null)
         {
             CPrint.Error($"Scene을 비동기로 로드하지 못했습니다. [{nextScene}]");
@@ -43,22 +53,10 @@ public class LoadingScene : BaseScene
 
         operation.allowSceneActivation = false;
 
-        // 실제 Scene 로딩 진행
-        while (operation.progress < 0.9f)
-        {
-            UpdateLoadingProgress(operation.progress);
-            yield return null;
-        }
+        yield return LoadSceneProgressAsync(operation);
+        yield return FillLoadingProgressAsync();
 
-        // 실제 로딩은 완료되었지만 UI 게이지를 100%까지 자연스럽게 채운다.
-        while (_hud != null && _hud.LoadingProgress < 1f)
-        {
-            UpdateLoadingProgress(1f);
-            yield return null;
-        }
-
-        // 사용자가 계속 진행할 때까지 대기
-        while (!CheckLoadable())
+        while (!IsSceneLoadable())
         {
             yield return null;
         }
@@ -68,6 +66,27 @@ public class LoadingScene : BaseScene
         operation.allowSceneActivation = true;
     }
 
+    /// <summary> 실제 Scene 로딩 진행도를 LoadingHUD에 반영한다. </summary>
+    private IEnumerator LoadSceneProgressAsync(AsyncOperation operation)
+    {
+        while (operation.progress < 0.9f)
+        {
+            UpdateLoadingProgress(operation.progress);
+            yield return null;
+        }
+    }
+
+    /// <summary> 실제 로딩 완료 후 LoadingHUD 게이지를 100%까지 채운다. </summary>
+    private IEnumerator FillLoadingProgressAsync()
+    {
+        while (_hud != null && _hud.LoadingProgress < 1f)
+        {
+            UpdateLoadingProgress(1f);
+            yield return null;
+        }
+    }
+
+    /// <summary> 현재 로딩 진행도를 HUD에 반영한다. </summary>
     private void UpdateLoadingProgress(float progress)
     {
         if (_hud == null)
@@ -75,22 +94,29 @@ public class LoadingScene : BaseScene
             return;
         }
 
-        float normalizedProgress = Mathf.Clamp01(progress / 0.9f);
-        float currentProgress = _hud.LoadingProgress;
-        float nextProgress = Mathf.MoveTowards(currentProgress, normalizedProgress, Time.deltaTime);
+        float targetProgress = Mathf.Clamp01(progress / 0.9f);
+        float nextProgress = Mathf.MoveTowards(
+            _hud.LoadingProgress,
+            targetProgress,
+            Time.deltaTime);
 
         _hud.SetLoadingProgress(nextProgress);
     }
 
-    private bool CheckLoadable()
-    {
-        switch (Managers.Scene.NextScene)
-        {
-            case SceneType.GameScene:
-                return _hud?.ContinueRequested ?? false;
+    #endregion ===== Scene 로딩 =====
 
-            default:
-                return false;
-        }
+
+    #region ===== 로딩 완료 확인 =====
+
+    /// <summary> 현재 다음 Scene으로 전환할 수 있는 상태인지 확인한다. </summary>
+    private bool IsSceneLoadable()
+    {
+        return Managers.Scene.NextScene switch
+        {
+            SceneType.GameScene => _hud?.ContinueRequested ?? false,
+            _ => false
+        };
     }
+
+    #endregion ===== 로딩 완료 확인 =====
 }
