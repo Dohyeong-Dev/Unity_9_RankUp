@@ -95,16 +95,12 @@ public class LoadingScene : BaseScene
         }
 
         float targetProgress = Mathf.Clamp01(progress / 0.9f);
-        float nextProgress = Mathf.MoveTowards(
-            _hud.LoadingProgress,
-            targetProgress,
-            Time.deltaTime);
+        float nextProgress = Mathf.MoveTowards(_hud.LoadingProgress, targetProgress, Time.deltaTime);
 
         _hud.SetLoadingProgress(nextProgress);
     }
 
     #endregion ===== Scene 로딩 =====
-
 
     #region ===== 로딩 완료 확인 =====
 
