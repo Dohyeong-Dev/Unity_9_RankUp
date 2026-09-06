@@ -10,7 +10,7 @@ public abstract class BaseScreen : BaseUI
     {
         OnAwake();
 
-        Managers.UI.SetupCanvas(gameObject, this);
+        Managers.UI.SetupCanvas(this);
         Managers.UI.CloseAllPopupUI();
     }
 

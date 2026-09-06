@@ -1,47 +1,43 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> 게임의 HUD, Screen, Popup, Overlay, Loading UI를 생성하고 관리한다. </summary>
 public class UIManager
 {
-    // 현재 씬에 존재하는 UI
-
-    #region ===== CurrentSceneUI =====
+    #region ===== 현재 UI =====
 
     public BaseHUD CurrentHUD { get; private set; }
     public BaseScreen CurrentScreen { get; private set; }
     public BasePopup CurrentPopup => _popupStack.Count > 0 ? _popupStack.Peek() : null;
 
-    #endregion ===== CurrentSceneUI =====
+    #endregion ===== 현재 UI =====
 
-
-    #region ===== PopupUI =====
+    #region ===== Popup =====
 
     private readonly Stack<BasePopup> _popupStack = new();
     private int _nextPopupSortingOrder = 2;
 
-    #endregion ===== PopupUI =====
-
+    #endregion ===== Popup =====
 
     #region ===== Overlay =====
 
     private HitEffectUI _hitEffectUI;
 
-    #endregion -----Overlay =====
+    #endregion ===== Overlay =====
 
-
-    #region ===== LoadingUI =====
+    #region ===== Loading =====
 
     private GameObject _loadingObject;
     public bool IsLoading => _loadingObject != null;
 
-    #endregion ===== LoadingUI =====
-
+    #endregion ===== Loading =====
 
     #region ===== Root =====
 
     private GameObject _root;
 
-    public GameObject Root
+    private GameObject Root
     {
         get
         {
@@ -55,6 +51,7 @@ public class UIManager
     }
 
     private GameObject _persistentRoot;
+
     private GameObject PersistentRoot
     {
         get
@@ -62,7 +59,7 @@ public class UIManager
             if (_persistentRoot == null)
             {
                 _persistentRoot = new GameObject("UI_PersistentRoot");
-                Object.DontDestroyOnLoad(_persistentRoot);
+                UnityEngine.Object.DontDestroyOnLoad(_persistentRoot);
             }
 
             return _persistentRoot;
@@ -71,7 +68,7 @@ public class UIManager
 
     #endregion ===== Root =====
 
-
+    /// <summary> 현재 활성화된 UI에 따라 입력 처리를 수행한다. </summary>
     public void OnUpdate()
     {
         if (IsLoading)
@@ -83,23 +80,34 @@ public class UIManager
         {
             Managers.Input.SetInputEnabled(false);
             CurrentPopup.OnInputKey();
+            return;
         }
-        else if (CurrentScreen != null)
+
+        if (CurrentScreen != null)
         {
             Managers.Input.SetInputEnabled(false);
             CurrentScreen.OnInputKey();
+            return;
         }
-        else if (CurrentHUD != null)
+
+        if (CurrentHUD != null)
         {
             Managers.Input.SetInputEnabled(true);
             CurrentHUD.OnInputKey();
         }
     }
 
-    /// <summary> UI Canvas 초기 설정 </summary>
-    public void SetupCanvas(GameObject uiObject, BaseUI baseUI)
+    #region ===== Canvas =====
+
+    /// <summary> UI Canvas를 설정하고 UI 종류에 맞는 정렬 순서를 적용한다. </summary>
+    public void SetupCanvas(BaseUI baseUI)
     {
-        Canvas canvas = uiObject.GetOrAddComponent<Canvas>();
+        if (baseUI == null)
+        {
+            return;
+        }
+
+        Canvas canvas = baseUI.gameObject.GetOrAddComponent<Canvas>();
 
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
@@ -112,21 +120,21 @@ public class UIManager
         if (baseUI is BasePopup)
         {
             canvas.sortingOrder = _nextPopupSortingOrder++;
+            return;
         }
-        else
-        {
-            canvas.sortingOrder = baseUI.SortingOrder;
-        }
+
+        canvas.sortingOrder = baseUI.SortingOrder;
     }
 
-    #region Screen
+    #endregion ===== Canvas =====
 
-    /// <summary> Screen UI 열기 </summary>
+    #region ===== Screen =====
+
+    /// <summary> 지정된 타입의 Screen UI를 연다. </summary>
     public T OpenScreen<T>() where T : BaseScreen
     {
         if (CurrentScreen is T)
         {
-            // 이미 동일한 Screen UI가 열려있는 경우
             return null;
         }
 
@@ -136,15 +144,15 @@ public class UIManager
         }
 
         string resourceName = typeof(T).Name;
-
         GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.ScreenUI + resourceName);
+
         if (uiObject == null)
         {
             CPrint.Error($"Screen UI를 찾을 수 없습니다. [{resourceName}]");
             return null;
         }
 
-        uiObject.transform.SetParent(Root.transform, worldPositionStays: false);
+        uiObject.transform.SetParent(Root.transform, false);
 
         T screen = uiObject.GetOrAddComponent<T>();
         CurrentScreen = screen;
@@ -152,42 +160,48 @@ public class UIManager
         return screen;
     }
 
-    #endregion
+    /// <summary> 현재 열려 있는 Screen UI를 닫는다. </summary>
+    private void CloseCurrentScreen()
+    {
+        if (CurrentScreen == null)
+        {
+            return;
+        }
 
-    #region Popup
+        CurrentScreen.gameObject.DestroyGO();
+        CurrentScreen = null;
+    }
 
-    /// <summary> Popup UI 열기 </summary>
+    #endregion ===== Screen =====
+
+    #region ===== Popup =====
+
+    /// <summary> 지정된 타입의 Popup UI를 연다. </summary>
     public T OpenPopup<T>() where T : BasePopup
     {
         string resourceName = typeof(T).Name;
-
         GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.PopupUI + resourceName);
+
         if (uiObject == null)
         {
             CPrint.Error($"Popup UI를 찾을 수 없습니다. [{resourceName}]");
             return null;
         }
 
-        if (CurrentScreen != null)
-        {
-            uiObject.transform.SetParent(CurrentScreen.transform, worldPositionStays: false);
-        }
-        else
-        {
-            uiObject.transform.SetParent(Root.transform, worldPositionStays: false);
-        }
+        Transform parent = CurrentScreen != null ? CurrentScreen.transform : Root.transform;
 
+        uiObject.transform.SetParent(parent, false);
         uiObject.transform.localScale = Vector3.one;
 
         T popup = uiObject.GetOrAddComponent<T>();
         _popupStack.Push(popup);
-        
+
         Managers.Input.SetCursorLock(false);
 
         return popup;
     }
 
-    /// <summary> 가장 최근에 열린 Popup 닫기 </summary>
+    /// <summary> 가장 최근에 열린 Popup을 닫는다. </summary>
     public void ClosePopupUI()
     {
         if (_popupStack.Count == 0)
@@ -196,6 +210,7 @@ public class UIManager
         }
 
         BasePopup popup = _popupStack.Pop();
+
         if (popup != null)
         {
             popup.gameObject.DestroyGO();
@@ -203,15 +218,13 @@ public class UIManager
 
         _nextPopupSortingOrder--;
 
-        // 모든 팝업이 닫혔을 때만 커서를 다시 잠금
-
         if (_popupStack.Count == 0)
         {
             Managers.Input.SetCursorLock(true);
         }
     }
 
-    /// <summary> 지정된 Popup이 가장 최근 Popup일 경우 닫기 </summary>
+    /// <summary> 지정된 Popup이 가장 최근에 열린 Popup인 경우 닫는다. </summary>
     public void ClosePopupUI(BasePopup popup)
     {
         if (_popupStack.Count == 0)
@@ -219,7 +232,7 @@ public class UIManager
             return;
         }
 
-        if (_popupStack.Peek() != popup)
+        if (CurrentPopup != popup)
         {
             CPrint.Error("가장 최근에 열린 Popup이 아닙니다.");
             return;
@@ -228,7 +241,7 @@ public class UIManager
         ClosePopupUI();
     }
 
-    /// <summary> 모든 Popup 닫기 </summary>
+    /// <summary> 현재 열려 있는 모든 Popup을 닫는다. </summary>
     public void CloseAllPopupUI()
     {
         while (_popupStack.Count > 0)
@@ -237,42 +250,125 @@ public class UIManager
         }
     }
 
-    #endregion
+    #endregion ===== Popup =====
 
-    #region Overlay
+    #region ===== Overlay =====
 
+    /// <summary> 플레이어 피격 효과를 재생한다. </summary>
     public void OpenHitEffect()
     {
-        if (_hitEffectUI == null)
+        if (!TryCreateHitEffect())
         {
-            GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.OverlayUI + nameof(HitEffectUI));
-
-            uiObject.transform.SetParent(PersistentRoot.transform, false);
-
-            _hitEffectUI = uiObject.GetOrAddComponent<HitEffectUI>();
-
-            SetupCanvas(uiObject, _hitEffectUI);
+            return;
         }
 
         _hitEffectUI.Play();
     }
 
-    #endregion
+    /// <summary> 피격 효과 UI가 없으면 생성하고 참조를 저장한다. </summary>
+    private bool TryCreateHitEffect()
+    {
+        if (_hitEffectUI != null)
+        {
+            return true;
+        }
 
-    #region Clear
+        GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.OverlayUI + nameof(HitEffectUI));
 
-    /// <summary> 현재 Screen과 모든 Popup 닫기 </summary>
+        if (uiObject == null)
+        {
+            CPrint.Error("HitEffectUI를 생성하지 못했습니다.");
+            return false;
+        }
+
+        uiObject.transform.SetParent(PersistentRoot.transform, false);
+
+        _hitEffectUI = uiObject.GetOrAddComponent<HitEffectUI>();
+
+        SetupCanvas(_hitEffectUI);
+
+        return true;
+    }
+
+    #endregion ===== Overlay =====
+
+    #region ===== Loading =====
+
+    /// <summary> Loading UI를 열고 지정된 페이드 연출을 재생한다. </summary>
+    public void OpenLoadingUI(float fadeTime = 0f, Action openAction = null)
+    {
+        if (IsLoading)
+        {
+            return;
+        }
+
+        string resourcePath = ResourceKey.Path.UI + ResourceKey.Name.LoaindgUI;
+        GameObject uiObject = Managers.Resource.Spawn(resourcePath);
+
+        if (uiObject == null)
+        {
+            CPrint.Error($"Loading UI를 찾을 수 없습니다. [{resourcePath}]");
+            return;
+        }
+
+        uiObject.transform.SetParent(PersistentRoot.transform, false);
+
+        _loadingObject = uiObject;
+
+        LoadingUI loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
+        loadingUI.FadeIn(fadeTime, openAction);
+    }
+
+    /// <summary> 현재 Loading UI를 닫고 지정된 페이드 연출을 재생한다. </summary>
+    public void CloseLoadingUI(float fadeTime = 0f, Action closeAction = null)
+    {
+        if (!IsLoading)
+        {
+            return;
+        }
+
+        if (fadeTime <= 0f)
+        {
+            DestroyLoadingUI();
+            return;
+        }
+
+        LoadingUI loadingUI = _loadingObject.GetComponent<LoadingUI>();
+
+        if (loadingUI == null)
+        {
+            CPrint.Error("LoadingUI 컴포넌트를 찾을 수 없습니다.");
+            DestroyLoadingUI();
+            return;
+        }
+
+        loadingUI.FadeOut(fadeTime, closeAction);
+    }
+
+    /// <summary> 현재 Loading UI를 제거하고 참조를 초기화한다. </summary>
+    private void DestroyLoadingUI()
+    {
+        if (_loadingObject == null)
+        {
+            return;
+        }
+
+        _loadingObject.DestroyGO();
+        _loadingObject = null;
+    }
+
+    #endregion ===== Loading =====
+
+    #region ===== 정리 =====
+
+    /// <summary> 현재 Screen과 모든 Popup을 닫는다. </summary>
     public void CloseAll()
     {
         CloseAllPopupUI();
-
-        if (CurrentScreen != null)
-        {
-            CurrentScreen.gameObject.DestroyGO();
-            CurrentScreen = null;
-        }
+        CloseCurrentScreen();
     }
 
+    /// <summary> 현재 씬에서 사용한 UI 상태를 초기화한다. </summary>
     public void Clear()
     {
         CloseAll();
@@ -281,61 +377,5 @@ public class UIManager
         _nextPopupSortingOrder = 2;
     }
 
-    #endregion
-
-    #region LoadingUI
-
-    /// <summary> Loading UI 열기 </summary>
-    public void OpenLoadingUI(float fadeTime = 0f, System.Action openAction = null)
-    {
-        if (_loadingObject != null)
-        {
-            return;
-        }
-
-        string resourcePath = ResourceKey.Path.UI + ResourceKey.Name.LoaindgUI;
-
-        GameObject uiObject = Managers.Resource.Spawn(resourcePath);
-        if (uiObject == null)
-        {
-            CPrint.Error($"Loading UI를 찾을 수 없습니다. [{resourcePath}]");
-            return;
-        }
-
-        uiObject.transform.SetParent(PersistentRoot.transform, worldPositionStays: false);
-
-        _loadingObject = uiObject;
-
-        LoadingUI loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
-        loadingUI.FadeIn(fadeTime, openAction);
-    }
-
-    /// <summary> Loading UI 닫기 </summary>
-    public void CloseLoadingUI(float fadeTime = 0f, System.Action closeAction = null)
-    {
-        if (_loadingObject == null)
-        {
-            return;
-        }
-
-        if (fadeTime <= 0f)
-        {
-            _loadingObject.DestroyGO();
-            _loadingObject = null;
-            return;
-        }
-
-        LoadingUI loadingUI = _loadingObject.GetComponent<LoadingUI>();
-        if (loadingUI == null)
-        {
-            CPrint.Error("LoadingUI 컴포넌트를 찾을 수 없습니다.");
-            _loadingObject.DestroyGO();
-            _loadingObject = null;
-            return;
-        }
-
-        loadingUI.FadeOut(fadeTime, closeAction);
-    }
-
-    #endregion
+    #endregion ===== 정리 =====
 }

@@ -33,7 +33,7 @@ public abstract class BasePopup : BaseUI
     {
         OnAwake();
 
-        Managers.UI.SetupCanvas(gameObject, this);
+        Managers.UI.SetupCanvas(this);
 
         PlayAnimation(true);
     }

@@ -1,75 +1,78 @@
 using UnityEngine;
 
+/// <summary> 게임 전역에서 사용하는 매니저들을 생성하고 관리한다. </summary>
 public class Managers : MonoBehaviour
 {
+    private static bool _isQuitting;
+    public static bool IsQuit => _isQuitting || !Application.isPlaying;
+    
+    #region ===== 인스턴스 =====
+
     private static Managers _instance;
+
     private static Managers Instance
     {
         get
         {
-            if (_instance == null)
+            if (_instance != null)
             {
-                if (IsQuit)
-                {
-                    return null;
-                }
+                return _instance;
+            }
 
-                Init();
+            if (IsQuit || !TryInitialize())
+            {
+                return null;
             }
 
             return _instance;
         }
     }
-    
-    private static bool _isQuitting;
-    public static bool IsQuit => _isQuitting || !Application.isPlaying;
 
+    #endregion ===== 인스턴스 =====
 
-    #region NO_MONOBEHAVIOUR
+    #region ===== 일반 매니저 =====
 
-    private InputManager _input = new();
+    private readonly InputManager _input = new();
     public static InputManager Input => Instance?._input;
-    
-    private UIManager _ui = new();
+
+    private readonly UIManager _ui = new();
     public static UIManager UI => Instance?._ui;
-    
-    private ResourceManager _resource = new();
+
+    private readonly ResourceManager _resource = new();
     public static ResourceManager Resource => Instance?._resource;
 
-    private PoolManager _pool = new();
+    private readonly PoolManager _pool = new();
     public static PoolManager Pool => Instance?._pool;
-    
-    private EventManager _event = new();
+
+    private readonly EventManager _event = new();
     public static EventManager Event => Instance?._event;
-    
-    #endregion
 
+    #endregion ===== 일반 매니저 =====
 
-    #region MONOBEHAVIOUR
+    #region ===== MonoBehaviour 매니저 =====
 
     private static ScenesManager _scene;
+
     public static ScenesManager Scene
     {
         get
         {
-            if (_scene == null)
+            if (_scene != null)
             {
-                if (IsQuit)
-                {
-                    return null;
-                }
-
-                GameObject go = new GameObject(nameof(ScenesManager));
-                go.transform.SetParent(Instance.transform);
-                _scene = go.GetOrAddComponent<ScenesManager>();
+                return _scene;
             }
 
+            if (IsQuit || Instance == null)
+            {
+                return null;
+            }
+
+            InitializeSceneManager();
             return _scene;
         }
     }
 
-    #endregion
-
+    #endregion ===== MonoBehaviour 매니저 =====
 
     private void Update()
     {
@@ -77,9 +80,9 @@ public class Managers : MonoBehaviour
         {
             return;
         }
-        
-        UI.OnUpdate();
-        Input.OnUpdate();
+
+        _ui.OnUpdate();
+        _input.OnUpdate();
     }
 
     private void OnApplicationQuit()
@@ -87,20 +90,43 @@ public class Managers : MonoBehaviour
         _isQuitting = true;
     }
 
-    private static void Init()
+    #region ===== 초기화 =====
+
+    /// <summary> Managers 싱글톤 인스턴스를 생성하고 초기화한다. </summary>
+    private static bool TryInitialize()
     {
         if (!Application.isPlaying)
         {
-            return;
+            return false;
         }
 
         if (_instance != null)
         {
+            return false;
+        }
+        
+        GameObject managerObject = new GameObject("@Managers");
+
+        _instance = managerObject.AddComponent<Managers>();
+
+        DontDestroyOnLoad(managerObject);
+
+        return true;
+    }
+
+    /// <summary> SceneManager 오브젝트를 생성하고 Managers 하위에 등록한다. </summary>
+    private static void InitializeSceneManager()
+    {
+        if (Instance == null || _scene != null)
+        {
             return;
         }
 
-        GameObject go = new GameObject("@Managers");
-        _instance = go.AddComponent<Managers>();
-        DontDestroyOnLoad(go);
+        GameObject sceneManagerObject = new GameObject(nameof(ScenesManager));
+        sceneManagerObject.transform.SetParent(Instance.transform);
+
+        _scene = sceneManagerObject.GetOrAddComponent<ScenesManager>();
     }
+
+    #endregion ===== 초기화 =====
 }

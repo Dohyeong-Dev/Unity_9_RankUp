@@ -13,7 +13,7 @@ public class LoadingUI : BaseUI
 
     private void Awake()
     {
-        Managers.UI.SetupCanvas(gameObject, this);
+        Managers.UI.SetupCanvas(this);
         Bind<Image>(typeof(Images));
     }
 

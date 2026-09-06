@@ -10,7 +10,7 @@ public abstract class BaseHUD : BaseUI
     {
         _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
 
-        Managers.UI.SetupCanvas(gameObject, this);
+        Managers.UI.SetupCanvas(this);
 
         OnAwake();
     }
