@@ -47,7 +47,7 @@ public class HitEffectUI : BaseUI
 
         Image background = Get<Image>(Images.Bg);
 
-        _sequence = DOTween.Sequence().Append(background.DOFade(0.5f, _fadeInDuration).SetEase(Ease.OutQuad))
+        _sequence = DOTween.Sequence().Append(background.DOFade(0.7f, _fadeInDuration).SetEase(Ease.OutQuad))
             .AppendInterval(_displayDuration)
             .Append(background.DOFade(0f, _fadeOutDuration).SetEase(Ease.OutCubic))
             .OnComplete(() => gameObject.SetActive(false));

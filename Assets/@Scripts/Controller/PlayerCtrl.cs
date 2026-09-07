@@ -349,30 +349,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _hitInvincibleTimer = Mathf.Max(0f, _hitInvincibleTimer - Time.deltaTime);
     }
 
-    /// <summary> 공격자 방향에 피격 이펙트를 생성한다. </summary>
-    public void PlayHitEffect(Transform attacker)
-    {
-        if (attacker == null)
-        {
-            return;
-        }
-
-        PoolObj poolObject = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect);
-
-        if (poolObject == null)
-        {
-            return;
-        }
-
-        Transform hitEffect = poolObject.transform;
-        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(0.5f);
-
-        Vector3 direction = (attacker.position - transform.position).normalized;
-
-        hitEffect.position = transform.position + Vector3.up * 1.2f + direction * 0.1f;
-        hitEffect.LookAt(attacker);
-    }
-
     /// <summary> 플레이어에게 피해를 적용하고 생존 시 피격 상태로 전환한다. </summary>
     public void TakeDamage(float damage)
     {
@@ -571,4 +547,52 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 스탯 =====
+
+    #region ===== 피격 이펙트 ======
+
+    /// <summary> 공격자 방향에 피격 이펙트를 생성한다. </summary>
+    public void PlayHitEffect(Transform attacker)
+    {
+        if (attacker == null)
+        {
+            return;
+        }
+
+        Vector3 direction = (attacker.position - transform.position).normalized;
+        Vector3 hitPosition = transform.position + Vector3.up * 1.2f + direction * 0.1f;
+
+        PlayHitEffect(hitPosition, attacker.position);
+    }
+
+    /// <summary> 지정된 피격 위치에 피격 이펙트를 생성한다. </summary>
+    public void PlayHitEffect(Vector3 hitPosition)
+    {
+        Vector3 lookPosition = transform.position;
+        PlayHitEffect(hitPosition, lookPosition);
+    }
+
+    /// <summary> 지정된 위치와 방향으로 피격 이펙트를 생성한다. </summary>
+    public void PlayHitEffect(Vector3 hitPosition, Vector3 lookPosition)
+    {
+        PoolObj poolObject = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect);
+
+        if (poolObject == null)
+        {
+            return;
+        }
+
+        Transform hitEffect = poolObject.transform;
+        hitEffect.position = hitPosition;
+
+        Vector3 direction = lookPosition - hitPosition;
+
+        if (direction.sqrMagnitude > Mathf.Epsilon)
+        {
+            hitEffect.rotation = Quaternion.LookRotation(direction);
+        }
+
+        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(0.5f);
+    }
+
+    #endregion ===== 피격 이펙트 ======
 }

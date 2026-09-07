@@ -4969,7 +4969,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredSp: 4
-  _damageFactor: 1
+  _damageFactor: 1.5
   _meleeAttackRange: {fileID: 3690553982505492406}
   _meleeLayerMask:
     serializedVersion: 2
@@ -8618,7 +8618,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 770327319960961831, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.4696986
+      value: -0.46969867
       objectReference: {fileID: 0}
     - target: {fileID: 770327319960961831, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8626,7 +8626,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 770327319960961831, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.02606541
+      value: -0.026067235
       objectReference: {fileID: 0}
     - target: {fileID: 770327319960961831, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8654,7 +8654,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1760074079343828983, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.19181892
+      value: 0.19181558
       objectReference: {fileID: 0}
     - target: {fileID: 1760074079343828983, guid: 989b3201da81b8744a1902b8a798b7b8, type: 3}
       propertyPath: m_LocalRotation.w

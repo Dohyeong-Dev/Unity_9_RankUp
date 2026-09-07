@@ -17,9 +17,6 @@ public class EnemyHpUI : MonoBehaviour
     [Header("위치")]
     [SerializeField] private float _heightOffset = 0.15f;
 
-    [Header("HP")]
-    [SerializeField] private float _minFillAmount = 0.05f;
-
     #endregion ===== 설정 =====
 
     private void Awake()
@@ -108,7 +105,7 @@ public class EnemyHpUI : MonoBehaviour
         }
 
         float ratio = Mathf.Clamp01(currentHp / maxHp);
-        float fillAmount = ratio <= 0f ? 0f : Mathf.Max(ratio, _minFillAmount);
+        float fillAmount = ratio <= 0f ? 0f : ratio;
 
         SetHpUIVisible(currentHp > 0f);
         

@@ -16,12 +16,8 @@ public class EnemyMeleeAttack : EnemyAttackBehaviour
     /// <summary> 근접 공격을 실행하고 공격 범위 내의 대상에게 피해를 적용한다. </summary>
     public override void ExecuteAttack()
     {
-        if (!IsAvailable)
-        {
-            return;
-        }
-
         base.ExecuteAttack();
+        
         CheckMeleeAttackRange();
     }
 

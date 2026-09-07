@@ -57298,6 +57298,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
+      propertyPath: _meleeSpawnRatio
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
+      propertyPath: _rangeSpawnRatio
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -59657,6 +59665,14 @@ PrefabInstance:
     - target: {fileID: 5358065737929584034, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
+      propertyPath: _meleeSpawnRatio
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
+      propertyPath: _rangeSpawnRatio
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

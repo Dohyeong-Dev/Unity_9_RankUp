@@ -103,12 +103,12 @@ public abstract class EnemyAttackBehaviour : MonoBehaviour
     }
 
     /// <summary> 적의 공격력과 데미지 배율을 기준으로 랜덤 데미지를 계산한다. </summary>
-    protected float GetRandomDamage()
+    protected int GetRandomDamage()
     {
         float minDamage = Enemy.Strength * 0.5f;
         float maxDamage = Enemy.Strength * 1.5f;
 
-        return Random.Range(minDamage, maxDamage) * _damageFactor;
+        return Mathf.RoundToInt(Random.Range(minDamage, maxDamage) * _damageFactor);
     }
 
     #endregion ===== 공격 =====

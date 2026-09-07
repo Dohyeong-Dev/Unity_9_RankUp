@@ -71,7 +71,10 @@ public class GameScene : BaseScene
     private void CreatePool()
     {
         Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 10);
-        Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 10);
+        Managers.Pool.CreatePool(PoolKey.Path.EnemyRange, 5);
+        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Fireball), 5);
+        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Iceball), 5);
+        Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 3);
     }
     
     #endregion ===== 초기화 =====

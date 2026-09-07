@@ -18,6 +18,7 @@ public class ReturnState : BaseEnemyState
 
         Enemy.NavMeshAgent.stoppingDistance = PositionThreshold;
         Enemy.MoveTo(Enemy.SpawnPosition, Enemy.WalkSpeed);
+        Enemy.UpdateMovementAnimation();
     }
 
     public override void Update(float deltaTime)

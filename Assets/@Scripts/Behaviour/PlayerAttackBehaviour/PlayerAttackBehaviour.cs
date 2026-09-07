@@ -69,12 +69,12 @@ public abstract class PlayerAttackBehaviour : MonoBehaviour
     public abstract void Clear();
 
     /// <summary> 플레이어의 공격력과 데미지 배율을 기반으로 랜덤 데미지를 계산한다. </summary>
-    protected float GetRandomDamage()
+    protected int GetRandomDamage()
     {
         float minDamage = Player.STR * 0.5f;
         float maxDamage = Player.STR * 1.5f;
 
-        return Random.Range(minDamage, maxDamage) * _damageFactor;
+        return Mathf.RoundToInt(Random.Range(minDamage, maxDamage) * _damageFactor);
     }
 
     #endregion ===== 공격 =====

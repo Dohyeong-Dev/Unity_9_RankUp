@@ -12,6 +12,7 @@ public abstract class LayerKey
         public const int Enemy = 7;
         public const int Player = 8;
         public const int Object = 9;
+        public const int Projectile = 10;
     }
 
     public static class Mask
@@ -26,5 +27,6 @@ public abstract class LayerKey
         public const int Enemy = 1 << Idx.Enemy;
         public const int Player = 1 << Idx.Player;
         public const int Object = 1 << Idx.Object;
+        public const int Projectile = 1 << Idx.Projectile;
     }
 }

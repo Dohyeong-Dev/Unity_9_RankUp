@@ -2,24 +2,26 @@ public abstract class PoolKey
 {
     private const string RootPath = "Prefab/Pool/";
 
-    public static class Name
+    public enum ProjectileType
     {
-        public const string EnemyMelee = "EnemyMelee";
-        public const string EnemyRange = "EnemyRange";
-        public const string EnemyBoss = "EnemyBoss";
-        
-        public const string PlayerHitEffect = "PlayerHitEffect";
+        Fireball,
+        Iceball,
     }
 
     public static class Path
     {
-        private const string EnemyPath = RootPath + "Enemy/";
-        private const string EffectPath = RootPath + "Effect/";
+        private const string ProjectilePath = RootPath + "Projectile/";
 
-        public const string EnemyMelee = EnemyPath + Name.EnemyMelee;
-        public const string EnemyRange = EnemyPath + Name.EnemyRange;
-        public const string EnemyBoss = EnemyPath + Name.EnemyBoss;
-        
-        public const string PlayerHitEffect = EffectPath + Name.PlayerHitEffect;
+        /// <summary> 지정된 발사체 타입의 Pool 경로를 반환한다. </summary>
+        public static string GetProjectilePath(ProjectileType projectileType)
+        {
+            return ProjectilePath + projectileType;
+        }
+
+        public const string EnemyMelee = RootPath + "Enemy/EnemyMelee";
+        public const string EnemyRange = RootPath + "Enemy/EnemyRange";
+        public const string EnemyBoss = RootPath + "Enemy/EnemyBoss";
+
+        public const string PlayerHitEffect = RootPath + "Effect/PlayerHitEffect";
     }
 }
