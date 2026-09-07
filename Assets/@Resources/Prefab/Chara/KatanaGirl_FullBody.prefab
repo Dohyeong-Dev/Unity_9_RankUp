@@ -4919,6 +4919,7 @@ MonoBehaviour:
     m_Bits: 8
   _groundCheckDistance: 0.1
   _hitInvincibleDuration: 1
+  _hitEffectLifeTime: 0.3
   _maxHp: 100
   _maxSp: 100
   _spRecoveryThreshold: 10
@@ -4968,7 +4969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e67b9ed0fa0b6419696ec96cbab0dc1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredSp: 4
+  _requiredSp: 2
   _damageFactor: 2
   _meleeAttackRange: {fileID: 3690553982505492406}
   _meleeLayerMask:

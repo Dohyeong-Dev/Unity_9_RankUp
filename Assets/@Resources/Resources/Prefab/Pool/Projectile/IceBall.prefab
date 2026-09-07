@@ -9665,4 +9665,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _useLifetimeShrink: 0
   _useShrinkOnDestroy: 1
-  _shrinkDuration: 0.5
+  _shrinkDuration: 0.3
