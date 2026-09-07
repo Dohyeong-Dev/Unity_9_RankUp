@@ -51,6 +51,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     [Header("피격")]
     [SerializeField] private float _hitInvincibleDuration = 0.5f;
+    [SerializeField] private float _hitEffectLifeTime = 0.3f;
 
     #endregion ===== 설정 =====
 
@@ -559,7 +560,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         Vector3 direction = (attacker.position - transform.position).normalized;
-        Vector3 hitPosition = transform.position + Vector3.up * 1.2f + direction * 0.1f;
+        Vector3 hitPosition = transform.position + Vector3.up * 1.2f + direction * 0.3f;
 
         PlayHitEffect(hitPosition, attacker.position);
     }
@@ -591,7 +592,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             hitEffect.rotation = Quaternion.LookRotation(direction);
         }
 
-        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(0.5f);
+        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(_hitEffectLifeTime);
     }
 
     #endregion ===== 피격 이펙트 ======

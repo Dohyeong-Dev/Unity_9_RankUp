@@ -8846,6 +8846,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.4696986
+      objectReference: {fileID: 0}
+    - target: {fileID: 111211638589925067, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.02606541
+      objectReference: {fileID: 0}
     - target: {fileID: 1286639632634062274, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.52
@@ -8885,6 +8893,10 @@ PrefabInstance:
     - target: {fileID: 1286639632634062274, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1393530881572780571, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.19181892
       objectReference: {fileID: 0}
     - target: {fileID: 1914275313167630200, guid: 3cd6a309fe59b493abd43871dfd6371d, type: 3}
       propertyPath: m_Name
@@ -59668,11 +59680,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: _meleeSpawnRatio
-      value: 90
+      value: 70.7
       objectReference: {fileID: 0}
     - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: _rangeSpawnRatio
-      value: 10
+      value: 13.7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

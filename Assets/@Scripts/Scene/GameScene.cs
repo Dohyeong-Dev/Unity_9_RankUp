@@ -90,6 +90,7 @@ public class GameScene : BaseScene
         if (CurrentPhase >= MaxPhase)
         {
             Managers.Event.RaiseBossSpawned();
+            CPrint.Success("보스 등장");
         }
         
         Managers.Event.RaisePhaseUpdated();

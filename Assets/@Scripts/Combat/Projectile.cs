@@ -7,7 +7,6 @@ public class Projectile : MonoBehaviour
 {
     #region ===== 참조 =====
 
-    private Transform _projectileTransform;
     private Rigidbody _rigid;
     private Collider _collider;
 
@@ -21,14 +20,11 @@ public class Projectile : MonoBehaviour
 
     #region ===== 이동 =====
 
-    [Header("이동")]
-    [SerializeField] private float _guidedTargetHeightOffset = 1f;
-
     private bool _isGuided;
     private Vector3 _moveDirection;
     private float _moveSpeed;
     private Transform _target;
-
+    
     #endregion ===== 이동 =====
 
     #region ===== 공격 =====
@@ -66,7 +62,6 @@ public class Projectile : MonoBehaviour
 
     private void Awake()
     {
-        _projectileTransform = transform;
         _rigid = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
 
@@ -140,12 +135,12 @@ public class Projectile : MonoBehaviour
     /// <summary> 발사체 Visual Transform과 기본 크기를 캐싱한다. </summary>
     private void CacheVisualTransforms()
     {
-        if (_projectileTransform.childCount == 0)
+        if (transform.childCount == 0)
         {
             return;
         }
 
-        Transform projectileVisual = _projectileTransform.GetChild(0);
+        Transform projectileVisual = transform.GetChild(0);
 
         _visualTransforms = projectileVisual.GetComponentsInChildren<Transform>(true);
         _initialVisualScales = new Vector3[_visualTransforms.Length];
@@ -159,8 +154,8 @@ public class Projectile : MonoBehaviour
     /// <summary> 발사체를 풀에 반환하기 전 초기 상태로 되돌린다. </summary>
     public void ResetSettings()
     {
-        _projectileTransform.position = Vector3.zero;
-
+        transform.position = Vector3.zero;
+        
         _moveDirection = Vector3.zero;
         _moveSpeed = 0f;
         _damage = 0f;
@@ -220,17 +215,24 @@ public class Projectile : MonoBehaviour
     /// <summary> 설정된 방향으로 발사체를 직선 이동시킨다. </summary>
     private void MoveStraight()
     {
-        _projectileTransform.position += _moveDirection * _moveSpeed * Time.fixedDeltaTime;
+        transform.position += _moveDirection * _moveSpeed * Time.fixedDeltaTime;
     }
 
-    /// <summary> 설정된 목표를 향해 발사체를 이동시킨다. </summary>
+    /// <summary> 발사된 높이를 유지하면서 목표의 수평 위치를 추적한다. </summary>
     private void MoveGuided()
     {
-        Vector3 targetPosition = _target.position;
-        targetPosition.y += _guidedTargetHeightOffset;
+        Vector3 direction = _target.position - transform.position;
+        direction.y = 0f;
 
-        _projectileTransform.LookAt(targetPosition);
-        _projectileTransform.position += _projectileTransform.forward * _moveSpeed * Time.fixedDeltaTime;
+        if (direction.sqrMagnitude <= Mathf.Epsilon)
+        {
+            return;
+        }
+
+        _moveDirection = direction.normalized;
+
+        transform.rotation = Quaternion.LookRotation(_moveDirection);
+        transform.position += _moveDirection * _moveSpeed * Time.fixedDeltaTime;
     }
 
     #endregion ===== 이동 =====
@@ -302,7 +304,7 @@ public class Projectile : MonoBehaviour
         }
 
         ContactPoint contactPoint = collision.GetContact(0);
-        player.PlayHitEffect(contactPoint.point, contactPoint.normal);
+        player.PlayHitEffect(contactPoint.point + contactPoint.normal * 0.4f, contactPoint.normal);
     }
 
     /// <summary> 충돌 후 발사체의 이동과 물리 동작을 중지한다. </summary>
@@ -404,7 +406,8 @@ public class Projectile : MonoBehaviour
         _target = target;
         _isGuided = isGuided;
 
-        _projectileTransform.position = spawnPosition;
+        transform.position = spawnPosition;
+    
         _moveDirection = direction.normalized;
         _moveSpeed = speed;
         _damage = damage;

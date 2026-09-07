@@ -540,7 +540,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.5
+      scalar: 0
       minScalar: 0.5
       maxCurve:
         serializedVersion: 2
@@ -9628,7 +9628,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!135 &3226493108345758541
 SphereCollider:
@@ -9663,7 +9663,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d10e0ff6dbf044e89d2859e6c004216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _guidedTargetHeightOffset: 1
-  _useLifetimeShrink: 1
+  _useLifetimeShrink: 0
   _useShrinkOnDestroy: 1
   _shrinkDuration: 0.5

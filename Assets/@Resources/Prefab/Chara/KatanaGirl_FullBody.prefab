@@ -4969,7 +4969,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredSp: 4
-  _damageFactor: 1.5
+  _damageFactor: 2
   _meleeAttackRange: {fileID: 3690553982505492406}
   _meleeLayerMask:
     serializedVersion: 2
