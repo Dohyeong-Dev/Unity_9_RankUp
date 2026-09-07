@@ -8,6 +8,8 @@ public class EventManager
     public event Action OnPhaseUpdated;
     public event Action OnPlayerDead;
 
+    public event Action OnBossSpawned;
+    
     #endregion ===== 이벤트 =====
 
     #region ===== 이벤트 발행 =====
@@ -24,5 +26,11 @@ public class EventManager
         OnPlayerDead?.Invoke();
     }
 
+    /// <summary> 보스가 등장했음을 알린다. </summary>
+    public void RaiseBossSpawned()
+    {
+        OnBossSpawned?.Invoke();
+    }
+    
     #endregion ===== 이벤트 발행 =====
 }

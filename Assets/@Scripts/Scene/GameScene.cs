@@ -18,6 +18,7 @@ public class GameScene : BaseScene
     #region ===== 페이즈 =====
     
     public int CurrentPhase { get; private set; }
+    private const int MaxPhase = 2;
     
     #endregion ===== 페이즈 =====
     
@@ -86,6 +87,11 @@ public class GameScene : BaseScene
     {
         CurrentPhase++;
 
+        if (CurrentPhase >= MaxPhase)
+        {
+            Managers.Event.RaiseBossSpawned();
+        }
+        
         Managers.Event.RaisePhaseUpdated();
     }
 
