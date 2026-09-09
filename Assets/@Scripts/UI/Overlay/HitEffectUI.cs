@@ -53,6 +53,15 @@ public class HitEffectUI : BaseUI
             .OnComplete(() => gameObject.SetActive(false));
     }
 
+    /// <summary> 피격 화면 효과를 중지한다. </summary>
+    public void Stop()
+    {
+        _sequence?.Kill();
+
+        gameObject.SetActive(false);
+        SetAlpha(0f);
+    }
+    
     /// <summary> 피격 효과 이미지의 투명도를 설정한다. </summary>
     private void SetAlpha(float alpha)
     {

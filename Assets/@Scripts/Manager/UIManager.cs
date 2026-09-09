@@ -90,11 +90,19 @@ public class UIManager
             return;
         }
 
-        if (CurrentHUD != null)
+        if (CurrentHUD == null)
         {
-            Managers.Input.SetInputEnabled(true);
-            CurrentHUD.OnInputKey();
+            return;
         }
+
+        if (!CurrentHUD.IsVisible)
+        {
+            Managers.Input.SetInputEnabled(false);
+            return;
+        }
+
+        Managers.Input.SetInputEnabled(true);
+        CurrentHUD.OnInputKey();
     }
 
     #region ===== Canvas =====
@@ -265,6 +273,12 @@ public class UIManager
         _hitEffectUI.Play();
     }
 
+    /// <summary> 플레이어 피격 효과를 중지한다. </summary>
+    public void CloseHitEffect()
+    {
+        _hitEffectUI?.Stop();
+    }
+    
     /// <summary> 피격 효과 UI가 없으면 생성하고 참조를 저장한다. </summary>
     private bool TryCreateHitEffect()
     {

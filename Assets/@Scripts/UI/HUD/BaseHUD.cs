@@ -5,11 +5,9 @@ public abstract class BaseHUD : BaseUI
 {
     public override int SortingOrder => 0;
     
-    #region ===== 참조 =====
-
     private CanvasGroup _canvasGroup;
-
-    #endregion ===== 참조 =====
+    
+    public bool IsVisible { get; private set; } = true;
 
     private void Awake()
     {
@@ -57,7 +55,11 @@ public abstract class BaseHUD : BaseUI
     /// <summary> HUD UI의 표시 여부를 설정한다. </summary>
     public void SetVisible(bool visible)
     {
+        IsVisible = visible;
+        
         _canvasGroup.alpha = visible ? 1f : 0f;
+        SetRaycastEnabled(visible);
+        SetInteractEnabled(visible);
     }
 
     #endregion ===== 설정 =====

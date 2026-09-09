@@ -27,11 +27,9 @@ public abstract class AnimatorKey
         #region ===== Trigger =====
 
         public const string DoIdleChange = "DoIdleChange";
-        public const string DoDie = "DoDie";
         public const string DoCancelSheathe = "DoCancelSheathe";
         public const string DoAttack = "DoAttack";
         public const string DoHit = "DoHit";
-        public const string DoHit1 = "DoHit1";
 
         #endregion ===== Trigger =====
     }
@@ -41,8 +39,17 @@ public abstract class AnimatorKey
         public const string Hit1 = "Hit1";
         public const string Hit2 = "Hit2";
         public const string Die = "Die";
+
+        #region ===== 컷신 =====
+
+        public const string Idle = "Idle";
+        public const string Walk = "Walk";
+        public const string Evade = "Evade";
+        public const string TurnR = "TurnR";
+
+        #endregion ===== 컷신 =====
     }
-    
+
     public static class Layer
     {
         public const string BaseLayer = "BaseLayer";
@@ -50,7 +57,7 @@ public abstract class AnimatorKey
         public const string MeleeAttack = "MeleeAttack";
         public const string Reaction = "Reaction";
     }
-    
+
     public static class Hash
     {
         #region ===== Int =====
@@ -76,19 +83,23 @@ public abstract class AnimatorKey
         #region ===== Trigger =====
 
         public static readonly int DoIdleChange = Animator.StringToHash(Parameter.DoIdleChange);
-        public static readonly int DoDie = Animator.StringToHash(Parameter.DoDie);
         public static readonly int DoCancelSheathe = Animator.StringToHash(Parameter.DoCancelSheathe);
         public static readonly int DoAttack = Animator.StringToHash(Parameter.DoAttack);
         public static readonly int DoHit = Animator.StringToHash(Parameter.DoHit);
 
         #endregion ===== Trigger =====
 
-        #region ===== Name =====
+        #region ===== State =====
 
         public static readonly int Hit1 = Animator.StringToHash(Name.Hit1);
         public static readonly int Hit2 = Animator.StringToHash(Name.Hit2);
         public static readonly int Die = Animator.StringToHash(Name.Die);
 
-        #endregion ===== Name =====
+        public static readonly int Idle = Animator.StringToHash(Name.Idle);
+        public static readonly int Walk = Animator.StringToHash(Name.Walk);
+        public static readonly int Evade = Animator.StringToHash(Name.Evade);
+        public static readonly int TurnR = Animator.StringToHash(Name.TurnR);
+
+        #endregion ===== State =====
     }
 }

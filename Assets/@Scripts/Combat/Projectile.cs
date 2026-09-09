@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -55,6 +56,11 @@ public class Projectile : MonoBehaviour
 
     #region ===== 크기 =====
 
+    [Header("최소 크기")]
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float _minimumScaleRatio = 0.1f;
+
     private Transform[] _visualTransforms;
     private Vector3[] _initialVisualScales;
 
@@ -80,6 +86,8 @@ public class Projectile : MonoBehaviour
         _isShrinking = false;
 
         ResetSize();
+        
+        Managers.Event.OnPlayerDead += ReturnPool;
     }
 
     private void FixedUpdate()
@@ -103,6 +111,12 @@ public class Projectile : MonoBehaviour
 
         StopProjectile();
         ApplyDamage(collision);
+
+        if (!isActiveAndEnabled)
+        {
+            return;
+        }
+
         ReturnAfterCollision();
     }
     
@@ -110,6 +124,11 @@ public class Projectile : MonoBehaviour
     {
         StopAllCoroutines();
         ResetSettings();
+
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPlayerDead -= ReturnPool;
+        }
     }
 
     #region ===== 초기화 =====
@@ -142,7 +161,7 @@ public class Projectile : MonoBehaviour
 
         Transform projectileVisual = transform.GetChild(0);
 
-        _visualTransforms = projectileVisual.GetComponentsInChildren<Transform>(true);
+        _visualTransforms = projectileVisual.GetComponentsInChildren<Transform>();
         _initialVisualScales = new Vector3[_visualTransforms.Length];
 
         for (int i = 0; i < _visualTransforms.Length; i++)
@@ -270,7 +289,7 @@ public class Projectile : MonoBehaviour
         float progress = Mathf.Clamp01(_elapsedLifetime / _lifeTime);
         SetVisualScale(progress);
     }
-
+    
     #endregion ===== 생명 주기 =====
 
     #region ===== 충돌 =====
@@ -376,7 +395,6 @@ public class Projectile : MonoBehaviour
 
             return;
         }
-
         Managers.Pool.Return(poolObj);
     }
 
@@ -384,7 +402,7 @@ public class Projectile : MonoBehaviour
 
     #region ===== 설정 =====
 
-    /// <summary> 진행도에 따라 발사체 Visual의 크기를 조절한다. </summary>
+    /// <summary> 진행도에 따라 설정된 최소 크기까지 발사체 Visual의 크기를 조절한다. </summary>
     private void SetVisualScale(float progress)
     {
         if (_visualTransforms == null || _initialVisualScales == null)
@@ -394,7 +412,9 @@ public class Projectile : MonoBehaviour
 
         for (int i = 0; i < _visualTransforms.Length; i++)
         {
-            _visualTransforms[i].localScale = Vector3.Lerp(_initialVisualScales[i], Vector3.zero, progress);
+            Vector3 minimumScale = _initialVisualScales[i] * _minimumScaleRatio;
+
+            _visualTransforms[i].localScale = Vector3.Lerp(_initialVisualScales[i], minimumScale, progress);
         }
     }
     

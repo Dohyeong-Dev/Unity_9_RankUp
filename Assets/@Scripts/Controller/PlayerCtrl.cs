@@ -161,6 +161,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         FixedUpdateLocomotions();
     }
 
+    private void OnDisable()
+    {
+        ClearCurAttack();
+    }
+
     #region ===== 초기화 =====
 
     /// <summary> 플레이어가 사용하는 컴포넌트 참조를 초기화한다. </summary>
@@ -191,8 +196,26 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _cam = cam;
     }
 
-    /// <summary> 지정된 위치로 플레이어를 이동시키고 완료 후 콜백을 실행한다. </summary>
-    public void TeleportToTarget(Transform target, Action completionAction)
+    /// <summary> 지정된 위치로 플레이어를 즉시 이동시킨다. </summary>
+    public void TeleportToTarget(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        _rigid.position = target.position;
+        _rigid.rotation = target.rotation;
+        _rigid.velocity = Vector3.zero;
+        _rigid.angularVelocity = Vector3.zero;
+
+        transform.SetPositionAndRotation(target.position, target.rotation);
+
+        _cam?.ResetRotationToTarget(6f);
+    }
+
+    /// <summary> 로딩 UI 연출 후 지정된 위치로 플레이어를 이동시키고 완료 콜백을 실행한다. </summary>
+    public void TeleportToTargetWithLoading(Transform target, Action completionAction = null)
     {
         if (target == null)
         {
@@ -201,14 +224,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         Managers.UI.OpenLoadingUI(0.3f, openAction: () =>
         {
-            _rigid.position = target.position;
-            _rigid.rotation = target.rotation;
-            _rigid.velocity = Vector3.zero;
-            _rigid.angularVelocity = Vector3.zero;
-
-            transform.SetPositionAndRotation(target.position, target.rotation);
-
-            _cam?.ResetRotationToTarget(6f);
+            TeleportToTarget(target);
 
             completionAction?.Invoke();
 
@@ -334,7 +350,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         _currentAttack.Clear();
     }
-
+    
     #endregion ===== 공격 =====
 
     #region ===== 피격 =====

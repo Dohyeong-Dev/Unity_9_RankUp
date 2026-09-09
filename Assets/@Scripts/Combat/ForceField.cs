@@ -158,7 +158,7 @@ public class ForceField : MonoBehaviour
 
         UpdateVisualState();
 
-        _player.TeleportToTarget(_spawner.transform, _spawner.SpawnEnemies);
+        _player.TeleportToTargetWithLoading(_spawner.transform, _spawner.SpawnEnemies);
     }
 
     /// <summary> 현재 시련을 종료하고 다음 페이즈로 진행한다. </summary>

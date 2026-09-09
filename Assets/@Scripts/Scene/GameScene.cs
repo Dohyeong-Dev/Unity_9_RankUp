@@ -73,6 +73,7 @@ public class GameScene : BaseScene
     {
         Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 10);
         Managers.Pool.CreatePool(PoolKey.Path.EnemyRange, 5);
+        Managers.Pool.CreatePool(PoolKey.Path.EnemyBoss, 1);
         Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Fireball), 5);
         Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Iceball), 5);
         Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 3);
