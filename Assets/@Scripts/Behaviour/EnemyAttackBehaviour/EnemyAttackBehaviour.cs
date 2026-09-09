@@ -39,7 +39,7 @@ public abstract class EnemyAttackBehaviour : MonoBehaviour
 
     #endregion ===== 쿨타임 =====
 
-    private void Awake()
+    private void Start()
     {
         InitializeEnemy();
         InitializeCooldown();

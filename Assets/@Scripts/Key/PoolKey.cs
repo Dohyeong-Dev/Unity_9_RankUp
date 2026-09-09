@@ -6,6 +6,7 @@ public abstract class PoolKey
     {
         Fireball,
         Iceball,
+        SparkSpear,
     }
 
     public static class Path

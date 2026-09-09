@@ -59946,7 +59946,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveSpeed: 8.5
-  _lifeTime: 10
+  _lifeTime: 7
   _destroyOnLifetimeEnd: 0
   _moveEase: 15
 --- !u!4 &65636042538357223
@@ -72473,9 +72473,9 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 05cfc32bc12fe49c48be67b1430516f6, type: 2}
-  - {fileID: 2100000, guid: 6538dc57aa826474688eb2422d89d49d, type: 2}
-  - {fileID: 2100000, guid: 311d85363f63641c79c42f28f5317654, type: 2}
+  - {fileID: 2100000, guid: e6d4bab9b015e4ac99383c00cd7d3814, type: 2}
+  - {fileID: 2100000, guid: a95c96ca8898640098ddfe45c9cff7da, type: 2}
+  - {fileID: 2100000, guid: b8815e1ac1faf4c7da6075c4af5b7a6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

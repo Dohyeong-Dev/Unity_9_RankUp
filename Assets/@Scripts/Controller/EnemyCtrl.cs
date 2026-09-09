@@ -56,14 +56,14 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     public float RotationSpeed => _rotationSpeed;
 
     public float ChaseStoppingDistance => CurrentAttackBehaviour != null
-        ? CurrentAttackBehaviour.AttackableDistance : _defaultChaseStoppingDistance;
+        ? CurrentAttackBehaviour.AttackableDistance
+        : _defaultChaseStoppingDistance;
 
     #endregion ===== 이동 =====
 
     #region ===== 타겟 =====
 
     [Header("전투 타겟")]
-    
     [Tooltip("적이 플레이어를 마지막으로 인식한 후 전투 타겟을 유지하는 시간")]
     [SerializeField] private float _combatTargetDuration = 3f;
 
@@ -126,7 +126,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     [SerializeField] private float _maxHp = 100f;
 
     private float _hp;
-    
+
     public float MaxHp => _maxHp;
     public float Hp => _hp;
 
@@ -300,7 +300,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _rigid.velocity = Vector3.zero;
         _rigid.angularVelocity = Vector3.zero;
     }
-    
+
     private void ResetRigidbodyForDeath()
     {
         if (_rigid == null)
@@ -312,7 +312,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _rigid.angularVelocity = Vector3.zero;
         _rigid.isKinematic = true;
     }
-    
+
     private void ResetNavMeshAgent()
     {
         if (!IsNavMeshAgentAvailable())
@@ -324,13 +324,13 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _navMeshAgent.ResetPath();
         _navMeshAgent.velocity = Vector3.zero;
     }
-    
+
     private void ClearCombatTarget()
     {
         _combatTarget = null;
         _combatTargetTimer = 0f;
     }
-    
+
     #endregion ===== 초기화 =====
 
     #region ===== 이벤트 =====
@@ -395,7 +395,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         transform.SetPositionAndRotation(_spawnPosition, _spawnRotation);
 
         _navMeshAgent.enabled = true;
-        
+
         WarpToSpawnPosition();
 
         ResetEnemy();
@@ -501,7 +501,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation,
-                rotationSpeed * deltaTime);
+            rotationSpeed * deltaTime);
     }
 
     public void UpdateMovementAnimation()
@@ -565,42 +565,57 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _attackBehaviours.Add(attackBehaviour);
     }
 
+    /// <summary> 현재 타겟과의 거리에 가장 적합한 공격 행동을 선택한다. </summary>
     private void UpdateCurrentAttackBehaviour()
     {
-        if (CurrentAttackBehaviour != null && CurrentAttackBehaviour.IsAvailable)
+        if (_stateMachine.IsCurrentState<AttackState>())
         {
             return;
         }
-
-        CurrentAttackBehaviour = null;
 
         if (_attackBehaviours.Count == 0)
         {
+            CurrentAttackBehaviour = null;
             return;
         }
 
-        int attackCount = _attackBehaviours.Count;
-        int startIndex = UnityEngine.Random.Range(0, attackCount);
+        Transform target = Target;
 
-        for (int i = 0; i < attackCount; i++)
+        if (target == null)
         {
-            int index = (startIndex + i) % attackCount;
-
-            EnemyAttackBehaviour attackBehaviour = _attackBehaviours[index];
-
-            if (attackBehaviour == null)
-            {
-                continue;
-            }
-
-            if (!attackBehaviour.IsAvailable)
-            {
-                continue;
-            }
-
-            CurrentAttackBehaviour = attackBehaviour;
+            CurrentAttackBehaviour = null;
             return;
         }
+
+        Vector3 distanceDirection = target.position - transform.position;
+        distanceDirection.y = 0f;
+
+        float targetSqrDistance = distanceDirection.sqrMagnitude;
+
+        EnemyAttackBehaviour selectedAttack = null;
+        float closestDistanceDifference = float.MaxValue;
+
+        foreach (EnemyAttackBehaviour attackBehaviour in _attackBehaviours)
+        {
+            if (attackBehaviour == null || !attackBehaviour.IsAvailable)
+            {
+                continue;
+            }
+
+            float sqrAttackableDistance = attackBehaviour.AttackableDistance * attackBehaviour.AttackableDistance;
+
+            float distanceDifference = Mathf.Abs(sqrAttackableDistance - targetSqrDistance);
+
+            if (distanceDifference >= closestDistanceDifference)
+            {
+                continue;
+            }
+
+            closestDistanceDifference = distanceDifference;
+            selectedAttack = attackBehaviour;
+        }
+
+        CurrentAttackBehaviour = selectedAttack;
     }
 
     public void ExecuteAttack()
@@ -720,9 +735,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _fieldOfView?.ClearTarget();
 
         _collider.enabled = false;
-        
+
         ResetRigidbodyForDeath();
-        
+
         _navMeshAgent.enabled = false;
 
         SetAnimationMoveSpeed(0f);
@@ -734,7 +749,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         PlayDissolve(true);
     }
-    
+
     #endregion ===== 데미지/죽음 =====
 
     #region ===== 넉백 =====
@@ -777,7 +792,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         Vector3 targetPosition = transform.position + direction * knockbackDistance;
 
         _knockbackTween = transform.DOMove(targetPosition, _knockbackDuration).SetEase(_knockbackEase)
-                .OnComplete(CompleteKnockback);
+            .OnComplete(CompleteKnockback);
     }
 
     private void CompleteKnockback()
@@ -808,7 +823,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         Vector3 origin = transform.position + Vector3.up * _knockbackRadius;
 
         RaycastHit[] hits = Physics.SphereCastAll(origin, _knockbackRadius, direction, _knockbackDistance,
-                _knockbackCollisionLayer, QueryTriggerInteraction.Ignore);
+            _knockbackCollisionLayer, QueryTriggerInteraction.Ignore);
 
         if (hits.Length == 0)
         {
@@ -842,7 +857,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         foreach (Material material in _dissolveMaterials)
         {
-            if (material == null)
+            if (material == null || !material.HasProperty(DissolveProperty))
             {
                 continue;
             }
@@ -858,7 +873,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         KillDissolveTween();
 
         _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
-                .SetEase(_dissolveEase);
+            .SetEase(_dissolveEase);
 
         if (isDissolving)
         {

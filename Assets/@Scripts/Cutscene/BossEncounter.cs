@@ -260,12 +260,14 @@ public class BossEncounter : MonoBehaviour
 
         PoolObj poolObj = Managers.Pool.Get(PoolKey.Path.EnemyBoss);
 
-        if (poolObj == null)
+        if (!poolObj.TryGetComponent(out EnemyCtrl enemy))
         {
+            CPrint.Error("[BossEncounter] Pool object에 EnemyCtrl이 없습니다.");
+            Managers.Pool.Return(poolObj);
             return;
         }
 
-        poolObj.transform.SetPositionAndRotation(_cutsceneBoss.transform.position, _cutsceneBoss.transform.rotation);
+        enemy.Spawn(_cutsceneBoss.transform);
     }
     
     #endregion ===== 스폰 =====

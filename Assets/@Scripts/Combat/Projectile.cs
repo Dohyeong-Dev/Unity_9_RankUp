@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary> 발사체의 이동, 충돌, 데미지 처리 및 생명 주기를 관리한다. </summary>
@@ -61,7 +62,7 @@ public class Projectile : MonoBehaviour
     [Range(0f, 1f)]
     private float _minimumScaleRatio = 0.1f;
 
-    private Transform[] _visualTransforms;
+    private List<Transform> _visualTransforms = new();
     private Vector3[] _initialVisualScales;
 
     #endregion ===== 크기 =====
@@ -88,6 +89,8 @@ public class Projectile : MonoBehaviour
         ResetSize();
         
         Managers.Event.OnPlayerDead += ReturnPool;
+
+        PlayParticles();
     }
 
     private void FixedUpdate()
@@ -159,12 +162,19 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        Transform projectileVisual = transform.GetChild(0);
+        Transform[] transforms = transform.GetComponentsInChildren<Transform>();
 
-        _visualTransforms = projectileVisual.GetComponentsInChildren<Transform>();
-        _initialVisualScales = new Vector3[_visualTransforms.Length];
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            if (transforms[i].TryGetComponent<ParticleSystem>(out _))
+            {
+                _visualTransforms.Add(transforms[i]);
+            }
+        }
+        
+        _initialVisualScales = new Vector3[_visualTransforms.Count];
 
-        for (int i = 0; i < _visualTransforms.Length; i++)
+        for (int i = 0; i < _visualTransforms.Count; i++)
         {
             _initialVisualScales[i] = _visualTransforms[i].localScale;
         }
@@ -204,9 +214,17 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < _visualTransforms.Length; i++)
+        for (int i = 0; i < _visualTransforms.Count; i++)
         {
             _visualTransforms[i].localScale = _initialVisualScales[i];
+        }
+    }
+
+    private void PlayParticles()
+    {
+        for (int i = 0; i < _visualTransforms.Count; i++)
+        {
+            _visualTransforms[i].GetComponent<ParticleSystem>().Play();
         }
     }
     
@@ -363,9 +381,9 @@ public class Projectile : MonoBehaviour
             yield break;
         }
 
-        Vector3[] startScales = new Vector3[_visualTransforms.Length];
+        Vector3[] startScales = new Vector3[_visualTransforms.Count];
 
-        for (int i = 0; i < _visualTransforms.Length; i++)
+        for (int i = 0; i < _visualTransforms.Count; i++)
         {
             startScales[i] = _visualTransforms[i].localScale;
         }
@@ -410,7 +428,7 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < _visualTransforms.Length; i++)
+        for (int i = 0; i < _visualTransforms.Count; i++)
         {
             Vector3 minimumScale = _initialVisualScales[i] * _minimumScaleRatio;
 

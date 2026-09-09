@@ -52,6 +52,7 @@ public class EnemyStateMachine
     {
         if (_currentState == null)
         {
+            CPrint.Warning("[EnemyStateMachine] currentState가 존재하지 않습니다.");
             return;
         }
 

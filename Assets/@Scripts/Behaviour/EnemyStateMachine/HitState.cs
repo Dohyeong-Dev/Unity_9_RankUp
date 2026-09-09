@@ -42,7 +42,7 @@ public class HitState : BaseEnemyState
     {
         if (Enemy.Target != null)
         {
-            StateMachine.ChangeState<ChaseState>();
+            StateMachine.ChangeState<IdleState>();
             return;
         }
 

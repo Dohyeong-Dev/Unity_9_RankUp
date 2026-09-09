@@ -1134,7 +1134,6 @@ GameObject:
   - component: {fileID: 3607764460814878370}
   - component: {fileID: 7311964586879003315}
   - component: {fileID: 277454149835651410}
-  - component: {fileID: 291594092336927954}
   m_Layer: 7
   m_Name: EnemyMelee
   m_TagString: Untagged
@@ -1343,28 +1342,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackAnimationIndex: 2
   _attackableDistance: 0.8
-  _damageFactor: 1
+  _damageFactor: 1.5
   _coolTime: 2
-  _meleeAttackRange: {fileID: 850712703580727742}
-  _meleeLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
---- !u!114 &291594092336927954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4937344872469748292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a614eab859cc497f96431572ad773811, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _attackAnimationIndex: 3
-  _attackableDistance: 0.8
-  _damageFactor: 1
-  _coolTime: 3
   _meleeAttackRange: {fileID: 850712703580727742}
   _meleeLayerMask:
     serializedVersion: 2
