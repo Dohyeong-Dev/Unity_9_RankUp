@@ -1132,7 +1132,7 @@ GameObject:
   - component: {fileID: 8716027239909535574}
   - component: {fileID: 1348572054228863927}
   - component: {fileID: 2121470173390168326}
-  - component: {fileID: 4001026613210276064}
+  - component: {fileID: 8744061952384875592}
   - component: {fileID: 2530825626623421944}
   - component: {fileID: 8545468803348507607}
   - component: {fileID: 704863614345831673}
@@ -1278,7 +1278,7 @@ MonoBehaviour:
   _obstacleLayer:
     serializedVersion: 2
     m_Bits: 512
---- !u!114 &4001026613210276064
+--- !u!114 &8744061952384875592
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1287,7 +1287,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4937344872469748292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e354bce447c44e64ad6dd0b0c6fae12, type: 3}
+  m_Script: {fileID: 11500000, guid: 36e80beeb1e604dfb97f41e527bccdd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _walkSpeed: 1.5
@@ -1298,7 +1298,7 @@ MonoBehaviour:
   _animationSpeedMultiplier: 0.2
   _combatTargetDuration: 10
   _combatRetentionDistance: 20
-  _maxHp: 10000
+  _maxHp: 2000
   _strength: 10
   _knockbackDistance: 1
   _knockbackDuration: 0.15
@@ -1309,8 +1309,8 @@ MonoBehaviour:
   _knockbackRadius: 0.3
   _knockbackCollisionOffset: 0.1
   _hitEffect: {fileID: 8318467592180314545}
-  _dissolveDuration: 1.5
-  _dissolveEase: 7
+  _dissolveDuration: 0
+  _dissolveEase: 0
 --- !u!114 &2530825626623421944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1344,7 +1344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackAnimationIndex: 2
-  _attackableDistance: 1
+  _attackableDistance: 1.5
   _damageFactor: 1
   _coolTime: 0.1
   _meleeAttackRange: {fileID: 850712703580727742}
@@ -1364,7 +1364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackAnimationIndex: 3
-  _attackableDistance: 1
+  _attackableDistance: 2
   _damageFactor: 1
   _coolTime: 0.1
   _meleeAttackRange: {fileID: 850712703580727742}
@@ -1386,11 +1386,12 @@ MonoBehaviour:
   _attackAnimationIndex: 4
   _attackableDistance: 10
   _damageFactor: 1
-  _coolTime: 3
+  _coolTime: 5
   _moveSpeed: 10
   _isGuided: 1
   _lifeTime: 2
   _projectileCount: 5
+  _isRandomProjectileCount: 0
   _spawnOffset: {x: 0, y: 1, z: 1}
   _projectileType: 2
 --- !u!114 &-7907206499278971176
@@ -1406,13 +1407,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackAnimationIndex: 4
-  _attackableDistance: 10
+  _attackableDistance: 4
   _damageFactor: 1
   _coolTime: 1
   _moveSpeed: 15
   _isGuided: 0
   _lifeTime: 2
-  _projectileCount: 5
+  _projectileCount: 7
+  _isRandomProjectileCount: 1
   _spawnOffset: {x: 0, y: 1, z: 1}
   _projectileType: 0
 --- !u!1 &5092463709841558120

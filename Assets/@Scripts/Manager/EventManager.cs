@@ -9,6 +9,7 @@ public class EventManager
     public event Action OnPlayerDead;
 
     public event Action OnBossSpawned;
+    public event Action OnBossClear;
     
     #endregion ===== 이벤트 =====
 
@@ -30,6 +31,12 @@ public class EventManager
     public void RaiseBossSpawned()
     {
         OnBossSpawned?.Invoke();
+    }
+    
+    /// <summary> 보스를 클리어했음을 알린다. </summary>
+    public void RaiseBossClear()
+    {
+        OnBossClear?.Invoke();
     }
     
     #endregion ===== 이벤트 발행 =====

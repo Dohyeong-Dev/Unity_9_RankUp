@@ -4923,7 +4923,7 @@ MonoBehaviour:
   _maxHp: 100
   _maxSp: 100
   _spRecoveryThreshold: 10
-  _spRecoveryRate: 30
+  _spRecoveryRate: 50
   _str: 10
 --- !u!114 &9116578313329837819
 MonoBehaviour:
@@ -4970,7 +4970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredSp: 5
-  _damageFactor: 2
+  _damageFactor: 1
   _meleeAttackRange: {fileID: 3690553982505492406}
   _meleeLayerMask:
     serializedVersion: 2

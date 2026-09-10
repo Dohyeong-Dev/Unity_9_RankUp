@@ -452,7 +452,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 사망 애니메이션이 종료되면 엔드 화면을 표시한다. </summary>
     public void OnDeadAnimationEnded()
     {
-        Managers.UI.OpenScreen<EndScreen>()?.Open(true);
+        Managers.UI.OpenScreen<EndScreen>()?.Set(true);
     }
 
     #endregion ===== 사망 =====

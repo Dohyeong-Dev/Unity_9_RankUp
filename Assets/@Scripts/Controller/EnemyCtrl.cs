@@ -16,11 +16,11 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     private PlayerCtrl _player;
 
-    private NavMeshAgent _navMeshAgent;
-    private Animator _animator;
+    protected NavMeshAgent _navMeshAgent;
+    protected Animator _animator;
     private Rigidbody _rigid;
-    private Collider _collider;
-    private FieldOfView _fieldOfView;
+    protected Collider _collider;
+    protected FieldOfView _fieldOfView;
 
     public NavMeshAgent NavMeshAgent => _navMeshAgent;
     public Animator Animator => _animator;
@@ -177,7 +177,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     #region ===== 상태 =====
 
-    public bool IsDead { get; private set; }
+    public bool IsDead { get; protected set; }
 
     public event Action<EnemyCtrl> OnDead;
 
@@ -301,7 +301,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _rigid.angularVelocity = Vector3.zero;
     }
 
-    private void ResetRigidbodyForDeath()
+    protected void ResetRigidbodyForDeath()
     {
         if (_rigid == null)
         {
@@ -325,7 +325,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _navMeshAgent.velocity = Vector3.zero;
     }
 
-    private void ClearCombatTarget()
+    protected void ClearCombatTarget()
     {
         _combatTarget = null;
         _combatTargetTimer = 0f;
@@ -377,6 +377,11 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         OnAttackFinished?.Invoke();
     }
 
+    public void RaiseDead()
+    {
+        OnDead?.Invoke(this);
+    }
+    
     #endregion ===== 이벤트 =====
 
     #region ===== 스폰 =====
@@ -716,7 +721,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _hitEffect.Play();
     }
 
-    public void Die()
+    public virtual void Die()
     {
         if (IsDead)
         {
@@ -725,7 +730,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         IsDead = true;
 
-        OnDead?.Invoke(this);
+        RaiseDead();
 
         KillKnockbackTween();
 
@@ -904,7 +909,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     #region ===== 트윈 =====
 
-    private void KillTweens()
+    protected void KillTweens()
     {
         KillDissolveTween();
         KillKnockbackTween();

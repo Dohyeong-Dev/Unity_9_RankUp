@@ -181,7 +181,7 @@ public class BossEncounter : MonoBehaviour
     
     #endregion ===== 컷신 =====
 
-    #region ===== 오브젝트 활성화/비활성화 =====
+    #region ===== 활성/비활성화 =====
 
     /// <summary> 컷신 가상 카메라와 카메라 타겟 관리 오브젝트의 활성 상태를 변경한다. </summary>
     private void SetCutsceneCameraActive(bool isActive)
@@ -268,6 +268,11 @@ public class BossEncounter : MonoBehaviour
         }
 
         enemy.Spawn(_cutsceneBoss.transform);
+
+        if (Managers.Scene.TryGetCurrentScene(out GameScene scene))
+        {
+            scene.HUD.SubscribeBossEvents(enemy);
+        }
     }
     
     #endregion ===== 스폰 =====

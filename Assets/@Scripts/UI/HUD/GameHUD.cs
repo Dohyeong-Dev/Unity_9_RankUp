@@ -3,13 +3,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary> 플레이어의 HP와 SP 상태를 화면에 표시하는 게임 HUD다. </summary>
+/// <summary> 플레이어의 HP/SP, 보스 HP 상태를 화면에 표시하는 게임 HUD다. </summary>
 public class GameHUD : BaseHUD
 {
     private enum Sliders
     {
         HpSlider,
         SpSlider,
+        BossHpSlider
     }
 
     private enum Texts
@@ -27,6 +28,7 @@ public class GameHUD : BaseHUD
     #region ===== 참조 =====
 
     private PlayerCtrl _player;
+    private EnemyCtrl _boss;
 
     #endregion ===== 참조 =====
 
@@ -34,6 +36,7 @@ public class GameHUD : BaseHUD
 
     private Tween _hpEmptyCoverTween;
     private Tween _spEmptyCoverTween;
+    private Tween _bossHpShowTween;
 
     private Color _hpCoverDefaultColor;
     private Color _spCoverDefaultColor;
@@ -47,6 +50,8 @@ public class GameHUD : BaseHUD
         Bind<Image>(typeof(Images));
 
         InitializeCoverColors();
+
+        SetBossHpSliderActive(false);
     }
 
     protected override void OnStart()
@@ -76,8 +81,8 @@ public class GameHUD : BaseHUD
             return;
         }
 
-        _player.OnHpChanged -= UpdateHpSlider;
-        _player.OnSpChanged -= UpdateSpSlider;
+        UnsubscribePlayerEvents();
+        UnsubscribeBossEvents();
     }
     
     #region ===== 초기화 =====
@@ -90,6 +95,15 @@ public class GameHUD : BaseHUD
     }
 
     #endregion ===== 초기화 =====
+
+    #region ===== 활성/비활성화 =====
+
+    private void SetBossHpSliderActive(bool active)
+    {
+        Get<Slider>(Sliders.BossHpSlider).gameObject.SetActive(active);
+    }
+
+    #endregion ===== 활성/비활성화 =====
     
     #region ===== 참조 확인 =====
 
@@ -173,6 +187,32 @@ public class GameHUD : BaseHUD
 
     #endregion ===== 플레이어 =====
 
+    #region ===== 보스 =====
+
+    private void UpdateBossHpSlider(float currentHp, float maxHp)
+    {
+        Slider bossHpSlider = Get<Slider>(Sliders.BossHpSlider);
+        
+        if (bossHpSlider == null)
+        {
+            return;
+        }
+
+        if (_bossHpShowTween == null)
+        {
+            bossHpSlider.gameObject.SetActive(true);
+
+            bossHpSlider.transform.localScale = Vector3.zero;
+
+            _bossHpShowTween = bossHpSlider.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+        }
+        
+        float sliderValue = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
+        bossHpSlider.value = sliderValue;
+    }
+    
+    #endregion ===== 보스 =====
+    
     #region ===== 이펙트 =====
 
     /// <summary> HP가 낮을 때 HP 게이지의 경고 효과를 재생한다. </summary>
@@ -230,6 +270,33 @@ public class GameHUD : BaseHUD
     {
         _player.OnHpChanged += UpdateHpSlider;
         _player.OnSpChanged += UpdateSpSlider;
+    }
+    
+    /// <summary> 플레이어 이벤트를 해제한다. </summary>
+    private void UnsubscribePlayerEvents()
+    {
+        _player.OnHpChanged -= UpdateHpSlider;
+        _player.OnSpChanged -= UpdateSpSlider;
+    }
+
+    public void SubscribeBossEvents(EnemyCtrl boss)
+    {
+        if (_boss == null)
+        {
+            _boss = boss;
+        }
+        
+        _boss.OnHpChanged += UpdateBossHpSlider;
+    }
+    
+    private void UnsubscribeBossEvents()
+    {
+        if (_boss == null)
+        {
+            return;
+        }
+        
+        _boss.OnHpChanged -= UpdateBossHpSlider;
     }
 
     #endregion ===== 이벤트 =====

@@ -10,10 +10,13 @@ public class EnemyRangeAttack : EnemyAttackBehaviour
     [SerializeField] private bool _isGuided = true;
     [SerializeField] private float _lifeTime = 2f;
 
+    [Space(5)]
     [Tooltip("동시에 발사할 발사체 개수")]
     [Min(1)]
     [SerializeField] private int _projectileCount = 1;
+    [SerializeField] private bool _isRandomProjectileCount = false;
 
+    [Space(5)]
     [Tooltip("적의 로컬 좌표를 기준으로 계산되는 발사 위치")]
     [SerializeField] private Vector3 _spawnOffset = new(0f, 1f, 1f);
 
@@ -48,9 +51,16 @@ public class EnemyRangeAttack : EnemyAttackBehaviour
         Vector3 spawnPosition = Enemy.transform.TransformPoint(_spawnOffset);
         Vector3 centerDirection = GetAttackDirection(target.position, spawnPosition);
 
-        for (int i = 0; i < _projectileCount; i++)
+        int count = _projectileCount;
+        
+        if (_isRandomProjectileCount)
         {
-            Vector3 direction = GetSpreadDirection(centerDirection, i);
+            count = Random.Range(1, _projectileCount + 1);
+        }
+        
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 direction = GetSpreadDirection(centerDirection, i, count);
 
             SpawnProjectile(target, spawnPosition, direction);
         }
@@ -78,11 +88,18 @@ public class EnemyRangeAttack : EnemyAttackBehaviour
             _lifeTime, _isGuided, target);
     }
 
-    /// <summary> 전방 180도 범위를 기준으로 균등하게 분배된 발사 방향을 반환한다. </summary>
-    private Vector3 GetSpreadDirection(Vector3 centerDirection, int index)
+    /// <summary> 적의 전방을 중심으로 균등하게 분배된 발사 방향을 반환한다. </summary>
+    private Vector3 GetSpreadDirection(Vector3 centerDirection, int index, int count)
     {
-        float angleStep = 180f / (_projectileCount + 1);
-        float angle = angleStep * (index + 1) - 90f;
+        if (count <= 1)
+        {
+            return centerDirection;
+        }
+
+        const float spreadAngle = 90f;
+
+        float angleStep = spreadAngle / (count - 1);
+        float angle = -spreadAngle * 0.5f + angleStep * index;
 
         return Quaternion.AngleAxis(angle, Vector3.up) * centerDirection;
     }

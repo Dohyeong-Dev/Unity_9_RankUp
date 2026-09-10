@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary> 게임 플레이 씬의 초기화와 페이즈 진행을 관리한다. </summary>
@@ -6,6 +7,7 @@ public class GameScene : BaseScene
     #region ===== 참조 =====
 
     private GameHUD _hud;
+    public GameHUD HUD => _hud;
 
     [SerializeField] private PlayerCtrl _player;
     [SerializeField] private CamCtrl _camera;
@@ -41,10 +43,20 @@ public class GameScene : BaseScene
         CreatePool();
 
         Managers.Event.RaisePhaseUpdated();
+
+        Managers.Event.OnBossClear += OpenClearScreen;
     }
 
     protected override void OnUpdate()
     {
+    }
+
+    private void OnDestroy()
+    {
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnBossClear -= OpenClearScreen;
+        }
     }
 
     #region ===== 초기화 =====
@@ -74,8 +86,8 @@ public class GameScene : BaseScene
         Managers.Pool.CreatePool(PoolKey.Path.EnemyMelee, 10);
         Managers.Pool.CreatePool(PoolKey.Path.EnemyRange, 5);
         Managers.Pool.CreatePool(PoolKey.Path.EnemyBoss, 1);
-        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Fireball), 5);
-        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Iceball), 5);
+        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Fireball), 10);
+        Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Iceball), 10);
         Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.SparkSpear), 5);
         Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 3);
     }
@@ -98,5 +110,10 @@ public class GameScene : BaseScene
         Managers.Event.RaisePhaseUpdated();
     }
 
+    public void OpenClearScreen()
+    {
+        Managers.UI.OpenScreen<EndScreen>().Set(false);
+    }
+    
     #endregion ===== 페이즈 =====
 }

@@ -73,6 +73,7 @@ public class UIManager
     {
         if (IsLoading)
         {
+            Managers.Input.SetInputEnabled(false);
             return;
         }
 

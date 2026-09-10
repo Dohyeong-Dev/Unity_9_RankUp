@@ -48,7 +48,7 @@ public class EndScreen : BaseScreen
     }
 
     /// <summary> 게임 종료 여부에 따라 결과 화면을 표시한다. </summary>
-    public void Open(bool isGameOver)
+    public void Set(bool isGameOver)
     {
         Get<Image>(Images.Bg).gameObject.SetActive(true);
 
