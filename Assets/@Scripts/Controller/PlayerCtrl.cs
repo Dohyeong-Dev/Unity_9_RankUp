@@ -373,7 +373,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 플레이어에게 피해를 적용하고 생존 시 피격 상태로 전환한다. </summary>
     public void TakeDamage(float damage)
     {
-        if (IsDead || IsHitInvincible)
+        if (IsHitInvincible || IsDead)
         {
             return;
         }
@@ -595,6 +595,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 지정된 위치와 방향으로 피격 이펙트를 생성한다. </summary>
     public void PlayHitEffect(Vector3 hitPosition, Vector3 lookPosition)
     {
+        if (IsHitInvincible || IsDead)
+        {
+            return;
+        }
+        
         PoolObj poolObject = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect);
 
         if (poolObject == null)

@@ -9762,7 +9762,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _groundCheckDistance: 0.1
-  _hitInvincibleDuration: 1
+  _hitInvincibleDuration: 2
   _hitInvincibleEffect: {fileID: 714420690687197222}
   _hitEffectLifeTime: 0.3
   _maxHp: 100
