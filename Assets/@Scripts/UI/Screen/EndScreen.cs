@@ -6,31 +6,26 @@ public class EndScreen : BaseScreen
 {
     #region ===== UI 바인딩 =====
 
-    private enum Texts
-    {
-        OverTxt,
-        ClearTxt,
-    }
-
     private enum Buttons
     {
-        CloseBtn,
+        RetryBtn,
     }
 
     private enum Images
     {
         Bg,
+        ClearImage,
+        OverImage
     }
 
     #endregion ===== UI 바인딩 =====
 
     protected override void OnAwake()
     {
-        Bind<TMP_Text>(typeof(Texts));
         Bind<Button>(typeof(Buttons));
         Bind<Image>(typeof(Images));
 
-        Get<Button>(Buttons.CloseBtn).onClick.AddListener(Restart);
+        Get<Button>(Buttons.RetryBtn).onClick.AddListener(Restart);
         Get<Image>(Images.Bg).gameObject.SetActive(false);
     }
 
@@ -52,14 +47,14 @@ public class EndScreen : BaseScreen
     {
         Get<Image>(Images.Bg).gameObject.SetActive(true);
 
-        SetResultText(isGameOver);
+        Show(isGameOver);
     }
 
-    /// <summary> 게임 결과에 맞는 텍스트를 표시한다. </summary>
-    private void SetResultText(bool isGameOver)
+    /// <summary> 게임 결과에 맞는 화면을 표시한다. </summary>
+    private void Show(bool isGameOver)
     {
-        Get<TMP_Text>(Texts.OverTxt).gameObject.SetActive(isGameOver);
-        Get<TMP_Text>(Texts.ClearTxt).gameObject.SetActive(!isGameOver);
+        Get<Image>(Images.ClearImage).gameObject.SetActive(!isGameOver);
+        Get<Image>(Images.OverImage).gameObject.SetActive(isGameOver);
     }
 
     /// <summary> 현재 게임을 종료하고 처음부터 다시 시작한다. </summary>

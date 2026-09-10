@@ -169,10 +169,11 @@ public abstract class BasePopup : BaseUI
         if (isOpen)
         {
             background.transform.DOScale(1f, 0.25f).From(0f).OnComplete(OnOpened);
-            return;
         }
-
-        background.transform.DOScale(0f, 0.25f).OnComplete(CloseImmediately);
+        else
+        {
+            background.transform.DOScale(0f, 0.25f).OnComplete(CloseImmediately);
+        }
     }
 
     /// <summary> Popup 콘텐츠가 위로 이동하며 표시되는 애니메이션을 재생한다. </summary>

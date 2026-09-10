@@ -1298,7 +1298,7 @@ MonoBehaviour:
   _animationSpeedMultiplier: 0.2
   _combatTargetDuration: 10
   _combatRetentionDistance: 20
-  _maxHp: 2000
+  _maxHp: 1000
   _strength: 10
   _knockbackDistance: 1
   _knockbackDuration: 0.15
@@ -2006,8 +2006,8 @@ Transform:
   m_GameObject: {fileID: 6920216434532036343}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.85, z: 1.17}
-  m_LocalScale: {x: 1.9376, y: 1.9631811, z: 1.8463}
+  m_LocalPosition: {x: 0, y: 0.85, z: 1.19}
+  m_LocalScale: {x: 1.9376, y: 1.9631811, z: 2.3935728}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5061881473483460607}

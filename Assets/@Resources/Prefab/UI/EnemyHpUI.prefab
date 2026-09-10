@@ -280,4 +280,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _heightOffset: 0.5
-  _minFillAmount: 0.05

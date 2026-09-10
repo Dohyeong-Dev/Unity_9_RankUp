@@ -70,7 +70,15 @@ public class GameHUD : BaseHUD
     protected override void OnUpdate()
     {
     }
-    
+
+    public override void OnInputKey()
+    {
+        if (Managers.Input.KeyDown_Esc)
+        {
+            Managers.UI.OpenPopup<ExitPopup>();
+        }
+    }
+
     private void OnDestroy()
     {
         _hpEmptyCoverTween?.Kill();

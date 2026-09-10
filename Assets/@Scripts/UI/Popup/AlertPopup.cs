@@ -38,13 +38,11 @@ public class AlertPopup : BasePopup
 
     public override void OnInputKey()
     {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();
-            return;
         }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        else if (Managers.Input.KeyDown_Esc)
         {
             OnClickNo();
         }

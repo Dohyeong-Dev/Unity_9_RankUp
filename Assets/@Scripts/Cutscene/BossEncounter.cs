@@ -107,6 +107,7 @@ public class BossEncounter : MonoBehaviour
 
         Managers.Input.SetInputEnabled(false);
         Managers.UI.CurrentHUD?.SetVisible(false);
+        Managers.UI.CloseHitEffect();
 
         SetRealPlayerActive(false);
         SetCutsceneCameraActive(true);

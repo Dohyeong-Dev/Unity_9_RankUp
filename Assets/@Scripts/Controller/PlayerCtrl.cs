@@ -51,6 +51,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     [Header("피격")]
     [SerializeField] private float _hitInvincibleDuration = 0.5f;
+    [SerializeField] private GameObject _hitInvincibleEffect;
+    
     [SerializeField] private float _hitEffectLifeTime = 0.3f;
 
     #endregion ===== 설정 =====
@@ -360,9 +362,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         if (_hitInvincibleTimer <= 0f)
         {
+            _hitInvincibleEffect?.gameObject.SetActive(false);
             return;
         }
 
+        _hitInvincibleEffect?.gameObject.SetActive(true);
         _hitInvincibleTimer = Mathf.Max(0f, _hitInvincibleTimer - Time.deltaTime);
     }
 

@@ -29,6 +29,7 @@ public class InputManager
 
     public bool KeyDown_Space => Input.GetKeyDown(KeyCode.Space);
     public bool KeyDown_Esc => Input.GetKeyDown(KeyCode.Escape);
+    public bool KeyDown_Enter => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
     #endregion ===== 키보드 =====
 
