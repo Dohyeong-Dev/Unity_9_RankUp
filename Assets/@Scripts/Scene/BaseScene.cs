@@ -23,6 +23,8 @@ public abstract class BaseScene : MonoBehaviour
 
     private void Start()
     {
+        DynamicGI.UpdateEnvironment();
+        
         OnStart();
     }
 

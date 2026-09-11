@@ -163,6 +163,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         FixedUpdateLocomotions();
     }
 
+    private void OnEnable()
+    {
+        _hitInvincibleTimer = 0f;
+    }
+
     private void OnDisable()
     {
         ClearCurAttack();

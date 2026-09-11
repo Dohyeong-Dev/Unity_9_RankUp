@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary> 게임 플레이 씬의 초기화와 페이즈 진행을 관리한다. </summary>
 public class GameScene : BaseScene
