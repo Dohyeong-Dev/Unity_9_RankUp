@@ -1299,7 +1299,7 @@ MonoBehaviour:
   _combatTargetDuration: 10
   _combatRetentionDistance: 20
   _maxHp: 1000
-  _strength: 10
+  _strength: 8
   _knockbackDistance: 1
   _knockbackDuration: 0.15
   _knockbackEase: 6
@@ -1409,8 +1409,8 @@ MonoBehaviour:
   _attackAnimationIndex: 4
   _attackableDistance: 4
   _damageFactor: 1
-  _coolTime: 1
-  _moveSpeed: 15
+  _coolTime: 4
+  _moveSpeed: 13
   _isGuided: 0
   _lifeTime: 2
   _projectileCount: 7
