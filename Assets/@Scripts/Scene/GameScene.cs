@@ -46,6 +46,8 @@ public class GameScene : BaseScene
         Managers.Event.RaisePhaseUpdated();
 
         Managers.Event.OnBossClear += OpenClearScreen;
+        
+        Managers.Sound.PlayBgm(ResourceKey.Name.BgmType.GlobalResonance, fadeTime: 3f);
     }
 
     protected override void OnUpdate()

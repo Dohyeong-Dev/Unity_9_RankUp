@@ -30,6 +30,7 @@ public class AlertPopup : BasePopup
 
     protected override void OnStart()
     {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeAlert);
     }
 
     protected override void OnUpdate()
@@ -69,11 +70,13 @@ public class AlertPopup : BasePopup
     private void OnClickYes()
     {
         Close(() => _yesAction?.Invoke());
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeConfirm);
     }
 
     /// <summary> No 버튼을 선택했을 때 팝업을 닫는다. </summary>
     private void OnClickNo()
     {
         Close();
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
     }
 }

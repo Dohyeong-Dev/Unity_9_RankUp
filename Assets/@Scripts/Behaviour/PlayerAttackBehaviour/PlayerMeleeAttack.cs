@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary> 플레이어의 근접 공격, 콤보, 공격 방향 및 슬래시 이펙트를 관리한다. </summary>
 public class PlayerMeleeAttack : PlayerAttackBehaviour
 {
-    private enum ComboStep
+    public enum ComboStep
     {
         First = 1,
         Second,
@@ -12,7 +12,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
 
     #region ===== 상태 =====
 
-    private ComboStep _currentComboStep;
+    public ComboStep CurrentComboStep  { get; private set; } = ComboStep.First;
 
     // 다음 콤보 공격 입력이 예약되었는지 여부
     private bool _isComboInputBuffered;
@@ -69,7 +69,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
     {
         Player.UnsetCurAttack();
 
-        _currentComboStep = 0;
+        CurrentComboStep = 0;
         _isComboInputBuffered = false;
 
         _nextComboDirection = Vector3.zero;
@@ -209,10 +209,11 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         Player.SetCurAttack(this);
         Player.SetSp(-RequiredSp);
 
-        _currentComboStep = comboStep;
+        CurrentComboStep = comboStep;
+
         _isComboInputBuffered = false;
 
-        Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, (int)_currentComboStep);
+        Player.Animator.SetInteger(AnimatorKey.Hash.MeleeComboStep, (int)CurrentComboStep);
     }
 
     /// <summary> 예약된 콤보 입력이 있으면 다음 콤보 공격으로 전환한다. </summary>
@@ -235,14 +236,14 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
     /// <summary> 다음 콤보 단계를 반환하고 마지막 단계라면 첫 번째 단계로 돌아간다. </summary>
     private ComboStep GetNextComboStep()
     {
-        _currentComboStep++;
+        CurrentComboStep++;
 
-        if ((int)_currentComboStep > Utils.GetEnumCount(typeof(ComboStep)))
+        if ((int)CurrentComboStep > Utils.GetEnumCount(typeof(ComboStep)))
         {
-            _currentComboStep = ComboStep.First;
+            CurrentComboStep = ComboStep.First;
         }
 
-        return _currentComboStep;
+        return CurrentComboStep;
     }
 
     /// <summary> 현재 공격 범위 안의 적에게 데미지를 적용한다. </summary>
@@ -260,7 +261,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
             return;
         }
 
-        Player.Cam?.ShakeCamera((int)_currentComboStep);
+        Player.Cam?.ShakeCamera((int)CurrentComboStep);
 
         foreach (Collider collider in colliders)
         {

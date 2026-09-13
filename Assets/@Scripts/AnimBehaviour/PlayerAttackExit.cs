@@ -14,15 +14,20 @@ public class PlayerAttackExit : StateMachineBehaviour
 
     private float _stateElapsedTime;
 
+    private bool isPlayedSound;
+
     #endregion ===== 상태 =====
 
     #region ===== 설정 =====
 
-    [Header("칼집 모션 중 행동")]
+    [Header("설정")]
     
     [Tooltip("칼집 모션 시작 후 이 시간이 지나야 이동 가능")]
     [SerializeField, Min(0f)] private float _movementEnableDelay = 0.5f;
 
+    [Tooltip("칼집 모션 시작 후 이 시간이 지나면 재생")]
+    [SerializeField, Min(0f)] private float _playSoundDelay = 0.5f;
+    
     #endregion ===== 설정 =====
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -46,25 +51,37 @@ public class PlayerAttackExit : StateMachineBehaviour
 
         _stateElapsedTime += Time.deltaTime;
 
-        if (_stateElapsedTime < _movementEnableDelay)
+        if (_stateElapsedTime >= _playSoundDelay)
         {
-            return;
+            if (!isPlayedSound)
+            {
+                isPlayedSound = true;
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.KatanaSheathe);
+            }
         }
-
-        if (_player.IsMoving)
+        
+        if (_stateElapsedTime >= _movementEnableDelay)
         {
-            _meleeAttack.CancelSheathe();
+            if (_player.IsMoving)
+            {
+                if (isPlayedSound)
+                {
+                    Managers.Sound.StopSfx(ResourceKey.Name.SfxType.KatanaSheathe);
+                }
+                
+                _meleeAttack.CancelSheathe();
+            }
         }
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_meleeAttack == null)
+        isPlayedSound = false;
+        
+        if (_meleeAttack != null)
         {
-            return;
+            _meleeAttack.Clear();
         }
-
-        _meleeAttack.Clear();
     }
 
     #region ===== 참조 확인 =====

@@ -53,8 +53,10 @@ public class PlayerAttack : StateMachineBehaviour
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        InitializeMeleeAttack(animator);
+        TryResolveMeleeAttack(animator);
         ResetState();
+
+        PlayAttackSound();
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -71,10 +73,15 @@ public class PlayerAttack : StateMachineBehaviour
         UpdateSlashVFX(progress);
     }
 
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        StopAttackSound();
+    }
+
     #region ===== 초기화 =====
 
     /// <summary> 현재 Animator에서 근접 공격 컴포넌트 참조를 초기화한다. </summary>
-    private void InitializeMeleeAttack(Animator animator)
+    private void TryResolveMeleeAttack(Animator animator)
     {
         if (_meleeAttack != null)
         {
@@ -148,4 +155,54 @@ public class PlayerAttack : StateMachineBehaviour
     }
 
     #endregion ===== 검 궤적 =====
+    
+    #region ===== 사운드 =====
+    
+    /// <summary> 현재 콤보에 따라 공격 사운드를 재생한다. </summary>
+    private void PlayAttackSound()
+    {
+        if (_meleeAttack == null)
+        {
+            CPrint.Error("[PlayerAttack] PlayerMeleeAttack을 찾을 수 없습니다.");
+            return;
+        }
+        
+        switch (_meleeAttack.CurrentComboStep)
+        {
+            case PlayerMeleeAttack.ComboStep.First:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.KatanaSwing01);
+                break;
+            case PlayerMeleeAttack.ComboStep.Second:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.KatanaSwing02);
+                break;
+            case PlayerMeleeAttack.ComboStep.Third:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.KatanaSwing03);
+                break;
+        }
+    }
+    
+    /// <summary> 현재 콤보에 따라 공격 사운드를 정지한다. </summary>
+    private void StopAttackSound()
+    {
+        if (_meleeAttack == null)
+        {
+            CPrint.Error("[PlayerAttack] PlayerMeleeAttack을 찾을 수 없습니다.");
+            return;
+        }
+        
+        switch (_meleeAttack.CurrentComboStep)
+        {
+            case PlayerMeleeAttack.ComboStep.First:
+                Managers.Sound.StopSfx(ResourceKey.Name.SfxType.KatanaSwing01);
+                break;
+            case PlayerMeleeAttack.ComboStep.Second:
+                Managers.Sound.StopSfx(ResourceKey.Name.SfxType.KatanaSwing02);
+                break;
+            case PlayerMeleeAttack.ComboStep.Third:
+                Managers.Sound.StopSfx(ResourceKey.Name.SfxType.KatanaSwing03);
+                break;
+        }
+    }
+    
+    #endregion ===== 사운드 =====
 }

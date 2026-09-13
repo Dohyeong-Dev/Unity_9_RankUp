@@ -9,6 +9,11 @@ public class EnemyHit : StateMachineBehaviour
 
     #endregion ===== 참조 =====
 
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyHit);
+    }
+    
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (!TryResolveEnemy(animator))

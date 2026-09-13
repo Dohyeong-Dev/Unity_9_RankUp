@@ -18,6 +18,8 @@ public class PlayerDash : StateMachineBehaviour
         }
 
         _dash.StartDashMovement();
+        
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerDash);
     }
 
     #region ===== 참조 확인 =====

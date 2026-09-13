@@ -92,6 +92,7 @@ public class BossEncounter : MonoBehaviour
     private void StartCutscene()
     {
         StopCutsceneCoroutines();
+        Managers.Sound.StopBgm();
 
         _cutsceneStartCoroutine = StartCoroutine(Co_StartCutscene());
     }
@@ -147,6 +148,8 @@ public class BossEncounter : MonoBehaviour
 
         Managers.UI.CurrentHUD?.SetVisible(true);
         Managers.Input.SetInputEnabled(true);
+        
+        Managers.Sound.PlayBgm(ResourceKey.Name.BgmType.Boss);
     }
 
     /// <summary> 진행 중인 컷신 시작과 종료 코루틴을 모두 중지한다. </summary>
@@ -284,6 +287,7 @@ public class BossEncounter : MonoBehaviour
     private void HandlePlayerTurnStarted()
     {
         SetCutsceneProjectileActive(true);
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.SparkProjectile);
         
         _cutsceneCamera?.SetCameraTargetToTransition();
     }

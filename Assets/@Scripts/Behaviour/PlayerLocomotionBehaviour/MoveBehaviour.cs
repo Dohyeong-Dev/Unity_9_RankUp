@@ -1,9 +1,16 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-/// <summary> 플레이어의 기본 이동, 회전 및 달리기 상태를 관리한다. </summary>
+/// <summary> 플레이어의 기본 이동, 회전, 달리기 및 발소리를 관리한다. </summary>
 public class MoveBehaviour : BaseLocomotionBehaviour
 {
+    #region ===== 참조 =====
+    
+    private Transform _leftFoot;
+    private Transform _rightFoot;
+    
+    #endregion ===== 참조 =====
+    
     #region ===== 상태 =====
 
     private float _currentRunFactor = DefaultMoveFactor;
@@ -11,6 +18,18 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     private bool _canRunInCurrentState = true;
 
     private Coroutine _runStateCoroutine;
+
+    // 발소리
+    private enum Foot
+    {
+        Left,
+        Right
+    }
+
+    private Foot _currentFoot = Foot.Right;
+
+    private bool _hasLiftedFoot;
+    private float _footDistance;
 
     #endregion ===== 상태 =====
 
@@ -28,10 +47,16 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     [Tooltip("달리기 시 기본 SP 소비량에 적용되는 배율")]
     [SerializeField] private float _runSpFactor = 2f;
 
+    [Header("발소리")]
+    [Tooltip("발이 바닥에 닿았다고 판단하는 최대 거리")]
+    [SerializeField] private float _footstepDistance = 0.12f;
+
     #endregion ===== 설정 =====
 
     private void Start()
     {
+        InitializeFootTransforms();
+
         Player.SetDefLocomotionBehaviour(BehaviourHash);
     }
 
@@ -73,6 +98,17 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         AdjustRunSpeed();
     }
+
+    #region ===== 초기화 =====
+
+    /// <summary> 플레이어의 좌우 발 본 Transform을 초기화한다. </summary>
+    private void InitializeFootTransforms()
+    {
+        _leftFoot = Player.Animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+        _rightFoot = Player.Animator.GetBoneTransform(HumanBodyBones.RightFoot);
+    }
+
+    #endregion ===== 초기화 =====
 
     #region ===== 이동 =====
 
@@ -176,9 +212,62 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
         float animationSpeed = inputMagnitude * _currentRunFactor;
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, 0.01f, Time.fixedDeltaTime);
+
+        UpdateFootstep();
     }
 
     #endregion ===== 이동 =====
+
+    #region ===== 발소리 =====
+
+    /// <summary> 현재 이동 중인 발의 위치를 확인하여 발소리를 재생한다. </summary>
+    private void UpdateFootstep()
+    {
+        if (!Player.IsGrounded || Player.IsDashing || !Player.IsMoving)
+        {
+            return;
+        }
+
+        if (_leftFoot == null || _rightFoot == null)
+        {
+            return;
+        }
+
+        switch (_currentFoot)
+        {
+            case Foot.Left:
+                UpdateFootDistance(_leftFoot, Foot.Right);
+                break;
+
+            case Foot.Right:
+                UpdateFootDistance(_rightFoot, Foot.Left);
+                break;
+        }
+    }
+
+    /// <summary> 지정된 발이 올라갔다가 바닥에 내려오면 발소리를 재생한다. </summary>
+    private void UpdateFootDistance(Transform footTransform, Foot nextFoot)
+    {
+        _footDistance = footTransform.position.y - Player.Tr.position.y;
+        
+        if (_footDistance > _footstepDistance)
+        {
+            _hasLiftedFoot = true;
+            return;
+        }
+
+        if (!_hasLiftedFoot)
+        {
+            return;
+        }
+
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.FootStep, 0.5f, true, footTransform.position);
+
+        _currentFoot = nextFoot;
+        _hasLiftedFoot = false;
+    }
+
+    #endregion ===== 발소리 =====
 
     #region ===== 달리기 =====
 

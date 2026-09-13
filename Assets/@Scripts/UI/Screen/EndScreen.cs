@@ -27,6 +27,8 @@ public class EndScreen : BaseScreen
 
         Get<Button>(Buttons.RetryBtn).onClick.AddListener(Restart);
         Get<Image>(Images.Bg).gameObject.SetActive(false);
+        
+        Managers.Sound.StopBgm();
     }
 
     protected override void OnStart()
@@ -46,15 +48,25 @@ public class EndScreen : BaseScreen
     public void Set(bool isGameOver)
     {
         Get<Image>(Images.Bg).gameObject.SetActive(true);
-
+        Get<Image>(Images.ClearImage).gameObject.SetActive(false);
+        Get<Image>(Images.OverImage).gameObject.SetActive(false);
+        
         Show(isGameOver);
     }
 
     /// <summary> 게임 결과에 맞는 화면을 표시한다. </summary>
     private void Show(bool isGameOver)
     {
-        Get<Image>(Images.ClearImage).gameObject.SetActive(!isGameOver);
-        Get<Image>(Images.OverImage).gameObject.SetActive(isGameOver);
+        if (isGameOver)
+        {
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.GameOver);
+            Get<Image>(Images.OverImage).gameObject.SetActive(true);
+        }
+        else
+        {
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.GameClear);
+            Get<Image>(Images.ClearImage).gameObject.SetActive(true);
+        }
     }
 
     /// <summary> 현재 게임을 종료하고 처음부터 다시 시작한다. </summary>

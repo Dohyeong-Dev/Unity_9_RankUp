@@ -72,6 +72,27 @@ public class Managers : MonoBehaviour
         }
     }
 
+    private static SoundManager _sound;
+
+    public static SoundManager Sound
+    {
+        get
+        {
+            if (_sound != null)
+            {
+                return _sound;
+            }
+
+            if (IsQuit || Instance == null)
+            {
+                return null;
+            }
+
+            InitializeSoundManager();
+            return _sound;
+        }
+    }
+    
     #endregion ===== MonoBehaviour 매니저 =====
 
     private void Update()
@@ -128,5 +149,19 @@ public class Managers : MonoBehaviour
         _scene = sceneManagerObject.GetOrAddComponent<ScenesManager>();
     }
 
+    /// <summary> SoundManager 오브젝트를 생성하고 Managers 하위에 등록한다. </summary>
+    private static void InitializeSoundManager()
+    {
+        if (Instance == null || _sound != null)
+        {
+            return;
+        }
+
+        GameObject soundManagerObject = new GameObject(nameof(SoundManager));
+        soundManagerObject.transform.SetParent(Instance.transform);
+
+        _sound = soundManagerObject.GetOrAddComponent<SoundManager>();
+    }
+    
     #endregion ===== 초기화 =====
 }

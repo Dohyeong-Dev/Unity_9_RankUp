@@ -24,7 +24,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private CapsuleCollider _capsuleCollider;
 
     private int _reactionLayerIndex;
-
+    
     #endregion ===== 참조 =====
 
     #region ===== 설정 =====
@@ -166,6 +166,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private void OnEnable()
     {
         _hitInvincibleTimer = 0f;
+
+        Managers.Sound.SetListener(transform);
     }
 
     private void OnDisable()
@@ -371,7 +373,12 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        _hitInvincibleEffect?.gameObject.SetActive(true);
+        if (_hitInvincibleEffect?.gameObject.activeSelf == false)
+        {
+            _hitInvincibleEffect?.gameObject.SetActive(true);
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ElectronicShield, 0.5f);
+        }
+        
         _hitInvincibleTimer = Mathf.Max(0f, _hitInvincibleTimer - Time.deltaTime);
     }
 
@@ -444,6 +451,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             return;
         }
 
+        Managers.Sound.StopBgm(3f);
+        
         UnsetCurAttack();
         SetState(PlayerState.Dead);
 

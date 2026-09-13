@@ -384,7 +384,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     
     #endregion ===== 이벤트 =====
 
-    #region ===== 스폰 =====
+    #region ===== 스폰/디스폰 =====
 
     public void Spawn(Transform spawnPoint)
     {
@@ -423,7 +423,26 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _navMeshAgent.Warp(_spawnPosition);
     }
 
-    #endregion ===== 스폰 =====
+    private void ReturnToPool()
+    {
+        if (!gameObject.activeSelf)
+        {
+            return;
+        }
+
+        StopMovement();
+
+        if (!TryGetComponent(out PoolObj poolObj))
+        {
+            CPrint.Warning($"[EnemyCtrl] {name}에서 PoolObj를 찾을 수 없습니다.");
+
+            return;
+        }
+
+        Managers.Pool.Return(poolObj);
+    }
+    
+    #endregion ===== 스폰/디스폰 =====
 
     #region ===== 타겟 =====
 
@@ -654,7 +673,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         SetHp(-damage);
         PlayHitEffect();
-
+        
         if (IsDead)
         {
             return;
@@ -858,21 +877,26 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     private void SetDissolveValue(float value)
     {
+        if (_dissolveMaterials.Count == 0)
+        {
+            return;
+        }
+        
         _dissolveValue = value;
 
         foreach (Material material in _dissolveMaterials)
         {
-            if (material == null || !material.HasProperty(DissolveProperty))
-            {
-                continue;
-            }
-
             material.SetFloat(DissolveProperty, _dissolveValue);
         }
     }
 
     private void PlayDissolve(bool isDissolving)
     {
+        if (_dissolveMaterials.Count == 0)
+        {
+            return;
+        }
+        
         float targetValue = isDissolving ? 1f : 0f;
 
         KillDissolveTween();
@@ -883,26 +907,12 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         if (isDissolving)
         {
             _dissolveTween.OnComplete(ReturnToPool);
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.9f);
         }
-    }
-
-    private void ReturnToPool()
-    {
-        if (!gameObject.activeSelf)
+        else
         {
-            return;
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.2f);
         }
-
-        StopMovement();
-
-        if (!TryGetComponent(out PoolObj poolObj))
-        {
-            CPrint.Warning($"[EnemyCtrl] {name}에서 PoolObj를 찾을 수 없습니다.");
-
-            return;
-        }
-
-        Managers.Pool.Return(poolObj);
     }
 
     #endregion ===== 디졸브 =====

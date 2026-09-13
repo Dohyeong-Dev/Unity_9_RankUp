@@ -75,8 +75,10 @@ public class CutscenePlayer : MonoBehaviour
     {
         yield return MoveForward();
 
+        _animator.Play(AnimatorKey.Hash.Evade);
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerDash);
+        
         OnBeforeTurn?.Invoke();
-
         yield return new WaitForSeconds(_turnDelay);
 
         _animator.Play(AnimatorKey.Hash.TurnR);
@@ -102,8 +104,6 @@ public class CutscenePlayer : MonoBehaviour
         yield return _moveTween.WaitForCompletion();
 
         _moveTween = null;
-
-        _animator.Play(AnimatorKey.Hash.Evade);
     }
 
     /// <summary> 현재 Y축 회전을 가장 가까운 90도 단위로 보정한다. </summary>

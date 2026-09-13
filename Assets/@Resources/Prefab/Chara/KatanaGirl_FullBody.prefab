@@ -14808,6 +14808,7 @@ MonoBehaviour:
   _moveSpeed: 5
   _runFactor: 1.7
   _runSpFactor: 1.8
+  _footstepDistance: 0.3
 --- !u!114 &7998747283445063671
 MonoBehaviour:
   m_ObjectHideFlags: 0

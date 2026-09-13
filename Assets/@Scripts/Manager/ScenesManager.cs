@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,8 @@ public class ScenesManager : MonoBehaviour
 
     #endregion ===== 다음 씬 =====
 
+    public event Action OnSceneLoaded;
+    
     #region ===== 씬 관리 =====
 
     /// <summary> 현재 활성화된 BaseScene을 등록한다. </summary>
@@ -31,6 +34,8 @@ public class ScenesManager : MonoBehaviour
         CPrint.Log($"SetCurrentScene ({scene.GetType().Name})");
 
         _currentScene = scene;
+        
+        OnSceneLoaded?.Invoke();
     }
 
     /// <summary> 로딩 씬을 거쳐 지정된 씬으로 전환한다. </summary>

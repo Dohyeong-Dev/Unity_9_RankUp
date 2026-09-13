@@ -46,12 +46,12 @@ public class EnemyMeleeAttack : EnemyAttackBehaviour
             return;
         }
 
-        damageable.TakeDamage(GetRandomDamage());
-
         if (collider.TryGetComponent(out PlayerCtrl player))
         {
             player.PlayHitEffect(transform);
         }
+        
+        damageable.TakeDamage(GetRandomDamage());
     }
 
     #endregion ===== 공격 =====

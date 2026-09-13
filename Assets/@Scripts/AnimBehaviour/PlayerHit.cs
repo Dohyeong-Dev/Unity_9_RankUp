@@ -9,6 +9,11 @@ public class PlayerHit : StateMachineBehaviour
 
     #endregion ===== 참조 =====
 
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerHit);
+    }
+
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (!TryResolvePlayer(animator))

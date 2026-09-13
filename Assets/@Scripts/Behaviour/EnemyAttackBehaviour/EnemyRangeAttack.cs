@@ -86,6 +86,25 @@ public class EnemyRangeAttack : EnemyAttackBehaviour
 
         projectile.SetProjectile(Enemy.gameObject, spawnPosition, direction, _moveSpeed, GetRandomDamage(),
             _lifeTime, _isGuided, target);
+
+        PlayProjectileSound();
+    }
+
+    /// <summary> 프로젝타일의 사운드를 재생한다. </summary>
+    private void PlayProjectileSound()
+    {
+        switch (_projectileType)
+        {
+            case PoolKey.ProjectileType.Fireball:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.FireProjectile);
+                break;
+            case PoolKey.ProjectileType.Iceball:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.IceProjectile);
+                break;
+            case PoolKey.ProjectileType.SparkSpear:
+                Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.SparkProjectile);
+                break;
+        }
     }
 
     /// <summary> 적의 전방을 중심으로 균등하게 분배된 발사 방향을 반환한다. </summary>

@@ -19,6 +19,7 @@ public class ExitPopup : BasePopup
 
     protected override void OnStart()
     {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimePopup);
     }
 
     protected override void OnUpdate()
@@ -50,6 +51,7 @@ public class ExitPopup : BasePopup
     private void OnClickYes()
     {
         Utils.QuitApp();
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeConfirm);
     }
 
     /// <summary> No 버튼을 선택했을 때 팝업을 닫는다. </summary>
@@ -57,5 +59,6 @@ public class ExitPopup : BasePopup
     {
         Time.timeScale = 1f;
         Close();
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
     }
 }

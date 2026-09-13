@@ -328,13 +328,6 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        if (!target.TryGetComponent(out IDamageable damageable))
-        {
-            return;
-        }
-
-        damageable.TakeDamage(_damage);
-
         if (!target.TryGetComponent(out PlayerCtrl player))
         {
             return;
@@ -342,6 +335,13 @@ public class Projectile : MonoBehaviour
 
         ContactPoint contactPoint = collision.GetContact(0);
         player.PlayHitEffect(contactPoint.point + contactPoint.normal * 0.4f, contactPoint.normal);
+        
+        if (!target.TryGetComponent(out IDamageable damageable))
+        {
+            return;
+        }
+
+        damageable.TakeDamage(_damage);
     }
 
     /// <summary> 충돌 후 발사체의 이동과 물리 동작을 중지한다. </summary>

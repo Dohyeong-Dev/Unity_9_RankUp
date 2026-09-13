@@ -7,6 +7,7 @@ public class StartPopup : BasePopup
 
     protected override void OnStart()
     {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimePopup);
     }
 
     protected override void OnUpdate()
@@ -17,6 +18,7 @@ public class StartPopup : BasePopup
     {
         if (Managers.Input.KeyDown_Space)
         {
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeConfirm);
             Close();
         }
     }

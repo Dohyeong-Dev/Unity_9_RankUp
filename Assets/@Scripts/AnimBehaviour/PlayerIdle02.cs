@@ -24,6 +24,11 @@ public class PlayerIdle02 : StateMachineBehaviour
 
         _isReturningToIdle01 = false;
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
+
+        if (Managers.UI.CurrentScreen == null && Managers.UI.CurrentPopup == null)
+        {
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerIdle2);
+        }
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

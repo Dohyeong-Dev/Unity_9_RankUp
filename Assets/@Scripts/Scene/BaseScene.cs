@@ -72,12 +72,13 @@ public abstract class BaseScene : MonoBehaviour
         CPrint.Error($"SceneType을 찾을 수 없습니다. [{GetType().Name}]");
     }
 
-    /// <summary> 씬에서 사용한 UI, 리소스, 오브젝트 풀을 정리한다. </summary>
+    /// <summary> 씬에서 사용한 UI, 리소스, 오브젝트 풀등을 정리한다. </summary>
     public virtual void Clear()
     {
         Managers.UI.Clear();
         Managers.Resource.Clear();
         Managers.Pool.Clear();
+        Managers.Sound.Clear();
     }
 
     #endregion ===== 초기화 =====

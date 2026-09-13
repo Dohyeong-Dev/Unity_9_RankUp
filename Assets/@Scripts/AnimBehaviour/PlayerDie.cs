@@ -23,6 +23,8 @@ public class PlayerDie : StateMachineBehaviour
         }
 
         _isDeathAnimationFinished = false;
+        
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerDieVoice);
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
