@@ -385,7 +385,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 플레이어에게 피해를 적용하고 생존 시 피격 상태로 전환한다. </summary>
     public void TakeDamage(float damage)
     {
-        if (IsHitInvincible || IsDead)
+        if (IsHitInvincible || IsDashing || IsDead)
         {
             return;
         }

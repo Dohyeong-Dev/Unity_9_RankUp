@@ -123,7 +123,7 @@ public class EnemyRangeAttack : EnemyAttackBehaviour
         return Quaternion.AngleAxis(angle, Vector3.up) * centerDirection;
     }
 
-    /// <summary> 발사 위치에서 타겟을 향하는 수평 방향을 반환한다. </summary>
+    /// <summary> 발사 위치에서 타겟을 향하는 방향벡터를 반환한다. </summary>
     private Vector3 GetAttackDirection(Vector3 targetPosition, Vector3 spawnPosition)
     {
         Vector3 direction = targetPosition - spawnPosition;
