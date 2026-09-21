@@ -34,6 +34,8 @@ public class SoundManager : MonoBehaviour
     private void Start()
     {
         Managers.Scene.OnSceneLoaded += HandleSceneLoaded;
+        
+        RemoveOtherAudioListeners();
     }
 
     private void Update()
