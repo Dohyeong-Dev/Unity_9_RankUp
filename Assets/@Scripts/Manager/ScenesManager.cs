@@ -35,6 +35,11 @@ public class ScenesManager : MonoBehaviour
 
         _currentScene = scene;
         
+        if (_currentScene.Type != SceneType.LoadingScene)
+        {
+            _nextScene = SceneType.None;
+        }
+        
         OnSceneLoaded?.Invoke();
     }
 
