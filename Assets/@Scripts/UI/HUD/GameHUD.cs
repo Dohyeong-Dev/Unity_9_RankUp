@@ -56,8 +56,6 @@ public class GameHUD : BaseHUD
 
     protected override void OnStart()
     {
-        Managers.Input.SetCursorLock(true);
-
         if (!TryResolvePlayer())
         {
             return;

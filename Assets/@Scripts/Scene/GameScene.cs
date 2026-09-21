@@ -24,7 +24,9 @@ public class GameScene : BaseScene
     private const int MaxPhase = 2;
     
     #endregion ===== 페이즈 =====
-    
+
+    public override bool IsCursorLock { get; protected set; } = true;
+
     protected override void OnAwake()
     {
         _hud = GetComponentInChildren<GameHUD>(true);

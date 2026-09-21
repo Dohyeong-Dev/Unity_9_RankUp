@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 public abstract class BaseScene : MonoBehaviour
 {
     public SceneType Type { get; private set; }
+    
+    public virtual bool IsCursorLock { get; protected set; }
 
     private void Awake()
     {
@@ -24,6 +26,8 @@ public abstract class BaseScene : MonoBehaviour
     private void Start()
     {
         DynamicGI.UpdateEnvironment();
+        
+        Managers.Input.SetCursorLock(IsCursorLock);
         
         OnStart();
     }

@@ -46,8 +46,6 @@ public class LoadingHUD : BaseHUD
         {
             CPrint.Error("[LoadingHUD] No Scene");
         }
-        
-        Managers.Input.SetCursorLock(false);
     }
 
     protected override void OnUpdate()
