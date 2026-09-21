@@ -54,9 +54,17 @@ public class ScenesManager : MonoBehaviour
 
         _nextScene = sceneType;
 
-        _currentScene.Clear();
+        ClearCurrentScene();
 
-        SceneManager.LoadScene(nameof(SceneType.LoadingScene));
+        LoadScene(SceneType.LoadingScene);
+    }
+
+    /// <summary> 로딩 씬을 거치지 않고 동기로 씬을 전환한다. </summary>
+    public void LoadScene(SceneType scene)
+    {
+        ClearCurrentScene();
+        
+        SceneManager.LoadScene(scene.ToString());
     }
 
     /// <summary> 현재 씬이 지정한 BaseScene 타입인지 확인한다. </summary>
