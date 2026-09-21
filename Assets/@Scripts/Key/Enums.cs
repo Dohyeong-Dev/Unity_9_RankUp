@@ -9,6 +9,7 @@ public enum PrintType : ushort
 public enum SceneType : ushort
 {
     None,
+    TitleScene,
     LoadingScene,
     GameScene,
 }

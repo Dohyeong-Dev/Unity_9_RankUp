@@ -11,6 +11,8 @@ public class LoadingScene : BaseScene
 
     #endregion ===== 참조 =====
 
+    private bool _isContinueRequested = false;
+    
     protected override void OnAwake()
     {
         _hud = GetComponentInChildren<LoadingHUD>(true);
@@ -56,7 +58,7 @@ public class LoadingScene : BaseScene
         yield return LoadSceneProgressAsync(operation);
         yield return FillLoadingProgressAsync();
 
-        while (!IsSceneLoadable())
+        while (!_isContinueRequested)
         {
             yield return null;
         }
@@ -102,17 +104,8 @@ public class LoadingScene : BaseScene
 
     #endregion ===== Scene 로딩 =====
 
-    #region ===== 로딩 완료 확인 =====
-
-    /// <summary> 현재 다음 Scene으로 전환할 수 있는 상태인지 확인한다. </summary>
-    private bool IsSceneLoadable()
+    public void SetContinueRequested(bool isContinueRequested)
     {
-        return Managers.Scene.NextScene switch
-        {
-            SceneType.GameScene => _hud?.ContinueRequested ?? false,
-            _ => false
-        };
+        _isContinueRequested = isContinueRequested;
     }
-
-    #endregion ===== 로딩 완료 확인 =====
 }

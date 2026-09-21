@@ -7,6 +7,8 @@ using UnityEngine.UI;
 /// <summary> 씬 로딩 진행률을 표시하고 다음 씬으로 진행할 입력을 처리하는 HUD다. </summary>
 public class LoadingHUD : BaseHUD
 {
+    private LoadingScene _loadingScene;
+    
     private enum Sliders
     {
         LoadingSlider,
@@ -24,10 +26,8 @@ public class LoadingHUD : BaseHUD
 
     public float LoadingProgress => Get<Slider>(Sliders.LoadingSlider).value;
 
-    public bool ContinueRequested { get; private set; }
-
     private Tween _continueMessageTween;
-    
+
     protected override void OnAwake()
     {
         Bind<Slider>(typeof(Sliders));
@@ -40,6 +40,13 @@ public class LoadingHUD : BaseHUD
 
     protected override void OnStart()
     {
+        Managers.Scene.TryGetCurrentScene(out _loadingScene);
+
+        if (_loadingScene == null)
+        {
+            CPrint.Error("[LoadingHUD] No Scene");
+        }
+        
         Managers.Input.SetCursorLock(false);
     }
 
@@ -56,7 +63,7 @@ public class LoadingHUD : BaseHUD
 
         if (Managers.Input.MouseDown_Left)
         {
-            ContinueRequested = true;
+            _loadingScene.SetContinueRequested(true);
         }
     }
 
@@ -105,29 +112,16 @@ public class LoadingHUD : BaseHUD
         Sequence showSequence = DOTween.Sequence();
 
         // Glow와 문구를 동시에 등장
-        showSequence.Append(
-            glowImage.DOFade(1f, 0.8f)
-                .SetEase(Ease.OutSine));
-
-        showSequence.Join(
-            alertText.DOFade(1f, 0.8f)
-                .SetEase(Ease.OutSine));
-
-        showSequence.Join(
-            alertText.transform.DOScale(Vector3.one, 0.8f)
-                .SetEase(Ease.OutBack));
+        showSequence.Append(glowImage.DOFade(1f, 0.8f).SetEase(Ease.OutSine));
+        showSequence.Join(alertText.DOFade(1f, 0.8f).SetEase(Ease.OutSine));
+        showSequence.Join(alertText.transform.DOScale(Vector3.one, 0.8f).SetEase(Ease.OutBack));
 
         showSequence.OnComplete(() =>
         {
-            _continueMessageTween = DOTween.Sequence()
-                .Append(alertText.DOFade(0.5f, 0.9f)
-                    .SetEase(Ease.InOutSine))
-                .Join(glowImage.DOFade(0.65f, 0.9f)
-                    .SetEase(Ease.InOutSine))
-                .Append(alertText.DOFade(1f, 0.9f)
-                    .SetEase(Ease.InOutSine))
-                .Join(glowImage.DOFade(1f, 0.9f)
-                    .SetEase(Ease.InOutSine))
+            _continueMessageTween = DOTween.Sequence().Append(alertText.DOFade(0.5f, 0.9f).SetEase(Ease.InOutSine))
+                .Join(glowImage.DOFade(0.65f, 0.9f).SetEase(Ease.InOutSine))
+                .Append(alertText.DOFade(1f, 0.9f).SetEase(Ease.InOutSine))
+                .Join(glowImage.DOFade(1f, 0.9f).SetEase(Ease.InOutSine))
                 .SetLoops(-1, LoopType.Restart);
         });
 

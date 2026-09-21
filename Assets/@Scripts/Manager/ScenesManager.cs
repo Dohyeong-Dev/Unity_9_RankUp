@@ -13,7 +13,7 @@ public class ScenesManager : MonoBehaviour
 
     #region ===== 다음 씬 =====
 
-    private SceneType _nextScene = SceneType.GameScene;
+    private SceneType _nextScene = SceneType.None;
     public SceneType NextScene => _nextScene;
 
     #endregion ===== 다음 씬 =====
