@@ -284,7 +284,7 @@ Material:
     - _AlphaRemapMin: 0
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
-    - _AmbientStrength: 0.3
+    - _AmbientStrength: 0.423
     - _AngelRing: 0
     - _AngelRingOverridden: 0
     - _AngelRingVisible: 1
