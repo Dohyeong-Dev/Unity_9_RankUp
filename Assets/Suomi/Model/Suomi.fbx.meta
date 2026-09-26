@@ -117,10 +117,7 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
-    rigImportWarnings: "Avatar Rig Configuration mis-match. Inbetween bone rotation
-      in configuration does not match rotation in animation file:\n\t'\u8170\u30AD\u30E3\u30F3\u30BB\u30EB.R'
-      : rotation error = 1.519572 deg\n\t'\u8155\u6369.L' : rotation error = 16.781540
-      deg\n\t'\u8155\u6369.R' : rotation error = 16.778719 deg\n"
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -135,7 +132,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
