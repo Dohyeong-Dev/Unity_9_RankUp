@@ -1088,7 +1088,7 @@ ModelImporter:
     - name: "\u8155.L"
       parentName: "\u80A9C.L"
       position: {x: 6.6370784e-11, y: -5.2874393e-12, z: 3.0518008e-12}
-      rotation: {x: 0.51216906, y: -0.48292017, z: -0.51540935, w: -0.48869628}
+      rotation: {x: 0.5121691, y: -0.4829202, z: -0.5154094, w: -0.4886963}
       scale: {x: 1, y: 1.0000001, z: 1}
     - name: _shadow_ShoulderPart1_L
       parentName: "\u8155.L"
@@ -1958,7 +1958,7 @@ ModelImporter:
     - name: "\u80F81.L"
       parentName: "\u80F8\u7B4B.L"
       position: {x: 3.7252902e-11, y: 0.00048424696, z: 0.0000000012107193}
-      rotation: {x: 0.000000039338058, y: 0.13113397, z: 0.5568933, w: 0.8201668}
+      rotation: {x: 0.00000003933806, y: 0.13113399, z: 0.55689335, w: 0.8201669}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: "_shadow_\u80F82D.L"
       parentName: "\u80F81.L"
@@ -1998,7 +1998,7 @@ ModelImporter:
     - name: "\u80F81D.L"
       parentName: "\u80F8\u7B4B.L"
       position: {x: 3.7252902e-11, y: 0.00048424696, z: 0.0000000012107193}
-      rotation: {x: 0.000000039338058, y: 0.13113397, z: 0.5568933, w: 0.8201668}
+      rotation: {x: 0.00000003933806, y: 0.13113399, z: 0.55689335, w: 0.8201669}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: "\u80F82D.L"
       parentName: "\u80F81D.L"
@@ -2018,7 +2018,7 @@ ModelImporter:
     - name: "\u80F81.R"
       parentName: "\u80F8\u7B4B.R"
       position: {x: 1.3038516e-10, y: 0.00048424696, z: 5.867332e-10}
-      rotation: {x: 0.000000039338058, y: -0.13113397, z: -0.5568933, w: 0.8201668}
+      rotation: {x: 0.00000003933806, y: -0.13113399, z: -0.55689335, w: 0.8201669}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: "_shadow_\u80F82D.R"
       parentName: "\u80F81.R"
@@ -2058,7 +2058,7 @@ ModelImporter:
     - name: "\u80F81D.R"
       parentName: "\u80F8\u7B4B.R"
       position: {x: 1.3038516e-10, y: 0.00048424696, z: 5.867332e-10}
-      rotation: {x: 0.000000039338058, y: -0.13113397, z: -0.5568933, w: 0.8201668}
+      rotation: {x: 0.00000003933806, y: -0.13113399, z: -0.55689335, w: 0.8201669}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: "\u80F82D.R"
       parentName: "\u80F81D.R"
@@ -2358,7 +2358,7 @@ ModelImporter:
     - name: HatB2
       parentName: HatB1
       position: {x: 5.122274e-11, y: 0.00037076103, z: -7.9395246e-10}
-      rotation: {x: -0.17465252, y: -0.2017856, z: -0.68871754, w: 0.674127}
+      rotation: {x: -0.17465252, y: -0.20178558, z: -0.68871754, w: 0.674127}
       scale: {x: 1, y: 1, z: 1}
     - name: HatB2_end
       parentName: HatB2
@@ -2742,7 +2742,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: "\u8DB3D.R"
       parentName: "\u8170\u30AD\u30E3\u30F3\u30BB\u30EB.R"
-      position: {x: -0, y: 1.00583465e-10, z: -1.1240359e-11}
+      position: {x: -0.000059, y: -0, z: -0.000042}
       rotation: {x: 0.00000024586916, y: 0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: "\u3072\u3056D.R"
