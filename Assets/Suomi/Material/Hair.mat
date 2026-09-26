@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 1035ba4200ea08f41befac01b4c9d952, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SPECULAR_SETUP
   m_InvalidKeywords:
   - _EMISSIVE_SIMPLE
   - _OUTLINE_NML
@@ -206,7 +207,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecularOffsetNoiseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 695f05c0a762c4c2b9bdec8af10f6dd9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SubsurfaceMaskMap:
@@ -425,7 +426,7 @@ Material:
     - _ReceiveShadows: 1
     - _ReceivesSSR: 1
     - _RefractionModel: 0
-    - _RimExtension: 0
+    - _RimExtension: 0.5
     - _RimLight: 0
     - _RimLightOverridden: 0
     - _RimLightVisible: 1
@@ -450,10 +451,10 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularAAScreenSpaceVariance: 0.1
     - _SpecularAAThreshold: 0.2
-    - _SpecularBoost: 1
+    - _SpecularBoost: 2.5
     - _SpecularHighlights: 1
     - _SpecularOcclusionMode: 1
-    - _SpecularOffsetNoiseStrength: 0.02
+    - _SpecularOffsetNoiseStrength: 2
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _StencilComp: 8
@@ -511,7 +512,7 @@ Material:
     - _UseVertexColors: 0
     - _Use_1stAs2nd: 0
     - _Use_BaseAs1st: 0
-    - _WorkflowMode: 1
+    - _WorkflowMode: 0
     - _ZOverDrawMode: 0
     - _ZTestDepthEqualForOpaque: 4
     - _ZTestGBuffer: 4
@@ -556,7 +557,7 @@ Material:
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimLightMaskColor: {r: 1, g: 0, b: 1, a: 1}
-    - _RimThresholds: {r: 0.8, g: 0.82, b: 0, a: 0}
+    - _RimThresholds: {r: -1, g: 0, b: 0, a: 0}
     - _SecondShadeMaskColor: {r: 0, g: 0, b: 1, a: 1}
     - _ShadowThresholds: {r: 0.1, g: 0.11, b: 0, a: 0}
     - _ShadowTint: {r: 0, g: 0, b: 0, a: 0}

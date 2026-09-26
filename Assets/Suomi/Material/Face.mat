@@ -435,10 +435,10 @@ Material:
     - _PPDPrimitiveWidth: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _ReceivesSSR: 1
     - _RefractionModel: 0
-    - _RimExtension: 0
+    - _RimExtension: 0.5
     - _RimLight: 0
     - _RimLightOverridden: 0
     - _RimLightVisible: 1
@@ -569,7 +569,7 @@ Material:
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimLightMaskColor: {r: 1, g: 0, b: 1, a: 1}
-    - _RimThresholds: {r: 0.8, g: 0.82, b: 0, a: 0}
+    - _RimThresholds: {r: 0.57, g: 0.07, b: 0, a: 0}
     - _SecondShadeMaskColor: {r: 0, g: 0, b: 1, a: 1}
     - _ShadowThresholds: {r: 0.1, g: 0.11, b: 0, a: 0}
     - _ShadowTint: {r: 0, g: 0, b: 0, a: 0}
