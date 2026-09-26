@@ -454,7 +454,7 @@ Material:
     - _SpecularBoost: 2.5
     - _SpecularHighlights: 1
     - _SpecularOcclusionMode: 1
-    - _SpecularOffsetNoiseStrength: 2
+    - _SpecularOffsetNoiseStrength: 5
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _StencilComp: 8

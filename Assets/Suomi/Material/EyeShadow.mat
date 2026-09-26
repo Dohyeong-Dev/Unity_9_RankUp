@@ -8,21 +8,22 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: EyeShadow
-  m_Shader: {fileID: 4800000, guid: 1035ba4200ea08f41befac01b4c9d952, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 9d565b512efb79c4c88bd14dfd6accf2, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _SPECULAR_SETUP
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords:
-  - _EMISSIVE_SIMPLE
-  - _OUTLINE_NML
+  - _RECEIVE_SHADOWS_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap:
     RenderType: Transparent
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - DepthOnly
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -270,6 +271,7 @@ Material:
     - _AlphaRemapMin: 0
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
+    - _AmbientStrength: 0.1
     - _AngelRing: 0
     - _AngelRingOverridden: 0
     - _AngelRingVisible: 1
@@ -282,7 +284,7 @@ Material:
     - _BaseColor_Step: 0.5
     - _BaseShade_Feather: 0.0001
     - _Base_Speed: 0
-    - _Blend: 3
+    - _Blend: 2
     - _BlendMode: 0
     - _BlendModePreserveSpecular: 1
     - _BlurLevelMatcap: 0
@@ -290,6 +292,7 @@ Material:
     - _BumpScale: 1
     - _BumpScaleMatcap: 1
     - _CameraRolling_Stabilizer: 0
+    - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _ClippingMatteMode: 0
@@ -330,7 +333,7 @@ Material:
     - _DistortionVectorScale: 2
     - _DoubleSidedEnable: 0
     - _DoubleSidedNormalMode: 1
-    - _DstBlend: 0
+    - _DstBlend: 1
     - _DstBlendAlpha: 1
     - _EMISSIVE: 0
     - _EmissiveColorMode: 1
@@ -423,8 +426,9 @@ Material:
     - _PPDPrimitiveLength: 1
     - _PPDPrimitiveWidth: 1
     - _Parallax: 0.02
+    - _QueueControl: 0
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _ReceivesSSR: 1
     - _RefractionModel: 0
     - _RimExtension: 0
@@ -456,7 +460,9 @@ Material:
     - _SpecularHighlights: 1
     - _SpecularOcclusionMode: 1
     - _SpecularOffsetNoiseStrength: 0.02
-    - _SrcBlend: 2
+    - _SpecularPower: 300
+    - _SpecularStrength: 1
+    - _SrcBlend: 5
     - _SrcBlendAlpha: 0
     - _StencilComp: 8
     - _StencilMode: 0
@@ -515,11 +521,13 @@ Material:
     - _Use_BaseAs1st: 0
     - _WorkflowMode: 0
     - _ZOverDrawMode: 0
+    - _ZTest: 4
     - _ZTestDepthEqualForOpaque: 4
     - _ZTestGBuffer: 4
     - _ZTestModeDistortion: 8
     - _ZTestTransparent: 4
     - _ZWrite: 0
+    - _ZWriteControl: 0
     - _ZWriteMode: 1
     - _isUnityToonshader: 1
     - _simpleUI: 0
@@ -533,7 +541,7 @@ Material:
     - _AngelRingMaskColor: {r: 0, g: 1, b: 0, a: 1}
     - _AngelRing_Color: {r: 1, g: 1, b: 1, a: 1}
     - _Ap_RimLightColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColorMaskColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
