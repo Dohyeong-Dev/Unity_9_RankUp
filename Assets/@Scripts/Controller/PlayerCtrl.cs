@@ -236,6 +236,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
             completionAction?.Invoke();
 
+            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyAppearVoice);
             Managers.UI.CloseLoadingUI(0.3f);
         });
     }

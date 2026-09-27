@@ -56,6 +56,7 @@ public abstract class ResourceKey
             PlayerIdle2,
             EnemyDissolve,
             EnemyHit,
+            EnemyAppearVoice,
             ChimeAlert,
             ChimePopup,
             ChimeConfirm,

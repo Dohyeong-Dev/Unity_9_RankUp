@@ -27,7 +27,8 @@ public class PlayerIdle02 : StateMachineBehaviour
         _isReturningToIdle01 = false;
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
 
-        _blendShapeController?.SetBlendShape(BlendShapeKey.Player.Smile.Index, 100);
+        _blendShapeController?.SetBlendShape(BlendShapeKey.Player.A.Index, 100);
+        
         if (Managers.UI.CurrentScreen == null && Managers.UI.CurrentPopup == null)
         {
             Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerIdle2);
