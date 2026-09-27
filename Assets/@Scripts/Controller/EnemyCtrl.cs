@@ -358,12 +358,13 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        _fieldOfView?.StopDetection();
-        _fieldOfView?.ClearTarget();
-
+        CPrint.Log("[EnemyCtrl ]플레이어 죽음");
         ClearCombatTarget();
         StopMovement();
 
+        _fieldOfView?.StopDetection();
+        _fieldOfView?.ClearTarget();
+        
         _stateMachine.ChangeState<ReturnState>();
     }
 
