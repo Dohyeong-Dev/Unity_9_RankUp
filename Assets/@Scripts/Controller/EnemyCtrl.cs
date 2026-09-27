@@ -904,14 +904,11 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
             .SetEase(_dissolveEase);
 
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.5f, true, transform.position);
+        
         if (isDissolving)
         {
             _dissolveTween.OnComplete(ReturnToPool);
-            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.9f);
-        }
-        else
-        {
-            Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.2f);
         }
     }
 

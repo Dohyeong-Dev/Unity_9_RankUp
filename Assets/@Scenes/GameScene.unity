@@ -60753,11 +60753,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1535862441751168585, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1820424856175269922, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2337609736562167824, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: _spawner
@@ -60765,15 +60765,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2516729450888087881, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3235167594160641810, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4796990223131521625, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5075807997063165138, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_Name
@@ -60821,15 +60821,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5919997309761106884, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6418720303900454503, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6705615214318735321, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: _meleeSpawnRatio
@@ -60845,11 +60845,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8437156084541368912, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8790665196476211587, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -94627,7 +94627,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1820424856175269922, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2516729450888087881, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
@@ -94639,7 +94639,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4796990223131521625, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5075807997063165138, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_Name
@@ -94687,15 +94687,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5919997309761106884, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6418720303900454503, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6705615214318735321, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7599208859139198489, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: _meleeSpawnRatio
@@ -94707,15 +94707,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7910490607675743142, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8437156084541368912, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8790665196476211587, guid: e0b9efbd92de14dc6a10820a4461ec1c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

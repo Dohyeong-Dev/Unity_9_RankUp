@@ -165,8 +165,7 @@ public class SoundManager : MonoBehaviour
     #region ===== SFX =====
 
     /// <summary> 지정한 이름의 SFX를 재생한다. </summary>
-    public void PlaySfx(ResourceKey.Name.SfxType sfxType, float volume = 1f, bool is3D = false,
-        Vector3 position = default)
+    public void PlaySfx(ResourceKey.Name.SfxType sfxType, float volume = 1f, bool is3D = false, Vector3 position = default)
     {
         string sfxName = sfxType.ToString();
         
