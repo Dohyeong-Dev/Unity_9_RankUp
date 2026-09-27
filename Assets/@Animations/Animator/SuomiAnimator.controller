@@ -39,7 +39,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Attack1_Sheathe
-  m_Speed: 0.6
+  m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -5124570017387525155}
@@ -207,7 +207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.5
-  _comboTransitionProgress: 0.35
+  _comboTransitionProgress: 0.7
   _slashStartProgress: 0.535
   _slashPosition: {x: 0.4, y: 0.9, z: 0.8}
   _slashRotation: {x: 30, y: -80, z: 200}
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attackRangeProgress: 0.4
-  _comboTransitionProgress: 0.9
+  _comboTransitionProgress: 0.85
   _slashStartProgress: 0.35
   _slashPosition: {x: 0, y: 0.8, z: 1}
   _slashRotation: {x: 0, y: -20, z: 180}
@@ -440,7 +440,7 @@ AnimatorStateTransition:
   serializedVersion: 3
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
-  m_ExitTime: 1
+  m_ExitTime: 0.9
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -522,8 +522,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b8c18f8fccd4c938efe0870062e3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomMinTime: 186.1
-  _randomMaxTime: 253.1
+  _randomMinTime: 7
+  _randomMaxTime: 10
 --- !u!1102 &-2822933196863660129
 AnimatorState:
   serializedVersion: 6
@@ -689,7 +689,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Attack2_Swing
-  m_Speed: 0.8
+  m_Speed: 1.1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5451974848094700285}
@@ -787,7 +787,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.8125
   m_HasExitTime: 0
@@ -862,14 +862,8 @@ MonoBehaviour:
   - Progress: 0
     SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
-  - Progress: 0.553
-    SocketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
-    Executed: 0
-  - Progress: 0.817
-    SocketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
-    Executed: 0
-  - Progress: 1
-    SocketCommand: To_Hand_L_Socket-Sheath
+  - Progress: 0.45
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &-825724948589498816
 AnimatorStateTransition:
@@ -907,10 +901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTime: 1
   _socketEvents:
-  - Progress: 0.03
-    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
-    Executed: 0
-  - Progress: 0.7
+  - Progress: 0
     SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &-29832039766167812
@@ -1049,7 +1040,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.81707317
   m_HasExitTime: 0
@@ -1123,14 +1114,8 @@ MonoBehaviour:
   - Progress: 0
     SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
-  - Progress: 0.432
-    SocketCommand: To_add_weapon_r-Blade, To_add_weapon_l-Sheath
-    Executed: 0
-  - Progress: 0.811
-    SocketCommand: To_Katana_Close-Blade, To_add_weapon_l-Sheath
-    Executed: 0
-  - Progress: 1
-    SocketCommand: To_Hand_L_Socket-Sheath
+  - Progress: 0.35
+    SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!114 &1662776774044903979
 MonoBehaviour:
@@ -1213,7 +1198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207c2078ea586487b8a1392b109c0426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementEnableDelay: 0.1
+  _movementEnableDelay: 0.05
   _playSoundDelay: 0.55
 --- !u!1102 &2488756829527297743
 AnimatorState:
@@ -1439,12 +1424,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bcd9cfb265cf4cb8a091fc7e4a9c5f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _exitTime: 1
+  _exitTime: 0.9
   _socketEvents:
   - Progress: 0
     SocketCommand: To_Katana_Close-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
-  - Progress: 0.374
+  - Progress: 0.16
     SocketCommand: To_Hand_R_Socket-Blade, To_Hand_L_Socket-Sheath
     Executed: 0
 --- !u!1101 &5451974848094700285
@@ -1487,7 +1472,7 @@ MonoBehaviour:
   _attackRangeProgress: 0.4
   _comboTransitionProgress: 0.6
   _slashStartProgress: 0.398
-  _slashPosition: {x: 0, y: 0.9, z: 0.45}
+  _slashPosition: {x: 0, y: 1, z: 0.45}
   _slashRotation: {x: -30, y: 30, z: 30}
 --- !u!1102 &6071438603697399189
 AnimatorState:
@@ -1616,8 +1601,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207c2078ea586487b8a1392b109c0426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementEnableDelay: 0.1
-  _playSoundDelay: 0.6
+  _movementEnableDelay: 0.05
+  _playSoundDelay: 0.4
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -3,15 +3,21 @@ using UnityEngine;
 /// <summary> 플레이어의 근접 공격, 콤보, 공격 방향 및 슬래시 이펙트를 관리한다. </summary>
 public class PlayerMeleeAttack : PlayerAttackBehaviour
 {
+    #region ===== 참조 =====
+
+    private Character_Weapon_Controller _weaponController;
+    
+    #endregion ===== 참조 =====
+
+    #region ===== 상태 =====
+
     public enum ComboStep
     {
         First = 1,
         Second,
         Third,
     }
-
-    #region ===== 상태 =====
-
+    
     public ComboStep CurrentComboStep  { get; private set; } = ComboStep.First;
 
     // 다음 콤보 공격 입력이 예약되었는지 여부
@@ -46,6 +52,12 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
 
     #endregion ===== 설정 =====
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        _weaponController = GetComponent<Character_Weapon_Controller>();
+    }
 
     protected override void OnFixedUpdate()
     {
@@ -175,18 +187,18 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         {
             return;
         }
-
+        
+        if (!Player.HasEnoughSp(RequiredSp))
+        {
+            return;
+        }
+        
         if (Player.IsAttacking)
         {
             BufferNextComboInput();
             return;
         }
-
-        if (!Player.HasEnoughSp(RequiredSp))
-        {
-            return;
-        }
-
+        
         StartAttack(ComboStep.First);
     }
 
@@ -301,6 +313,7 @@ public class PlayerMeleeAttack : PlayerAttackBehaviour
         SetSheathingCancelled(true);
 
         Player.Animator.SetTrigger(AnimatorKey.Hash.DoCancelSheathe);
+        _weaponController?.SwitchSocketByString("To_Katana_Close-Blade, To_Hand_L_Socket-Sheath");
 
         Clear();
     }

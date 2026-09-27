@@ -25,10 +25,10 @@ public class GameScene : BaseScene
     
     #endregion ===== 페이즈 =====
 
-    public override bool IsCursorLock { get; protected set; } = true;
-
     protected override void OnAwake()
     {
+        IsCursorLock = true;
+        
         _hud = GetComponentInChildren<GameHUD>(true);
         
         if (_hud == null)

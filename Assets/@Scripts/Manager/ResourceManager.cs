@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary> Resources 에셋의 로드, 캐싱 및 인스턴스 생성을 관리한다. </summary>
+/// <summary> KDH : Resources 에셋의 로드, 캐싱 및 인스턴스 생성을 관리한다. </summary>
 public class ResourceManager
 {
     private readonly Dictionary<System.Type, Dictionary<string, Object>> _loadedObjectMap = new();
 
     #region ===== 로드 =====
 
-    /// <summary> 지정한 Resources 경로의 에셋을 로드하고 캐시에 저장한다. </summary>
+    /// <summary> KDH : 지정한 Resources 경로의 에셋을 로드하고 캐시에 저장한다. </summary>
     public T Load<T>(string path) where T : Object
     {
         if (string.IsNullOrWhiteSpace(path))

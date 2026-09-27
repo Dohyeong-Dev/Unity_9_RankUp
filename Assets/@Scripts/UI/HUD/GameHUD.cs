@@ -182,7 +182,7 @@ public class GameHUD : BaseHUD
         spSlider.value = sliderValue;
         Get<TMP_Text>(Texts.SpText).text = $"{sliderValue * 100f:F0}%";
 
-        if (currentSp >= _player.SpRecoveryThreshold)
+        if (currentSp >= _player.SpActionResumeThreshold)
         {
             StopSpEmptyWarning();
             return;

@@ -23,15 +23,10 @@ public abstract class PlayerAttackBehaviour : MonoBehaviour
 
     #endregion ===== 설정 =====
 
-
-    #region ===== 초기화 =====
-
-    private void Awake()
+    protected virtual void Awake()
     {
         Player = GetComponent<PlayerCtrl>();
     }
-
-    #endregion ===== 초기화 =====
 
     private void FixedUpdate()
     {

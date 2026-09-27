@@ -119,7 +119,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [SerializeField] private float _maxSp = 100f;
 
     [Tooltip("SP가 모두 소진된 후 다시 행동할 수 있게 되는 최소 SP")]
-    [SerializeField] private float _spRecoveryThreshold = 10f;
+    [SerializeField] private float _spActionResumeThreshold = 10f;
 
     [Tooltip("초당 SP 회복량")]
     [SerializeField] private float _spRecoveryRate = 30f;
@@ -128,10 +128,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     public float MaxSP => _maxSp;
     public float SP => _sp;
-    public float SpRecoveryThreshold => _spRecoveryThreshold;
+    public float SpActionResumeThreshold => _spActionResumeThreshold;
 
-    /// <summary> 현재 스태미너를 사용할 수 있는 상태인지 반환한다. </summary>
-    public bool CanUseStamina { get; private set; }
+    private bool _canUseStamina;
 
     public event Action<float, float> OnSpChanged;
 
@@ -192,7 +191,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         _hp = _maxHp;
         _sp = _maxSp;
-        CanUseStamina = true;
+        _canUseStamina = true;
     }
 
     #endregion ===== 초기화 =====
@@ -544,7 +543,12 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 특정 행동에 필요한 SP를 사용할 수 있는지 확인한다. </summary>
     public bool HasEnoughSp(float requiredSp)
     {
-        return _sp >= requiredSp && CanUseStamina;
+        if (_sp < requiredSp)
+        {
+            _canUseStamina = false;
+        }
+
+        return _sp >= requiredSp && _canUseStamina;
     }
 
     /// <summary> SP를 변경하고 현재 스태미너 사용 가능 상태를 갱신한다. </summary>
@@ -554,11 +558,11 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         if (_sp <= 0f)
         {
-            CanUseStamina = false;
+            _canUseStamina = false;
         }
-        else if (!CanUseStamina && _sp >= _spRecoveryThreshold)
+        else if (!_canUseStamina && _sp >= _spActionResumeThreshold)
         {
-            CanUseStamina = true;
+            _canUseStamina = true;
         }
 
         OnSpChanged?.Invoke(_sp, _maxSp);
@@ -609,7 +613,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     /// <summary> 지정된 위치와 방향으로 피격 이펙트를 생성한다. </summary>
     public void PlayHitEffect(Vector3 hitPosition, Vector3 lookPosition)
     {
-        if (IsHitInvincible || IsDead)
+        if (IsHitInvincible || IsDead || IsDashing)
         {
             return;
         }

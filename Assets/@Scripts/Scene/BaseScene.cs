@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 public abstract class BaseScene : MonoBehaviour
 {
     public SceneType Type { get; private set; }
-    
-    public virtual bool IsCursorLock { get; protected set; }
+
+    protected bool IsCursorLock = false;
 
     private void Awake()
     {

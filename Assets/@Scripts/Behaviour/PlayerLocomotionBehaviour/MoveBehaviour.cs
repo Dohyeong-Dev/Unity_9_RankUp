@@ -96,7 +96,14 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             return;
         }
 
-        AdjustRunSpeed();
+        if (Managers.Input.Key_LeftShift)
+        {
+            TryRun();
+        }
+        else if (Player.IsRunning)
+        {
+            SetPlayerRunState(false);
+        }
     }
 
     #region ===== 초기화 =====
@@ -118,7 +125,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Vector3 velocity = Player.Rigid.velocity;
         Player.Rigid.velocity = Vector3.up * velocity.y;
 
-        Player.UnsetState(PlayerCtrl.PlayerState.Running);
+        SetPlayerRunState(false);
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, 0f, 0.01f, Time.fixedDeltaTime);
     }
 
@@ -185,11 +192,6 @@ public class MoveBehaviour : BaseLocomotionBehaviour
             return;
         }
 
-        if (_currentRunFactor > DefaultMoveFactor && !Player.CanUseStamina)
-        {
-            _currentRunFactor = DefaultMoveFactor;
-        }
-
         Vector3 moveDirection = Player.Tr.forward;
         moveDirection.y = 0f;
 
@@ -207,8 +209,6 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         Vector3 horizontalVelocity = moveDirection * speed * inputMagnitude;
 
         Player.Rigid.velocity = new Vector3(horizontalVelocity.x, Player.Rigid.velocity.y, horizontalVelocity.z);
-
-        ConsumeRunSp();
 
         float animationSpeed = inputMagnitude * _currentRunFactor;
         Player.Animator.SetFloat(AnimatorKey.Hash.Speed, animationSpeed, 0.01f, Time.fixedDeltaTime);
@@ -271,42 +271,29 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     #region ===== 달리기 =====
 
-    /// <summary> 달리는 동안 매 FixedUpdate마다 SP를 소비한다. </summary>
-    private void ConsumeRunSp()
+    /// <summary> 현재 상태와 자원을 확인한 후 달리기를 시작한다. </summary>
+    private void TryRun()
     {
-        if (_currentRunFactor <= DefaultMoveFactor)
-        {
-            return;
-        }
-
-        float spCost = RequiredSpRate * _runSpFactor * Time.fixedDeltaTime;
-        Player.SetSp(-spCost);
-    }
-
-    /// <summary> 현재 입력과 상태를 기준으로 달리기 상태와 이동 배율을 갱신한다. </summary>
-    private void AdjustRunSpeed()
-    {
-        Player.UnsetState(PlayerCtrl.PlayerState.Running);
-
-        _currentRunFactor = DefaultMoveFactor;
-
         if (!_canRunInCurrentState)
         {
             return;
         }
 
-        if (!Managers.Input.Key_LeftShift || !Player.IsMoving)
+        if (!Player.IsMoving)
         {
             return;
         }
 
-        if (!Player.CanUseStamina)
+        float spCost = RequiredSpRate * _runSpFactor * Time.fixedDeltaTime;
+
+        if (!Player.HasEnoughSp(spCost))
         {
+            SetPlayerRunState(false);
             return;
         }
-
-        Player.SetState(PlayerCtrl.PlayerState.Running);
-        _currentRunFactor = _runFactor;
+        
+        Player.SetSp(-spCost);
+        SetPlayerRunState(true);
     }
 
     /// <summary> 현재 State에서 달리기 가능 여부를 설정한다. </summary>
@@ -341,5 +328,20 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         _runStateCoroutine = null;
     }
 
+    /// <summary> 플레이어의 달리기 상태를 설정한다. </summary>
+    private void SetPlayerRunState(bool isSet)
+    {
+        if (isSet)
+        {
+            Player.SetState(PlayerCtrl.PlayerState.Running);
+            _currentRunFactor = _runFactor;
+        }
+        else
+        {
+            Player.UnsetState(PlayerCtrl.PlayerState.Running);
+            _currentRunFactor = DefaultMoveFactor;
+        }
+    }
+    
     #endregion ===== 달리기 =====
 }
