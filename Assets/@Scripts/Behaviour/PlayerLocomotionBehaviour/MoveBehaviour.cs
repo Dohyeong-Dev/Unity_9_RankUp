@@ -62,7 +62,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
 
     public override void OnFixedUpdate()
     {
-        if (!Managers.Input.CanReceiveInput)
+        if (!Managers.Input.CanReceivePlayer)
         {
             RemoveHorizontalVelocity();
             return;

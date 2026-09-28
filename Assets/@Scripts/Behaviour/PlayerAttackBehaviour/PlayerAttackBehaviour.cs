@@ -35,7 +35,7 @@ public abstract class PlayerAttackBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (!Managers.Input.CanReceiveInput)
+        if (!Managers.Input.CanReceivePlayer)
         {
             return;
         }

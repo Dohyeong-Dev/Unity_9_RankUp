@@ -32,7 +32,7 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     {
         OnUpdateBeforeInput();
 
-        if (!Managers.Input.CanReceiveInput)
+        if (!Managers.Input.CanReceivePlayer)
         {
             return;
         }

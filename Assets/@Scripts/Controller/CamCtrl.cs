@@ -232,7 +232,7 @@ public class CamCtrl : MonoBehaviour
     /// <summary> 플레이어 입력에 따라 카메라 회전과 줌을 갱신한다. </summary>
     private void UpdateCameraInput()
     {
-        if (!Managers.Input.CanReceiveInput)
+        if (!Managers.Input.CanReceivePlayer)
         {
             return;
         }

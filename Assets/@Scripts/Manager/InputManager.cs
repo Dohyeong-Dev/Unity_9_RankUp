@@ -35,7 +35,8 @@ public class InputManager
 
     #region ===== 상태 =====
 
-    public bool CanReceiveInput { get; private set; }
+    /// <summary> 플레이어가 입력을 받을 수 있는 상태인지 나타낸다. </summary>
+    public bool CanReceivePlayer { get; private set; }
 
     #endregion ===== 상태 =====
 
@@ -101,7 +102,7 @@ public class InputManager
     /// <summary> 입력 수신 가능 여부를 설정한다. </summary>
     public void SetInputEnabled(bool enabled)
     {
-        CanReceiveInput = enabled;
+        CanReceivePlayer = enabled;
     }
 
     /// <summary> 마우스 커서의 잠금 상태를 설정한다. </summary>
