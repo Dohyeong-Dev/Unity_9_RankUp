@@ -7,8 +7,8 @@ using UnityEngine.UI;
 /// <summary> Popup UI의 입력, 열기 및 닫기 애니메이션을 제공하는 기본 클래스다. </summary>
 public abstract class BasePopup : BaseUI
 {
-    protected bool IsClosing;
-
+    private GraphicRaycaster _graphicRaycaster;
+    
     private Action _closeAction;
     
     #region ===== 애니메이션 =====
@@ -43,6 +43,8 @@ public abstract class BasePopup : BaseUI
     private void Awake()
     {
         OnAwake();
+        
+        _graphicRaycaster = gameObject.GetOrAddComponent<GraphicRaycaster>();
 
         Managers.UI.SetupCanvas(this);
 
@@ -89,12 +91,8 @@ public abstract class BasePopup : BaseUI
     /// <summary> Popup을 닫고 닫기 완료 후 전달받은 콜백을 실행한다. </summary>
     public virtual void Close(Action closeAction = null)
     {
-        if (IsClosing)
-        {
-            return;
-        }
-
-        IsClosing = true;
+        _graphicRaycaster.enabled = false;
+            
         _closeAction = closeAction;
 
         PlayAnimation(false);

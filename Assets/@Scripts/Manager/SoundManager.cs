@@ -10,6 +10,11 @@ public class SoundManager : MonoBehaviour
     private const string BgmVolumeParameter = "BgmVolume";
     private const string SfxVolumeParameter = "SfxVolume";
 
+    private const string BgmVolumePrefsKey = "Sound_BgmVolume";
+    private const string SfxVolumePrefsKey = "Sound_SfxVolume";
+
+    private const float DefaultVolume = 0.5f;
+    
     private AudioMixer _audioMixer;
     private AudioMixerGroup _bgmMixerGroup;
     private AudioMixerGroup _sfxMixerGroup;
@@ -55,11 +60,12 @@ public class SoundManager : MonoBehaviour
 
     #region ===== 초기화 =====
 
-    /// <summary> SoundManager에서 사용하는 AudioListener, AudioSource 및 AudioMixer를 초기화한다. </summary>
+    /// <summary> AudioListener, AudioSource 및 AudioMixer를 초기화 그리고 볼륨세팅 </summary>
     private void Initialize()
     {
         InitializeAudioMixer();
         InitializeAudioListener();
+        LoadVolumeSettings();
     }
 
     /// <summary> SoundMixer를 로드하고 BGM과 SFX에 사용할 Mixer Group을 설정한다. </summary>
@@ -109,6 +115,16 @@ public class SoundManager : MonoBehaviour
         _bgmAudioSource.outputAudioMixerGroup = _bgmMixerGroup;
     }
 
+    /// <summary> PlayerPrefs에 저장된 BGM과 SFX 볼륨을 불러와 적용한다. </summary>
+    private void LoadVolumeSettings()
+    {
+        float bgmVolume = PlayerPrefs.GetFloat(BgmVolumePrefsKey, DefaultVolume);
+        float sfxVolume = PlayerPrefs.GetFloat(SfxVolumePrefsKey, DefaultVolume);
+
+        SetBgmVolume(bgmVolume);
+        SetSfxVolume(sfxVolume);
+    }
+    
     /// <summary> 씬에서 사용한 SFX를 정리한다. </summary>
     public void Clear()
     {
@@ -375,16 +391,36 @@ public class SoundManager : MonoBehaviour
 
     #region ===== Mixer =====
 
-    /// <summary> BGM의 전체 볼륨을 설정한다. </summary>
+    /// <summary> BGM의 전체 볼륨을 설정하고 저장한다. </summary>
     public void SetBgmVolume(float volume)
     {
+        volume = Mathf.Clamp01(volume);
+
+        PlayerPrefs.SetFloat(BgmVolumePrefsKey, volume);
+        
         SetMixerVolume(BgmVolumeParameter, volume);
     }
 
-    /// <summary> SFX의 전체 볼륨을 설정한다. </summary>
+    /// <summary> SFX의 전체 볼륨을 설정하고 저장한다. </summary>
     public void SetSfxVolume(float volume)
     {
+        volume = Mathf.Clamp01(volume);
+
+        PlayerPrefs.SetFloat(SfxVolumePrefsKey, volume);
+        
         SetMixerVolume(SfxVolumeParameter, volume);
+    }
+    
+    /// <summary> 저장된 BGM 볼륨을 반환한다. </summary>
+    public float GetBgmVolume()
+    {
+        return PlayerPrefs.GetFloat(BgmVolumePrefsKey, DefaultVolume);
+    }
+
+    /// <summary> 저장된 SFX 볼륨을 반환한다. </summary>
+    public float GetSfxVolume()
+    {
+        return PlayerPrefs.GetFloat(SfxVolumePrefsKey, DefaultVolume);
     }
 
     /// <summary> AudioMixer의 볼륨 파라미터를 설정한다. </summary>

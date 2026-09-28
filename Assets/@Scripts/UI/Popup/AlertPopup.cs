@@ -19,8 +19,6 @@ public class AlertPopup : BasePopup
 
     private Action _yesAction;
 
-    private bool _isClicked;
-
     protected override void OnAwake()
     {
         Bind<Button>(typeof(Buttons));
@@ -71,12 +69,6 @@ public class AlertPopup : BasePopup
     /// <summary> Yes 버튼을 선택했을 때 팝업을 닫고 지정된 동작을 실행한다. </summary>
     private void OnClickYes()
     {
-        if (_isClicked)
-        {
-            return;
-        }
-        
-        _isClicked = true;
         Close(() => _yesAction?.Invoke());
         Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeConfirm);
     }
@@ -84,13 +76,6 @@ public class AlertPopup : BasePopup
     /// <summary> No 버튼을 선택했을 때 팝업을 닫는다. </summary>
     private void OnClickNo()
     {
-        if (_isClicked)
-        {
-            return;
-        }
-        
-        _isClicked = true;
-        
         Close();
         Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
     }
