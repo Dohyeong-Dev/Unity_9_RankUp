@@ -41,6 +41,7 @@ public class SoundManager : MonoBehaviour
         Managers.Scene.OnSceneLoaded += HandleSceneLoaded;
         
         RemoveOtherAudioListeners();
+        LoadVolumeSettings();
     }
 
     private void Update()
@@ -65,7 +66,6 @@ public class SoundManager : MonoBehaviour
     {
         InitializeAudioMixer();
         InitializeAudioListener();
-        LoadVolumeSettings();
     }
 
     /// <summary> SoundMixer를 로드하고 BGM과 SFX에 사용할 Mixer Group을 설정한다. </summary>
