@@ -178,6 +178,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     #region ===== 상태 =====
 
     public bool IsDead { get; protected set; }
+    private bool _isPlayerDead;
 
     public event Action<EnemyCtrl> OnDead;
 
@@ -280,6 +281,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         KillTweens();
 
         IsDead = false;
+        _isPlayerDead = false;
 
         ClearCombatTarget();
 
@@ -353,12 +355,13 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
     private void HandlePlayerDead()
     {
-        if (IsDead)
+        if (_isPlayerDead || IsDead)
         {
             return;
         }
 
-        CPrint.Log("[EnemyCtrl ]플레이어 죽음");
+        _isPlayerDead = true;
+        
         ClearCombatTarget();
         StopMovement();
 
@@ -670,7 +673,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        SetCombatTarget(_player != null ? _player.transform : null);
+        SetCombatTarget(!_isPlayerDead && _player != null ? _player.transform : null);
 
         SetHp(-damage);
         PlayHitEffect();
