@@ -470,7 +470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8086201a6e844fba92da108f742434a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackDelay: 0.5
+  _attackDelay: 1
 --- !u!1101 &7731197104584114837
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
