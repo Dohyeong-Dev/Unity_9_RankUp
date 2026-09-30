@@ -4,6 +4,8 @@ public abstract class ResourceKey
     {
         public const string Misc = "Prefab/Misc/";
 
+        public const string Table = "Table/";
+        
         #region ===== UI =====
         
         public const string UI = "Prefab/UI/";

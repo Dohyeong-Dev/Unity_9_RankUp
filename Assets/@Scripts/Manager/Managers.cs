@@ -30,7 +30,7 @@ public class Managers : MonoBehaviour
 
     #endregion ===== 인스턴스 =====
 
-    #region ===== 일반 매니저 =====
+    #region ===== Core =====
 
     private readonly InputManager _input = new();
     public static InputManager Input => Instance?._input;
@@ -46,10 +46,13 @@ public class Managers : MonoBehaviour
 
     private readonly EventManager _event = new();
     public static EventManager Event => Instance?._event;
+    
+    private readonly TableManager _table = new();
+    public static TableManager Table => Instance?._table;
 
-    #endregion ===== 일반 매니저 =====
+    #endregion ===== CORE =====
 
-    #region ===== MonoBehaviour 매니저 =====
+    #region ===== Mono =====
 
     private static ScenesManager _scene;
 
@@ -93,7 +96,7 @@ public class Managers : MonoBehaviour
         }
     }
     
-    #endregion ===== MonoBehaviour 매니저 =====
+    #endregion ===== Mono =====
 
     private void Update()
     {
