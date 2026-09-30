@@ -166,11 +166,11 @@ public abstract class BasePopup : BaseUI
 
         if (isOpen)
         {
-            background.transform.DOScale(1f, 0.25f).From(0f).OnComplete(OnOpened);
+            background.transform.DOScale(1f, 0.25f).From(0f).SetUpdate(true).OnComplete(OnOpened);
         }
         else
         {
-            background.transform.DOScale(0f, 0.25f).OnComplete(CloseImmediately);
+            background.transform.DOScale(0f, 0.25f).SetUpdate(true).OnComplete(CloseImmediately);
         }
     }
 
@@ -197,23 +197,20 @@ public abstract class BasePopup : BaseUI
     /// <summary> 콘텐츠가 위로 이동하며 열리는 애니메이션을 재생한다. </summary>
     private void PlayContentsUpOpenAnimation(TMP_Text contentText)
     {
-        contentText.transform.DOLocalMove(Vector3.up * _contentsUpOffsetY, 0.5f).SetRelative(true)
-            .From(contentText.transform.localPosition + Vector3.down * _contentsUpOffsetY).OnStart(() =>
+        contentText.transform.DOLocalMove(Vector3.up * _contentsUpOffsetY, 0.5f).SetUpdate(true)
+            .SetRelative(true).From(contentText.transform.localPosition + Vector3.down * _contentsUpOffsetY).OnStart(() =>
             {
-                contentText.DOFade(1f, 0.5f)
-                    .From(0f)
-                    .SetEase(Ease.InOutCirc);
+                contentText.DOFade(1f, 0.5f).From(0f).SetEase(Ease.InOutCirc).SetUpdate(true);
             }).OnComplete(OnOpened);
     }
 
     /// <summary> 콘텐츠가 아래로 이동하며 닫히는 애니메이션을 재생한다. </summary>
     private void PlayContentsUpCloseAnimation(TMP_Text contentText)
     {
-        contentText.transform.DOLocalMove(Vector3.down * _contentsUpOffsetY, 0.25f).SetRelative(true)
-            .SetEase(Ease.InOutCirc).OnStart(() =>
+        contentText.transform.DOLocalMove(Vector3.down * _contentsUpOffsetY, 0.25f).SetUpdate(true)
+            .SetRelative(true).SetEase(Ease.InOutCirc).OnStart(() =>
             {
-                contentText.DOFade(0f, 0.25f)
-                    .SetEase(Ease.InOutCirc);
+                contentText.DOFade(0f, 0.25f).SetEase(Ease.InOutCirc).SetUpdate(true);
             }).OnComplete(CloseImmediately);
     }
 
@@ -239,21 +236,21 @@ public abstract class BasePopup : BaseUI
     /// <summary> 배경이 위로 이동하며 열리는 애니메이션을 재생한다. </summary>
     private void PlayBgUpOpenAnimation(Transform backgroundTransform, CanvasGroup backgroundCanvasGroup)
     {
-        backgroundTransform.DOLocalMove(Vector3.up * _bgUpOffsetY, 0.2f).SetEase(Ease.Linear)
+        backgroundTransform.DOLocalMove(Vector3.up * _bgUpOffsetY, 0.2f).SetEase(Ease.Linear).SetUpdate(true)
             .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * _contentsUpOffsetY)
             .OnStart(() =>
             {
-                backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f);
+                backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f).SetUpdate(true);
             }).OnComplete(OnOpened);
     }
 
     /// <summary> 배경이 아래로 이동하며 닫히는 애니메이션을 재생한다. </summary>
     private void PlayBgUpCloseAnimation(Transform backgroundTransform, CanvasGroup backgroundCanvasGroup)
     {
-        backgroundTransform.DOLocalMove(Vector3.down * _bgUpOffsetY, 0.15f).SetEase(Ease.Linear)
+        backgroundTransform.DOLocalMove(Vector3.down * _bgUpOffsetY, 0.15f).SetEase(Ease.Linear).SetUpdate(true)
             .SetRelative(true).OnStart(() =>
             {
-                backgroundCanvasGroup.DOFade(0f, 0.15f).SetEase(Ease.Linear);
+                backgroundCanvasGroup.DOFade(0f, 0.15f).SetEase(Ease.Linear).SetUpdate(true);
             }).OnComplete(CloseImmediately);
     }
 
@@ -289,9 +286,9 @@ public abstract class BasePopup : BaseUI
         Vector3 startPosition = targetPosition + Vector3.up * GetBgDownDistance();
 
         backgroundTransform.DOLocalMove(targetPosition, 0.35f).SetEase(Ease.OutCubic).From(startPosition)
-            .OnStart(() =>
+            .SetUpdate(true).OnStart(() =>
             {
-                backgroundCanvasGroup.DOFade(0.98f, 0.2f).From(0f);
+                backgroundCanvasGroup.DOFade(0.98f, 0.2f).From(0f).SetUpdate(true);
             }).OnComplete(OnOpened);
     }
 
@@ -300,7 +297,7 @@ public abstract class BasePopup : BaseUI
     {
         Vector3 endPosition = backgroundTransform.localPosition + Vector3.down * GetBgDownDistance();
 
-        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InCubic).OnComplete(CloseImmediately);
+        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InCubic).SetUpdate(true).OnComplete(CloseImmediately);
     }
 
     #endregion ===== 애니메이션 =====

@@ -1,6 +1,14 @@
 using System;
 using UnityEngine;
 
+public enum PrintType : ushort
+{
+    Log,
+    Success,
+    Warning,
+    Error
+}
+
 public static class CPrint
 {
     // 로그 출력 스위치

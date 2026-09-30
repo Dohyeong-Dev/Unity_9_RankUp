@@ -1,6 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public enum SceneType : ushort
+{
+    None,
+    TitleScene,
+    LoadingScene,
+    GameScene,
+}
+
 /// <summary> 모든 게임 씬의 공통 초기화와 정리 기능을 제공하는 기본 씬 클래스다. </summary>
 public abstract class BaseScene : MonoBehaviour
 {
