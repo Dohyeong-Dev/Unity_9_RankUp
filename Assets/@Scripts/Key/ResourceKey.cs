@@ -2,13 +2,15 @@ public abstract class ResourceKey
 {
     public static class Path
     {
-        public const string Misc = "Prefab/Misc/";
-
+        public const string Prefab = "Prefab/";
         public const string Table = "Table/";
+            
+        public const string Misc = Prefab + "Misc/";
+        public const string Item = Prefab + "Item/";
         
         #region ===== UI =====
         
-        public const string UI = "Prefab/UI/";
+        public const string UI = Prefab + "UI/";
         public const string ScreenUI = UI + "ScreenUI/";
         public const string PopupUI = UI + "PopupUI/";
         public const string OverlayUI = UI + "OverlayUI/";
@@ -61,7 +63,8 @@ public abstract class ResourceKey
             IceProjectile,
             SparkProjectile,
             GameOver,
-            GameClear
+            GameClear,
+            PickUpItem
         }
         
         #endregion ===== 사운드 =====

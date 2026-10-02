@@ -50,6 +50,9 @@ public class Managers : MonoBehaviour
     private readonly TableManager _table = new();
     public static TableManager Table => Instance?._table;
 
+    private readonly DataManager _data = new();
+    public static DataManager Data => Instance?._data;
+    
     #endregion ===== CORE =====
 
     #region ===== Mono =====

@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _runEnableDelay: 0.4
-  _dashEnableDelay: 0.22
+  _dashEnableDelay: 0.1
 --- !u!1102 &-6826552075401506237
 AnimatorState:
   serializedVersion: 6
@@ -522,8 +522,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b8c18f8fccd4c938efe0870062e3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomMinTime: 1
-  _randomMaxTime: 5
+  _randomMinTime: 5
+  _randomMaxTime: 10
 --- !u!1102 &-2822933196863660129
 AnimatorState:
   serializedVersion: 6
@@ -1200,7 +1200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movementEnableDelay: 0.05
   _playSoundDelay: 0.55
-  _movementInputThreshold: 0.8
+  _movementInputThreshold: 0.5
 --- !u!1102 &2488756829527297743
 AnimatorState:
   serializedVersion: 6
@@ -1604,7 +1604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movementEnableDelay: 0.05
   _playSoundDelay: 0.4
-  _movementInputThreshold: 0.8
+  _movementInputThreshold: 0.5
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1

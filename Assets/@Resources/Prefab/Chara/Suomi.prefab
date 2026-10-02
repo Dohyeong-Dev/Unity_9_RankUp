@@ -44459,12 +44459,14 @@ GameObject:
   - component: {fileID: 7544890087937165029}
   - component: {fileID: 3722738949077729407}
   - component: {fileID: 7321903243690060044}
+  - component: {fileID: 1720247849678603384}
   - component: {fileID: 154000570595782512}
   - component: {fileID: 8758425364180487682}
   - component: {fileID: 8463252987596068913}
   - component: {fileID: 1806562370542907417}
   - component: {fileID: 7046109503859666843}
   - component: {fileID: 180884196588721542}
+  - component: {fileID: 4763604903833727953}
   m_Layer: 8
   m_Name: Suomi
   m_TagString: Player
@@ -44547,6 +44549,18 @@ MonoBehaviour:
   _spActionResumeThreshold: 10
   _spRecoveryRate: 30
   _str: 10
+--- !u!114 &1720247849678603384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898896727743157869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc130ede57a64f46b498c8f8cedeb58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &154000570595782512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44689,6 +44703,19 @@ MonoBehaviour:
     weaponRigidbody: {fileID: 0}
   supportIKSettings: []
   propEvents: []
+--- !u!114 &4763604903833727953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898896727743157869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfe23b101bf354138a271f8e21a821f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _skinnedMeshRenderer: {fileID: 4556821956701428157}
 --- !u!1 &1985333722050597714
 GameObject:
   m_ObjectHideFlags: 0
@@ -64979,8 +65006,8 @@ Transform:
   m_GameObject: {fileID: 5121626585257584215}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0.89}
-  m_LocalScale: {x: 2.99535, y: 1.7465, z: 1.7351099}
+  m_LocalPosition: {x: 0, y: 1, z: 1.119}
+  m_LocalScale: {x: 1.7321808, y: 1.7465, z: 2.06079}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7544890087937165029}
@@ -70295,8 +70322,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.0000001, z: -0.05}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 78158061981738401}
   m_Father: {fileID: 7544890087937165029}

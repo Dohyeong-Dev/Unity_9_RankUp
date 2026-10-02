@@ -18,25 +18,36 @@ public class GameHUD : BaseHUD
     {
         HpText,
         SpText,
+        PickUpText
     }
 
     private enum Images
     {
         HpSliderCover,
         SpSliderCover,
+        
+        SettingIconFrame,
         SettingIcon,
+        ShopIconFrame,
         ShopIcon,
+        InventoryIconFrame,
         InventoryIcon,
+        SaveIconFrame,
+        SaveIcon,
+        
+        PickUp
     }
 
     public enum SideBar
     {
         Setting,
         Shop,
-        Inventory
+        Inventory,
+        Save
     }
+
     private readonly Dictionary<SideBar, bool> _sideIconStatusMap = new();
-    
+
     #region ===== 참조 =====
 
     private PlayerCtrl _player;
@@ -64,6 +75,7 @@ public class GameHUD : BaseHUD
         InitializeCoverColors();
 
         SetBossHpSliderActive(false);
+        SetPickUpActive(false);
     }
 
     protected override void OnStart()
@@ -96,6 +108,11 @@ public class GameHUD : BaseHUD
         {
             Managers.UI.OpenToastMessage("인벤토리");
         }
+        else if (Managers.Input.KeyDown_O)
+        {
+            Managers.UI.OpenPopup<AlertPopup>().Set(AlertPopup.ContentsType.Save);
+            SetSideIconActive(SideBar.Save, true);
+        }
     }
 
     private void OnDestroy()
@@ -111,7 +128,7 @@ public class GameHUD : BaseHUD
         UnsubscribePlayerEvents();
         UnsubscribeBossEvents();
     }
-    
+
     #region ===== 초기화 =====
 
     /// <summary> HP와 SP 게이지 커버의 기본 색상을 저장한다. </summary>
@@ -130,8 +147,14 @@ public class GameHUD : BaseHUD
         Get<Slider>(Sliders.BossHpSlider).gameObject.SetActive(active);
     }
 
+    public void SetPickUpActive(bool active, string message = null)
+    {
+        Get<Image>(Images.PickUp).gameObject.SetActive(active);
+        Get<TMP_Text>(Texts.PickUpText).text = message;
+    }
+
     #endregion ===== 활성/비활성화 =====
-    
+
     #region ===== 참조 확인 =====
 
     /// <summary> 플레이어 참조를 반환하고 없으면 현재 씬에서 찾는다. </summary>
@@ -154,7 +177,7 @@ public class GameHUD : BaseHUD
     }
 
     #endregion ===== 참조 확인 =====
-    
+
     #region ===== 플레이어 =====
 
     /// <summary> 플레이어의 현재 HP와 SP를 HUD에 반영한다. </summary>
@@ -219,27 +242,22 @@ public class GameHUD : BaseHUD
     private void UpdateBossHpSlider(float currentHp, float maxHp)
     {
         Slider bossHpSlider = Get<Slider>(Sliders.BossHpSlider);
-        
-        if (bossHpSlider == null)
-        {
-            return;
-        }
 
         if (_bossHpShowTween == null)
         {
-            bossHpSlider.gameObject.SetActive(true);
+            SetBossHpSliderActive(true);
 
             bossHpSlider.transform.localScale = Vector3.zero;
 
             _bossHpShowTween = bossHpSlider.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
         }
-        
+
         float sliderValue = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
         bossHpSlider.value = sliderValue;
     }
-    
+
     #endregion ===== 보스 =====
-    
+
     #region ===== 사이드바 =====
 
     /// <summary> 해당 사이드 아이콘의 활성화 상태를 갱신한다. </summary>
@@ -250,15 +268,23 @@ public class GameHUD : BaseHUD
         switch (sideBar)
         {
             case SideBar.Setting:
+                UpdateSideIconColor(Images.SettingIconFrame, sideBar);
                 UpdateSideIconColor(Images.SettingIcon, sideBar);
                 break;
 
             case SideBar.Shop:
+                UpdateSideIconColor(Images.ShopIconFrame, sideBar);
                 UpdateSideIconColor(Images.ShopIcon, sideBar);
                 break;
 
             case SideBar.Inventory:
+                UpdateSideIconColor(Images.InventoryIconFrame, sideBar);
                 UpdateSideIconColor(Images.InventoryIcon, sideBar);
+                break;
+
+            case SideBar.Save:
+                UpdateSideIconColor(Images.SaveIconFrame, sideBar);
+                UpdateSideIconColor(Images.SaveIcon, sideBar);
                 break;
         }
     }
@@ -270,7 +296,7 @@ public class GameHUD : BaseHUD
     }
 
     #endregion ===== 사이드바 =====
-    
+
     #region ===== 이펙트 =====
 
     /// <summary> HP가 낮을 때 HP 게이지의 경고 효과를 재생한다. </summary>
@@ -329,7 +355,7 @@ public class GameHUD : BaseHUD
         _player.OnHpChanged += UpdateHpSlider;
         _player.OnSpChanged += UpdateSpSlider;
     }
-    
+
     /// <summary> 플레이어 이벤트를 해제한다. </summary>
     private void UnsubscribePlayerEvents()
     {
@@ -343,19 +369,41 @@ public class GameHUD : BaseHUD
         {
             _boss = boss;
         }
-        
+
         _boss.OnHpChanged += UpdateBossHpSlider;
     }
-    
+
     private void UnsubscribeBossEvents()
     {
         if (_boss == null)
         {
             return;
         }
-        
+
         _boss.OnHpChanged -= UpdateBossHpSlider;
     }
 
     #endregion ===== 이벤트 =====
+
+    #region ===== 상호작용 =====
+
+    public void SetInteractionTextActive(bool isActive, InteractType type = InteractType.PickUp)
+    {
+        SetPickUpActive(isActive, GetInteractionText(type));
+    }
+
+    private string GetInteractionText(InteractType type)
+    {
+        string interactionText = "[F] ";
+
+        interactionText += type switch
+        {
+            InteractType.PickUp => "줍기",
+            _ => string.Empty
+        };
+
+        return interactionText;
+    }
+
+    #endregion ===== 상호작용 =====
 }

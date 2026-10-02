@@ -13,13 +13,13 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     private static readonly int DissolveProperty = Shader.PropertyToID("_Dissolve");
 
     #region ===== ID =====
-    
+
     [Header("ID")]
     [Min(1)]
-    [SerializeField] private int _id; 
-    
+    [SerializeField] private int _id;
+
     #endregion ===== ID =====
-    
+
     #region ===== 컴포넌트 =====
 
     private PlayerCtrl _player;
@@ -129,7 +129,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     #endregion ===== 행동 =====
 
     #region ===== 스탯 =====
-    
+
     private float _hp;
     public float Hp => _hp;
     private float _maxHp;
@@ -366,13 +366,13 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         }
 
         _isPlayerDead = true;
-        
+
         ClearCombatTarget();
         StopMovement();
 
         _fieldOfView?.StopDetection();
         _fieldOfView?.ClearTarget();
-        
+
         _stateMachine.ChangeState<ReturnState>();
     }
 
@@ -390,7 +390,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     {
         OnDead?.Invoke(this);
     }
-    
+
     #endregion ===== 이벤트 =====
 
     #region ===== 스폰/디스폰 =====
@@ -450,7 +450,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         Managers.Pool.Return(poolObj);
     }
-    
+
     #endregion ===== 스폰/디스폰 =====
 
     #region ===== 타겟 =====
@@ -682,7 +682,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         SetHp(-damage);
         PlayHitEffect();
-        
+
         if (IsDead)
         {
             return;
@@ -890,7 +890,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         {
             return;
         }
-        
+
         _dissolveValue = value;
 
         foreach (Material material in _dissolveMaterials)
@@ -905,16 +905,28 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
         {
             return;
         }
-        
+
         float targetValue = isDissolving ? 1f : 0f;
 
-        KillDissolveTween();
+        KillDissolveTween(); 
 
+        bool isItemDropped = false;
         _dissolveTween = DOTween.To(() => _dissolveValue, SetDissolveValue, targetValue, _dissolveDuration)
-            .SetEase(_dissolveEase);
+            .SetEase(_dissolveEase).OnUpdate(() =>
+            {
+                if (isDissolving)
+                {
+                    if (!isItemDropped && _dissolveValue >= 0.5f)
+                    {
+                        isItemDropped = true;
+                        DropGold();
+                    }
+                }
+                
+            });
 
         Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.5f, true, transform.position);
-        
+
         if (isDissolving)
         {
             _dissolveTween.OnComplete(ReturnToPool);
@@ -944,4 +956,37 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 트윈 =====
+
+    #region ===== 아이템 =====
+
+    /// <summary> 사망 시 골드 드롭 여부를 확률에 따라 결정하고 골드를 생성한다. </summary>
+    private void DropGold()
+    {
+        EnemyData enemyData = Managers.Table.Enemy.GetMonsterInfo(_id);
+
+        if (enemyData == null)
+        {
+            return;
+        }
+
+        if (enemyData.Gold <= 0)
+        {
+            return;
+        }
+
+        if (UnityEngine.Random.value > enemyData.GoldDropRate / 100f)
+        {
+            return;
+        }
+
+        GameObject gold = Managers.Resource.Spawn(ResourceKey.Path.Item + "Gold");
+        gold.transform.position = transform.position;
+
+        if (gold.TryGetComponent(out Gold goldItem))
+        {
+            goldItem.SetGold(enemyData.Gold);
+        }
+    }
+
+    #endregion ===== 아이템 =====
 }

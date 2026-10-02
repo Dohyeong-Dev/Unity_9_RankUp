@@ -2,5 +2,5 @@ using UnityEngine;
 
 public static class ColorKey
 {
-    public static readonly Color DarkGray = new Color32(130, 135, 140, 255);
+    public static readonly Color DarkGray = new Color32(70, 75, 70, 255);
 }
