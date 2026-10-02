@@ -135,8 +135,11 @@ public class CamCtrl : MonoBehaviour
         InitializeTargetCollider();
         InitializeCameraState();
 
-        UpdateTargetFocusPos();
-        UpdateCameraTransform();
+        if (Time.timeScale > 0f)
+        {
+            UpdateTargetFocusPos();
+            UpdateCameraTransform();
+        }
     }
 
     private void LateUpdate()
