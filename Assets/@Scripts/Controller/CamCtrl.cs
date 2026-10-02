@@ -135,21 +135,13 @@ public class CamCtrl : MonoBehaviour
         InitializeTargetCollider();
         InitializeCameraState();
 
-        if (Time.timeScale > 0f)
-        {
-            UpdateTargetFocusPos();
-            UpdateCameraTransform();
-        }
+        UpdateTargetFocusPos();
+        UpdateCameraTransform();
     }
 
     private void LateUpdate()
     {
         if (_target == null)
-        {
-            return;
-        }
-
-        if (Time.timeScale <= 0f)
         {
             return;
         }
@@ -289,8 +281,19 @@ public class CamCtrl : MonoBehaviour
 
         cameraDirection.Normalize();
 
-        transform.position = cameraPivot + cameraDirection * _currentCollisionDistance + _shakeOffset;
+        Vector3 cameraPosition = cameraPivot + cameraDirection * _currentCollisionDistance + _shakeOffset;
+        if (IsValidPosition(cameraPosition))
+        {
+            transform.position = cameraPosition;
+        }
+
         transform.rotation = aimRotation;
+    }
+
+    /// <summary> 카메라 위치에 사용할 Vector3가 유효한 값인지 확인한다. </summary>
+    private bool IsValidPosition(Vector3 position)
+    {
+        return float.IsFinite(position.x) && float.IsFinite(position.y) && float.IsFinite(position.z);
     }
 
     /// <summary> 현재 줌 거리를 목표 줌 거리까지 부드럽게 이동시킨다. </summary>

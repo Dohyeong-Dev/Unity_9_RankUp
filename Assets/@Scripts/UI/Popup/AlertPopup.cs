@@ -46,6 +46,11 @@ public class AlertPopup : BasePopup
 
     public override void OnInputKey()
     {
+        if (!_graphicRaycaster.isActiveAndEnabled)
+        {
+            return;
+        }
+        
         if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();

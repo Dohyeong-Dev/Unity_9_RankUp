@@ -925,7 +925,7 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
                 
             });
 
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.5f, true, transform.position);
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyDissolve, 0.5f, true, transform.position, 10);
 
         if (isDissolving)
         {
@@ -974,7 +974,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
             return;
         }
 
-        if (UnityEngine.Random.value > enemyData.GoldDropRate / 100f)
+        float dropRate = Mathf.Clamp01(enemyData.GoldDropRate / 100f);
+
+        if (UnityEngine.Random.value > dropRate)
         {
             return;
         }

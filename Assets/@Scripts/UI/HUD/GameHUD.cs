@@ -95,6 +95,11 @@ public class GameHUD : BaseHUD
 
     public override void OnInputKey()
     {
+        if (_player.IsDead)
+        {
+            return;
+        }
+        
         if (Managers.Input.KeyDown_Esc)
         {
             Managers.UI.OpenPopup<ExitPopup>();
@@ -292,7 +297,7 @@ public class GameHUD : BaseHUD
     /// <summary> 사이드 아이콘 컬러를 갱신한다. </summary>
     private void UpdateSideIconColor(Images image, SideBar sideBar)
     {
-        Get<Image>(image).color = _sideIconStatusMap[sideBar] ? ColorKey.DarkGray : Color.white;
+        Get<Image>(image).color = _sideIconStatusMap[sideBar] ? ColorKey.Charcoal : Color.white;
     }
 
     #endregion ===== 사이드바 =====

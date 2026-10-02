@@ -38,6 +38,11 @@ public class ExitPopup : BasePopup
 
     public override void OnInputKey()
     {
+        if (!_graphicRaycaster.isActiveAndEnabled)
+        {
+            return;
+        }
+        
         if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();
@@ -57,11 +62,15 @@ public class ExitPopup : BasePopup
     protected override void DestroyOverride()
     {
         Time.timeScale = 1f;
-        Managers.Event.RaiseResume();
+
+        if (Managers.Event != null)
+        {
+            Managers.Event.RaiseResume();
+        }
         
         UnsubscribeSliderEvent();
         
-        if (Managers.Scene.TryGetCurrentScene(out GameScene scene))
+        if (Managers.Scene != null && Managers.Scene.TryGetCurrentScene(out GameScene scene))
         {
             scene.HUD.SetSideIconActive(GameHUD.SideBar.Setting, false);
         }

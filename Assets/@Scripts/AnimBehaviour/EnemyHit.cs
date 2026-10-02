@@ -11,7 +11,8 @@ public class EnemyHit : StateMachineBehaviour
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyHit);
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.EnemyHit, 0.7f, true,
+            animator.transform.position, maxAudioSourceCount: 2);
     }
     
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

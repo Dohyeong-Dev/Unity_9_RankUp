@@ -12,6 +12,10 @@ public class InventoryPopup : BasePopup
     {
     }
 
+    public override void OnInputKey()
+    {
+    }
+
     protected override void DestroyOverride()
     {
     }

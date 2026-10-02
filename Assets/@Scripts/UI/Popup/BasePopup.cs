@@ -8,7 +8,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
 public abstract class BasePopup : BaseUI
 {
-    private GraphicRaycaster _graphicRaycaster;
+    protected GraphicRaycaster _graphicRaycaster;
     
     private Action _closeAction;
     
@@ -67,17 +67,9 @@ public abstract class BasePopup : BaseUI
     }
 
     protected abstract void OnUpdate();
-    
-    /// <summary> Popup에서 처리할 입력을 확인한다. </summary>
-    public virtual void OnInputKey()
-    {
-        if (!Managers.Input.KeyDown_Esc)
-        {
-            return;
-        }
 
-        Close();
-    }
+    /// <summary> Popup에서 처리할 입력을 확인한다. </summary>
+    public abstract void OnInputKey();
 
     protected virtual void OnDestroy()
     {

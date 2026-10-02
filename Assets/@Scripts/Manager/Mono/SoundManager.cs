@@ -181,7 +181,7 @@ public class SoundManager : MonoBehaviour
     #region ===== SFX =====
 
     /// <summary> 지정한 이름의 SFX를 재생한다. </summary>
-    public void PlaySfx(ResourceKey.Name.SfxType sfxType, float volume = 1f, bool is3D = false, Vector3 position = default)
+    public void PlaySfx(ResourceKey.Name.SfxType sfxType, float volume = 1f, bool is3D = false, Vector3 position = default, int maxAudioSourceCount = 0)
     {
         string sfxName = sfxType.ToString();
         
@@ -201,7 +201,7 @@ public class SoundManager : MonoBehaviour
                 return;
             }
 
-            sfx = new Sfx(clip, _minDistance, _maxDistance, _sfxMixerGroup);
+            sfx = new Sfx(clip, _minDistance, _maxDistance, _sfxMixerGroup, maxAudioSourceCount);
 
             _sfxMap.Add(sfxName, sfx);
         }
@@ -452,24 +452,28 @@ public class Sfx
 {
     private readonly Transform _root;
 
-    private readonly List<AudioSource> _audioSourceList = new();
+    private readonly List<AudioSource> _audioSourceList;
 
     private readonly AudioClip _clip;
     private readonly AudioMixerGroup _mixerGroup;
 
     private readonly float _minDistance;
     private readonly float _maxDistance;
+    private readonly int _maxAudioSourceCount;
 
     public string ClipName => _clip?.name;
 
     /// <summary> SFX 재생에 필요한 AudioSource를 초기화한다. </summary>
-    public Sfx(AudioClip clip, float minDistance, float maxDistance, AudioMixerGroup mixerGroup)
+    public Sfx(AudioClip clip, float minDistance, float maxDistance, AudioMixerGroup mixerGroup, int maxAudioSourceCount)
     {
         _clip = clip;
         _minDistance = minDistance;
         _maxDistance = maxDistance;
         _mixerGroup = mixerGroup;
 
+        _audioSourceList = maxAudioSourceCount == 0 ? new() : new List<AudioSource>(maxAudioSourceCount);
+        _maxAudioSourceCount = maxAudioSourceCount;
+        
         GameObject rootObject = new GameObject(clip.name);
         rootObject.transform.SetParent(Managers.Sound.transform);
 
@@ -480,6 +484,11 @@ public class Sfx
     public void Play(float volume, bool is3D, Vector3 position)
     {
         AudioSource audioSource = GetAvailableAudioSource();
+
+        if (audioSource == null)
+        {
+            return;
+        }
 
         audioSource.transform.position = position;
         audioSource.volume = volume;
@@ -498,6 +507,11 @@ public class Sfx
             {
                 return audioSource;
             }
+        }
+
+        if (_maxAudioSourceCount > 0 && _audioSourceList.Count >= _maxAudioSourceCount)
+        {
+            return null;
         }
 
         return AddAudioSource();

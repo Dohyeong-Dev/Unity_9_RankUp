@@ -68,7 +68,7 @@ public class PlayerInteraction : MonoBehaviour
         IInteractable interactable = _interactables[0];
         _interactables.RemoveAt(0);
 
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PickUpItem, 0.8f);
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PickUpItem, 0.6f);
 
         interactable.Interact();
 
