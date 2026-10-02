@@ -23,7 +23,8 @@ public class InputManager
     public float KeyAxisX { get; private set; }
     public float KeyAxisY { get; private set; }
 
-    public float KeyVecSqrMagnitude => Mathf.Clamp01(new Vector2(KeyAxisX, KeyAxisY).sqrMagnitude);
+    /// <summary> 입력 자체의 세기 </summary>
+    public float KeyInputStrength => Mathf.Max(Mathf.Abs(KeyAxisX), Mathf.Abs(KeyAxisY));
 
     public bool Key_LeftShift => Input.GetKey(KeyCode.LeftShift);
     public bool KeyDown_Space => Input.GetKeyDown(KeyCode.Space);

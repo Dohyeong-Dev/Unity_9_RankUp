@@ -186,7 +186,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
     /// <summary> 현재 입력과 이동 상태를 기준으로 플레이어의 이동 속도를 갱신한다. </summary>
     private void UpdateMove()
     {
-        if (Managers.Input.KeyVecSqrMagnitude <= Mathf.Epsilon)
+        if (Managers.Input.KeyInputStrength <= Mathf.Epsilon)
         {
             RemoveHorizontalVelocity();
             return;
@@ -204,7 +204,7 @@ public class MoveBehaviour : BaseLocomotionBehaviour
         moveDirection.Normalize();
 
         float speed = _moveSpeed * _currentRunFactor;
-        float inputMagnitude = Managers.Input.KeyVecSqrMagnitude;
+        float inputMagnitude = Managers.Input.KeyInputStrength;
 
         Vector3 horizontalVelocity = moveDirection * speed * inputMagnitude;
 

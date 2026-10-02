@@ -1287,6 +1287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e354bce447c44e64ad6dd0b0c6fae12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _id: 1
   _walkSpeed: 1.5
   _runSpeed: 4
   _runSpeedVariance: 1
@@ -1295,8 +1296,6 @@ MonoBehaviour:
   _animationSpeedMultiplier: 0.2
   _combatTargetDuration: 3
   _combatRetentionDistance: 8
-  _maxHp: 100
-  _strength: 10
   _knockbackDistance: 1
   _knockbackDuration: 0.15
   _knockbackEase: 6

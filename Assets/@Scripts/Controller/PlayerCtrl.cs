@@ -80,7 +80,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool IsHit => HasState(PlayerState.Hit);
     public bool IsHitInvincible => _hitInvincibleTimer > 0f;
 
-    public bool IsMoving => Managers.Input != null && Managers.Input.KeyVecSqrMagnitude > Mathf.Epsilon;
+    public bool IsMoving => Managers.Input != null && Managers.Input.KeyInputStrength > Mathf.Epsilon;
 
     #endregion ===== 상태 =====
 

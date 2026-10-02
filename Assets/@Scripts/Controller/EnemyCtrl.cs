@@ -12,6 +12,14 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 {
     private static readonly int DissolveProperty = Shader.PropertyToID("_Dissolve");
 
+    #region ===== ID =====
+    
+    [Header("ID")]
+    [Min(1)]
+    [SerializeField] private int _id; 
+    
+    #endregion ===== ID =====
+    
     #region ===== 컴포넌트 =====
 
     private PlayerCtrl _player;
@@ -121,21 +129,16 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
     #endregion ===== 행동 =====
 
     #region ===== 스탯 =====
-
-    [Header("HP")]
-    [SerializeField] private float _maxHp = 100f;
-
+    
     private float _hp;
-
-    public float MaxHp => _maxHp;
     public float Hp => _hp;
+    private float _maxHp;
+    public float MaxHp => _maxHp;
 
     public event Action<float, float> OnHpChanged;
 
-    [Header("STR")]
-    [SerializeField] private float _strength = 10f;
-
-    public float Strength => _strength;
+    private float _str;
+    public float Str => _str;
 
     #endregion ===== 스탯 =====
 
@@ -285,7 +288,9 @@ public class EnemyCtrl : MonoBehaviour, IDamageable
 
         ClearCombatTarget();
 
+        _maxHp = Managers.Table.Enemy.GetMonsterInfo(_id)?.MaxHp ?? 0;
         _hp = _maxHp;
+        _str = Managers.Table.Enemy.GetMonsterInfo(_id)?.Str ?? 0;
 
         _collider.enabled = true;
 

@@ -65,7 +65,7 @@ public class PlayerAttackExit : StateMachineBehaviour
         
         if (_stateElapsedTime >= _movementEnableDelay)
         {
-            if (_player.IsMoving && Managers.Input.KeyVecSqrMagnitude > _movementInputThreshold * _movementInputThreshold)
+            if (_player.IsMoving && Managers.Input.KeyInputStrength > _movementInputThreshold * _movementInputThreshold)
             {
                 if (isPlayedSound)
                 {

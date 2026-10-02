@@ -17,7 +17,7 @@ public class EnemyData
     public int Exp;
 
     [CsvField("공격력")]
-    public int Damage;
+    public int Str;
 
     [CsvField("획득골드")]
     public int Gold;
