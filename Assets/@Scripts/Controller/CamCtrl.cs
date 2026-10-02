@@ -57,7 +57,6 @@ public class CamCtrl : MonoBehaviour
     #region ===== 카메라 초점 =====
 
     [Header("카메라 초점")]
-
     [Tooltip("일반 Orbit 카메라 초점 높이")]
     [SerializeField, Range(0f, 1f)] private float _orbitFocusHeightRatio = 0.65f;
 
@@ -69,7 +68,6 @@ public class CamCtrl : MonoBehaviour
     #region ===== 거리 보정 =====
 
     [Header("정수리 뷰 보정")]
-
     [Tooltip("카메라가 위에서 내려다볼수록 추가로 확보할 카메라 거리")]
     [SerializeField] private float _topViewDistBonus = 6f;
 
@@ -81,7 +79,6 @@ public class CamCtrl : MonoBehaviour
     #region ===== 카메라 충돌 =====
 
     [Header("카메라 충돌")]
-
     [Tooltip("카메라 충돌 체크 레이어")]
     [SerializeField] private LayerMask _collisionCheckLayerMask;
 
@@ -102,7 +99,6 @@ public class CamCtrl : MonoBehaviour
     #region ===== 카메라 줌 =====
 
     [Header("카메라 줌")]
-
     [Tooltip("마우스 휠 줌 속도")]
     [SerializeField] private float _zoomSpeed = 2f;
 
@@ -120,7 +116,6 @@ public class CamCtrl : MonoBehaviour
     #region ===== 카메라 셰이킹 =====
 
     [Header("카메라 셰이킹")]
-
     [Tooltip("카메라 흔들림이 유지되는 시간")]
     [SerializeField] private float _shakeTime = 0.05f;
 
@@ -147,6 +142,11 @@ public class CamCtrl : MonoBehaviour
     private void LateUpdate()
     {
         if (_target == null)
+        {
+            return;
+        }
+
+        if (Time.timeScale <= 0f)
         {
             return;
         }
@@ -197,7 +197,7 @@ public class CamCtrl : MonoBehaviour
         UpdateTargetFocusPos();
         UpdateCameraTransform();
     }
-    
+
     #endregion ===== 초기화 =====
 
     #region ===== 타겟 =====
