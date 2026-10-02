@@ -6,16 +6,10 @@ public class PlayerIdle02 : StateMachineBehaviour
     #region ===== 참조 =====
 
     private PlayerCtrl _player;
-    
+
     private BlendShapeController _blendShapeController;
 
     #endregion ===== 참조 =====
-
-    #region ===== 상태 =====
-
-    private bool _isReturningToIdle01;
-
-    #endregion ===== 상태 =====
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
@@ -24,11 +18,10 @@ public class PlayerIdle02 : StateMachineBehaviour
             return;
         }
 
-        _isReturningToIdle01 = false;
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
 
         _blendShapeController?.SetBlendShape(BlendShapeKey.Player.A.Index, 100);
-        
+
         if (Managers.UI.CurrentScreen == null && Managers.UI.CurrentPopup == null)
         {
             Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerIdle2);
@@ -37,12 +30,17 @@ public class PlayerIdle02 : StateMachineBehaviour
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_player == null || _isReturningToIdle01)
+        if (_player == null)
         {
             return;
         }
 
-        if (IsIdle02StateValid())
+        if (animator.IsInTransition(0))
+        {
+            return;
+        }
+
+        if (!IsPlayerActionState())
         {
             return;
         }
@@ -57,18 +55,15 @@ public class PlayerIdle02 : StateMachineBehaviour
 
     #region ===== Idle 전환 =====
 
-    /// <summary> Idle02 상태를 계속 유지할 수 있는지 반환한다. </summary>
-    private bool IsIdle02StateValid()
+    /// <summary> 플레이어가 Idle02를 유지할 수 없는 행동 상태인지 반환한다. </summary>
+    private bool IsPlayerActionState()
     {
-        return _player.IsDefaultBehaviour && !_player.IsMoving && !_player.IsAttacking && !_player.IsDashing;
+        return _player.IsMoving || _player.IsAttacking || _player.IsDead || _player.IsHit;
     }
 
     /// <summary> Idle01 상태로 복귀하는 Trigger를 실행한다. </summary>
     private void ReturnToIdle01(Animator animator)
     {
-        _isReturningToIdle01 = true;
-        _blendShapeController?.ResetBlendShape();
-
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
         animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
     }
@@ -88,7 +83,6 @@ public class PlayerIdle02 : StateMachineBehaviour
         if (animator.TryGetComponent(out _player))
         {
             _blendShapeController = _player.GetComponent<BlendShapeController>();
-            
             return true;
         }
 

@@ -19,7 +19,7 @@ public class PlayerIdle01 : StateMachineBehaviour
 
     #region ===== 상태 =====
 
-    private float _idleWaitingStartTime;
+    private float _stateElapsedTime;
     private float _randomIdleTime;
 
     #endregion ===== 상태 =====
@@ -33,8 +33,8 @@ public class PlayerIdle01 : StateMachineBehaviour
 
         animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
 
+        _stateElapsedTime = 0f;
         _randomIdleTime = Random.Range(_randomMinTime, _randomMaxTime);
-        _idleWaitingStartTime = Time.time;
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -44,9 +44,9 @@ public class PlayerIdle01 : StateMachineBehaviour
             return;
         }
 
-        if (_player.IsMoving || _player.IsAttacking)
+        if (_player.IsMoving || _player.IsAttacking || _player.IsDead || _player.IsHit)
         {
-            ResetIdleWaitingTime();
+            _stateElapsedTime = 0f;
             return;
         }
 
@@ -55,37 +55,32 @@ public class PlayerIdle01 : StateMachineBehaviour
             return;
         }
 
-        if (Time.time - _idleWaitingStartTime < _randomIdleTime)
+        _stateElapsedTime += Time.deltaTime;
+
+        if (_stateElapsedTime < _randomIdleTime)
         {
             return;
         }
 
-        animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
-        ResetIdleWaitingTime();
+        RequestIdle02(animator);
     }
 
-    #region ===== 대기 시간 =====
-
-    /// <summary> Idle02 전환을 위한 대기 시간을 초기화한다. </summary>
-    private void ResetIdleWaitingTime()
-    {
-        _idleWaitingStartTime = Time.time;
-    }
-
-    #endregion ===== 대기 시간 =====
-
-    #region ===== 전환 조건 =====
+    #region ===== Idle 전환 =====
 
     /// <summary> 현재 Idle02로 전환할 수 있는 상태인지 반환한다. </summary>
     private bool IsIdleTransitionReady(Animator animator)
     {
-        return !animator.IsInTransition(0)
-               && !_player.IsMoving
-               && !_player.IsAttacking
-               && _player.IsDefaultBehaviour;
+        return !animator.IsInTransition(0) && _player.IsDefaultBehaviour;
     }
 
-    #endregion ===== 전환 조건 =====
+    /// <summary> Idle02 상태로 전환을 요청하는 Trigger를 실행한다. </summary>
+    private void RequestIdle02(Animator animator)
+    {
+        animator.ResetTrigger(AnimatorKey.Hash.DoIdleChange);
+        animator.SetTrigger(AnimatorKey.Hash.DoIdleChange);
+    }
+
+    #endregion ===== Idle 전환 =====
 
     #region ===== 참조 확인 =====
 

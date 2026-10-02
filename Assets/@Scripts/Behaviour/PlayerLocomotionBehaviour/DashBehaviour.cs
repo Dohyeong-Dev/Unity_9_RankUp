@@ -70,7 +70,7 @@ public class DashBehaviour : BaseLocomotionBehaviour
     /// <summary> 현재 상태와 자원을 확인한 후 대시를 시작한다. </summary>
     private void TryDash()
     {
-        if (!Player.IsGrounded || !Player.IsDefaultBehaviour || Player.IsAttacking)
+        if (!Player.IsDefaultBehaviour || !Player.IsGrounded || Player.IsAttacking)
         {
             return;
         }

@@ -522,8 +522,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b8c18f8fccd4c938efe0870062e3a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomMinTime: 7
-  _randomMaxTime: 10
+  _randomMinTime: 1
+  _randomMaxTime: 5
 --- !u!1102 &-2822933196863660129
 AnimatorState:
   serializedVersion: 6

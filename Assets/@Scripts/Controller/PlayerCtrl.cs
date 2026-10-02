@@ -64,11 +64,9 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     {
         Grounded = 1 << 0,
         Dashing = 1 << 1,
-        Jumping = 1 << 2,
-        Colliding = 1 << 3,
-        Dead = 1 << 4,
-        Running = 1 << 5,
-        Hit = 1 << 6,
+        Dead = 1 << 2,
+        Running = 1 << 3,
+        Hit = 1 << 4,
     }
 
     private PlayerState _state;
@@ -78,8 +76,6 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public bool IsGrounded => HasState(PlayerState.Grounded);
     public bool IsDashing => HasState(PlayerState.Dashing);
     public bool IsRunning => HasState(PlayerState.Running);
-    public bool IsJumping => HasState(PlayerState.Jumping);
-    public bool IsColliding => HasState(PlayerState.Colliding);
     public bool IsDead => HasState(PlayerState.Dead);
     public bool IsHit => HasState(PlayerState.Hit);
     public bool IsHitInvincible => _hitInvincibleTimer > 0f;
@@ -95,7 +91,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private int _defaultLocomotionHash;
     private int _currentLocomotionHash;
 
-    public bool IsDefaultBehaviour => _currentLocomotionHash == _defaultLocomotionHash;
+    public bool IsDefaultBehaviour => _defaultLocomotionHash == _currentLocomotionHash;
 
     private PlayerAttackBehaviour _currentAttack;
 
