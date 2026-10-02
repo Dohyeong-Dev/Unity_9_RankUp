@@ -10,7 +10,10 @@ public class EventManager
 
     public event Action OnBossSpawned;
     public event Action OnBossClear;
-    
+
+    public event Action OnPause;
+    public event Action OnResume;
+
     #endregion ===== 이벤트 =====
 
     #region ===== 이벤트 발행 =====
@@ -32,12 +35,24 @@ public class EventManager
     {
         OnBossSpawned?.Invoke();
     }
-    
+
     /// <summary> 보스를 클리어했음을 알린다. </summary>
     public void RaiseBossClear()
     {
         OnBossClear?.Invoke();
     }
-    
+
+    /// <summary> 게임이 일시정지되었음을 알린다. </summary>
+    public void RaisePause()
+    {
+        OnPause?.Invoke();
+    }
+
+    /// <summary> 게임이 일시정지 상태에서 해제되었음을 알린다. </summary>
+    public void RaiseResume()
+    {
+        OnResume?.Invoke();
+    }
+
     #endregion ===== 이벤트 발행 =====
 }

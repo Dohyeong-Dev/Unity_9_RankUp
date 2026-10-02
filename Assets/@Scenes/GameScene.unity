@@ -61876,7 +61876,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 31.999817, y: 61.45996}
+  m_AnchoredPosition: {x: 31.999756, y: 61.45996}
   m_SizeDelta: {x: 368.4954, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2100552843
@@ -87081,7 +87081,7 @@ GameObject:
   - component: {fileID: 8709850338648074429}
   - component: {fileID: 4521069515393401759}
   m_Layer: 5
-  m_Name: Icon
+  m_Name: ShopIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87099,7 +87099,7 @@ GameObject:
   - component: {fileID: 8709850337980534733}
   - component: {fileID: 4521069516068054255}
   m_Layer: 5
-  m_Name: Icon
+  m_Name: InventoryIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87117,7 +87117,7 @@ GameObject:
   - component: {fileID: 8709850337971951827}
   - component: {fileID: 4521069516059472881}
   m_Layer: 5
-  m_Name: Icon
+  m_Name: SettingIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

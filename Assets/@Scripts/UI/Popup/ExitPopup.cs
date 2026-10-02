@@ -51,11 +51,20 @@ public class ExitPopup : BasePopup
     protected override void OnOpened()
     {
         Time.timeScale = 0f;
+        Managers.Event.RaisePause();
     }
     
     protected override void DestroyOverride()
     {
+        Time.timeScale = 1f;
+        Managers.Event.RaiseResume();
+        
         UnsubscribeSliderEvent();
+        
+        if (Managers.Scene.TryGetCurrentScene(out GameScene scene))
+        {
+            scene.HUD.SetSideIconActive(GameHUD.SideBar.Setting, false);
+        }
     }
     
     /// <summary> 사운드 슬라이더 값을 사운드 매니저의 볼륨값으로 업데이트 </summary>
@@ -75,8 +84,8 @@ public class ExitPopup : BasePopup
     /// <summary> No 버튼을 선택했을 때 팝업을 닫는다. </summary>
     private void OnClickNo()
     {
-        Time.timeScale = 1f;
         Close();
+        
         Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
     }
     

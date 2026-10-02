@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -22,9 +23,20 @@ public class GameHUD : BaseHUD
     private enum Images
     {
         HpSliderCover,
-        SpSliderCover
+        SpSliderCover,
+        SettingIcon,
+        ShopIcon,
+        InventoryIcon,
     }
 
+    public enum SideBar
+    {
+        Setting,
+        Shop,
+        Inventory
+    }
+    private readonly Dictionary<SideBar, bool> _sideIconStatusMap = new();
+    
     #region ===== 참조 =====
 
     private PlayerCtrl _player;
@@ -74,6 +86,7 @@ public class GameHUD : BaseHUD
         if (Managers.Input.KeyDown_Esc)
         {
             Managers.UI.OpenPopup<ExitPopup>();
+            SetSideIconActive(SideBar.Setting, true);
         }
         else if (Managers.Input.KeyDown_P)
         {
@@ -226,6 +239,37 @@ public class GameHUD : BaseHUD
     }
     
     #endregion ===== 보스 =====
+    
+    #region ===== 사이드바 =====
+
+    /// <summary> 해당 사이드 아이콘의 활성화 상태를 갱신한다. </summary>
+    public void SetSideIconActive(SideBar sideBar, bool isActive)
+    {
+        _sideIconStatusMap[sideBar] = isActive;
+
+        switch (sideBar)
+        {
+            case SideBar.Setting:
+                UpdateSideIconColor(Images.SettingIcon, sideBar);
+                break;
+
+            case SideBar.Shop:
+                UpdateSideIconColor(Images.ShopIcon, sideBar);
+                break;
+
+            case SideBar.Inventory:
+                UpdateSideIconColor(Images.InventoryIcon, sideBar);
+                break;
+        }
+    }
+
+    /// <summary> 사이드 아이콘 컬러를 갱신한다. </summary>
+    private void UpdateSideIconColor(Images image, SideBar sideBar)
+    {
+        Get<Image>(image).color = _sideIconStatusMap[sideBar] ? ColorKey.DarkGray : Color.white;
+    }
+
+    #endregion ===== 사이드바 =====
     
     #region ===== 이펙트 =====
 

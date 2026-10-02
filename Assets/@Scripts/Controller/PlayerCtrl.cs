@@ -24,7 +24,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     private CapsuleCollider _capsuleCollider;
 
     private int _reactionLayerIndex;
-    
+
     #endregion ===== 참조 =====
 
     #region ===== 설정 =====
@@ -52,7 +52,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [Header("피격")]
     [SerializeField] private float _hitInvincibleDuration = 0.5f;
     [SerializeField] private GameObject _hitInvincibleEffect;
-    
+
     [SerializeField] private float _hitEffectLifeTime = 0.3f;
 
     #endregion ===== 설정 =====
@@ -140,7 +140,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     public float STR => _str;
 
     #endregion ===== 스탯 =====
-
+    
     private void Awake()
     {
         InitializeComponents();
@@ -167,13 +167,37 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _hitInvincibleTimer = 0f;
 
         Managers.Sound.SetListener(transform);
+        
+        Managers.Event.OnResume += HandleGameResumed;
     }
 
     private void OnDisable()
     {
         ClearCurAttack();
+
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnResume -= HandleGameResumed;
+        }
     }
 
+    /// <summary> 일시정지 해제 후 Rigidbody의 물리 상태를 초기화한다. </summary>
+    private void ResetPausePhysics()
+    {
+        if (_rigid == null)
+        {
+            return;
+        }
+
+        _rigid.isKinematic = true;
+        _rigid.velocity = Vector3.zero;
+        _rigid.angularVelocity = Vector3.zero;
+
+        Physics.SyncTransforms();
+
+        _rigid.isKinematic = false;
+    }
+    
     #region ===== 초기화 =====
 
     /// <summary> 플레이어가 사용하는 컴포넌트 참조를 초기화한다. </summary>
@@ -359,7 +383,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         _currentAttack.Clear();
     }
-    
+
     #endregion ===== 공격 =====
 
     #region ===== 피격 =====
@@ -378,7 +402,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             _hitInvincibleEffect?.gameObject.SetActive(true);
             Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ElectronicShield, 0.5f);
         }
-        
+
         _hitInvincibleTimer = Mathf.Max(0f, _hitInvincibleTimer - Time.deltaTime);
     }
 
@@ -401,7 +425,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         _hitInvincibleTimer = _hitInvincibleDuration;
-        
+
         ExecuteHit();
     }
 
@@ -452,7 +476,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         Managers.Sound.StopBgm(3f);
-        
+
         UnsetCurAttack();
         SetState(PlayerState.Dead);
 
@@ -524,7 +548,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
         return isGrounded;
     }
-    
+
     #endregion ===== 상태 =====
 
     #region ===== 스탯 =====
@@ -555,7 +579,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         {
             return true;
         }
-        
+
         Managers.UI.OpenToastMessage("스태미너가 부족합니다.");
         return false;
     }
@@ -626,7 +650,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         {
             return;
         }
-        
+
         PoolObj poolObject = Managers.Pool.Get(PoolKey.Path.PlayerHitEffect);
 
         if (poolObject == null)
@@ -648,4 +672,15 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     }
 
     #endregion ===== 피격 이펙트 ======
+    
+    #region ===== 이벤트 =====
+    
+    /// <summary> 게임이 일시정지 상태에서 해제되었을 때 물리 상태를 초기화한다. </summary>
+    private void HandleGameResumed()
+    {
+        Managers.Input.ClearKeyAxisValue();
+        ResetPausePhysics();
+    }
+
+    #endregion ===== 이벤트 =====
 }

@@ -67,6 +67,13 @@ public class InputManager
         KeyAxisY = UpdateAxis(KeyAxisY, KeyCode.S, KeyCode.W);
     }
 
+    /// <summary> 현재 입력 축 값을 초기화하여 이전 이동 입력이 유지되지 않도록 한다. </summary>
+    public void ClearKeyAxisValue()
+    {
+        KeyAxisX = 0f;
+        KeyAxisY = 0f;
+    }
+    
     /// <summary> 지정한 두 키의 입력에 따라 축 값을 부드럽게 변경한다. </summary>
     private float UpdateAxis(float currentValue, KeyCode negativeKey, KeyCode positiveKey)
     {
