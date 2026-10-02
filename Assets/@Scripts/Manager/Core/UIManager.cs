@@ -409,7 +409,6 @@ public class UIManager
     {
         CloseToastMessage();
         CloseHitEffect();
-        CloseLoadingUI();
     }
     
     #endregion ===== Overlay =====

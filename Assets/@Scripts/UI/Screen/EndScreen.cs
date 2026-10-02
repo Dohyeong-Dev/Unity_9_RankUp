@@ -72,7 +72,9 @@ public class EndScreen : BaseScreen
     /// <summary> 현재 게임을 종료하고 처음부터 다시 시작한다. </summary>
     public void Restart()
     {
-        Managers.UI.OpenLoadingUI();
-        Managers.Scene.LoadSceneWithLoading(SceneType.GameScene);
+        Managers.UI.OpenLoadingUI(0.5f, () =>
+        {
+            Managers.Scene.LoadSceneWithLoading(SceneType.GameScene);
+        });
     }
 }
