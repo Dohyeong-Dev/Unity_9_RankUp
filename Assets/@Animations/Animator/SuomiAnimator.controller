@@ -1200,6 +1200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movementEnableDelay: 0.05
   _playSoundDelay: 0.55
+  _movementInputThreshold: 0.8
 --- !u!1102 &2488756829527297743
 AnimatorState:
   serializedVersion: 6
@@ -1603,6 +1604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movementEnableDelay: 0.05
   _playSoundDelay: 0.4
+  _movementInputThreshold: 0.8
 --- !u!114 &8124135582212749642
 MonoBehaviour:
   m_ObjectHideFlags: 1

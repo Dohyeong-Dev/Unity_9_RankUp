@@ -28,6 +28,9 @@ public class PlayerAttackExit : StateMachineBehaviour
     [Tooltip("칼집 모션 시작 후 이 시간이 지나면 재생")]
     [SerializeField, Min(0f)] private float _playSoundDelay = 0.5f;
     
+    [Range(0f, 1f)]
+    [SerializeField] private float _movementInputThreshold = 0.7f;
+    
     #endregion ===== 설정 =====
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -62,7 +65,7 @@ public class PlayerAttackExit : StateMachineBehaviour
         
         if (_stateElapsedTime >= _movementEnableDelay)
         {
-            if (_player.IsMoving)
+            if (_player.IsMoving && Managers.Input.KeyVecSqrMagnitude > _movementInputThreshold * _movementInputThreshold)
             {
                 if (isPlayedSound)
                 {

@@ -363,7 +363,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         _currentAttack = attackBehaviour;
     }
 
-    /// <summary> 현재 공격 행동 참조를 초기화한다. </summary>
+    /// <summary> 현재 공격 행동 참조를 해제한다. </summary>
     public void UnsetCurAttack()
     {
         _currentAttack = null;
