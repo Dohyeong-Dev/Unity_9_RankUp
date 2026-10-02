@@ -26,11 +26,13 @@ public class InputManager
     public float KeyVecSqrMagnitude => Mathf.Clamp01(new Vector2(KeyAxisX, KeyAxisY).sqrMagnitude);
 
     public bool Key_LeftShift => Input.GetKey(KeyCode.LeftShift);
-
     public bool KeyDown_Space => Input.GetKeyDown(KeyCode.Space);
     public bool KeyDown_Esc => Input.GetKeyDown(KeyCode.Escape);
     public bool KeyDown_Enter => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
+    public bool KeyDown_P => Input.GetKeyDown(KeyCode.P);
+    public bool KeyDown_I => Input.GetKeyDown(KeyCode.I);
+    
     #endregion ===== 키보드 =====
 
     #region ===== 상태 =====

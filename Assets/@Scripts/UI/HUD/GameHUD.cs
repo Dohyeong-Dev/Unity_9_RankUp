@@ -75,6 +75,14 @@ public class GameHUD : BaseHUD
         {
             Managers.UI.OpenPopup<ExitPopup>();
         }
+        else if (Managers.Input.KeyDown_P)
+        {
+            Managers.UI.OpenToastMessage("상점");
+        }
+        else if (Managers.Input.KeyDown_I)
+        {
+            Managers.UI.OpenToastMessage("인벤토리");
+        }
     }
 
     private void OnDestroy()

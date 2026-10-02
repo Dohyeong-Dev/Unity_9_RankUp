@@ -123,6 +123,11 @@ public class TableParser<TData> where TData : class, new()
             return float.Parse(value);
         }
 
+        if (fieldType == typeof(bool))
+        {
+            return bool.Parse(value);
+        }
+        
         throw new NotSupportedException($"지원하지 않는 필드 타입 : {fieldType}");
     }
 }

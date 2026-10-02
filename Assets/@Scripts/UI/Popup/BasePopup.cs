@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary> Popup UI의 입력, 열기 및 닫기 애니메이션을 제공하는 기본 클래스다. </summary>
+[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
 public abstract class BasePopup : BaseUI
 {
     private GraphicRaycaster _graphicRaycaster;
@@ -44,7 +45,7 @@ public abstract class BasePopup : BaseUI
     {
         OnAwake();
         
-        _graphicRaycaster = gameObject.GetOrAddComponent<GraphicRaycaster>();
+        _graphicRaycaster = GetComponent<GraphicRaycaster>();
 
         Managers.UI.SetupCanvas(this);
 

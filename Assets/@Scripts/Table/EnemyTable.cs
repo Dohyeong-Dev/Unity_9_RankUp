@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [Serializable]
 public class EnemyData
 {
-    [CsvField("몬스터ID")]
+    [CsvField("ID")]
     public int ID;
 
     [CsvField("이름")]
@@ -19,11 +19,11 @@ public class EnemyData
     [CsvField("공격력")]
     public int Damage;
 
-    [CsvField("코인드랍ID")]
-    public int CoinDropId;
+    [CsvField("획득골드")]
+    public int Gold;
 
-    [CsvField("코인드랍확률")]
-    public float CoinDropRate;
+    [CsvField("골드드랍확률")]
+    public float GoldDropRate;
 }
 
 public class EnemyTable : TableLoader<EnemyData>
@@ -39,6 +39,6 @@ public class EnemyTable : TableLoader<EnemyData>
 
     public EnemyData GetMonsterInfo(int monsterID)
     {
-        return _tableDatas[monsterID];
+        return _tableDatas.GetValueOrDefault(monsterID);
     }
 }

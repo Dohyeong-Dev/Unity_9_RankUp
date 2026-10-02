@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary> UI 요소를 Enum 이름을 기준으로 바인딩하고 관리하는 기본 UI 클래스다. </summary>
 public abstract class BaseUI : MonoBehaviour
 {
     public virtual int SortingOrder => 0;
-
+    
     // Type : Button, Image, Text ...
     protected readonly Dictionary<Type, UnityEngine.Object[]> UIMap = new();
     

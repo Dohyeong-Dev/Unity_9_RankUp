@@ -1,0 +1,3 @@
+ID,이름,설명,리소스이름,타입
+1,체력 포션,HP를 회복시킨다.,HpPotion,Consumable
+2,스태미너 포션,SP를 회복시킨다.,SpPotion,Consumable

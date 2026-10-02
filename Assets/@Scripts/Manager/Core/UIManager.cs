@@ -22,16 +22,14 @@ public class UIManager
 
     #region ===== Overlay =====
 
+    private ToastMessage _toastMessage;
+    
     private HitEffectUI _hitEffectUI;
 
+    private LoadingUI _loadingUI;
+    public bool IsLoading => _loadingUI != null && _loadingUI.gameObject.activeSelf;
+    
     #endregion ===== Overlay =====
-
-    #region ===== Loading =====
-
-    private GameObject _loadingObject;
-    public bool IsLoading => _loadingObject != null;
-
-    #endregion ===== Loading =====
 
     #region ===== Root =====
 
@@ -211,7 +209,7 @@ public class UIManager
     }
 
     /// <summary> 가장 최근에 열린 Popup을 닫는다. </summary>
-    public void ClosePopupUI()
+    private void ClosePopupUI()
     {
         if (_popupStack.Count == 0)
         {
@@ -263,6 +261,48 @@ public class UIManager
 
     #region ===== Overlay =====
 
+    /// <summary> 토스트 메세지를 활성화시킨다. </summary>
+    public void OpenToastMessage(string message)
+    {
+        if (!TryCreateToastMessage())
+        {
+            return;
+        }
+
+        _toastMessage.ActiveMessage(message);
+    }
+    
+    /// <summary> 활성화된 토스트 메세지를 비활성화시킨다. </summary>
+    public void CloseToastMessage()
+    {
+        _toastMessage?.ResetToastMessage();
+    }
+    
+    /// <summary> 토스트 메세지 UI가 없으면 생성하고 참조를 저장한다. </summary>
+    private bool TryCreateToastMessage()
+    {
+        if (_toastMessage != null)
+        {
+            return true;
+        }
+
+        GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.OverlayUI + nameof(ToastMessage));
+
+        if (uiObject == null)
+        {
+            CPrint.Error("ToastMessage를 생성하지 못했습니다.");
+            return false;
+        }
+
+        uiObject.transform.SetParent(PersistentRoot.transform, false);
+
+        _toastMessage = uiObject.GetOrAddComponent<ToastMessage>();
+
+        SetupCanvas(_hitEffectUI);
+
+        return true;
+    }
+    
     /// <summary> 플레이어 피격 효과를 재생한다. </summary>
     public void OpenHitEffect()
     {
@@ -304,11 +344,7 @@ public class UIManager
 
         return true;
     }
-
-    #endregion ===== Overlay =====
-
-    #region ===== Loading =====
-
+    
     /// <summary> Loading UI를 열고 지정된 페이드 연출을 재생한다. </summary>
     public void OpenLoadingUI(float fadeTime = 0f, Action openAction = null)
     {
@@ -316,22 +352,14 @@ public class UIManager
         {
             return;
         }
-
-        string resourcePath = ResourceKey.Path.UI + ResourceKey.Name.LoaindgUI;
-        GameObject uiObject = Managers.Resource.Spawn(resourcePath);
-
-        if (uiObject == null)
+        
+        if (!TryCreateLoading())
         {
-            CPrint.Error($"Loading UI를 찾을 수 없습니다. [{resourcePath}]");
             return;
         }
 
-        uiObject.transform.SetParent(PersistentRoot.transform, false);
-
-        _loadingObject = uiObject;
-
-        LoadingUI loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
-        loadingUI.FadeIn(fadeTime, openAction);
+        _loadingUI.gameObject.SetActive(true);
+        _loadingUI.FadeIn(fadeTime, openAction);
     }
 
     /// <summary> 현재 Loading UI를 닫고 지정된 페이드 연출을 재생한다. </summary>
@@ -344,43 +372,56 @@ public class UIManager
 
         if (fadeTime <= 0f)
         {
-            DestroyLoadingUI();
+            _loadingUI.gameObject.SetActive(false);
             return;
         }
 
-        LoadingUI loadingUI = _loadingObject.GetComponent<LoadingUI>();
-
-        if (loadingUI == null)
-        {
-            CPrint.Error("LoadingUI 컴포넌트를 찾을 수 없습니다.");
-            DestroyLoadingUI();
-            return;
-        }
-
-        loadingUI.FadeOut(fadeTime, closeAction);
+        _loadingUI.FadeOut(fadeTime, closeAction);
     }
 
-    /// <summary> 현재 Loading UI를 제거하고 참조를 초기화한다. </summary>
-    private void DestroyLoadingUI()
+    /// <summary> 로딩 UI가 없으면 생성하고 참조를 저장한다. </summary>
+    private bool TryCreateLoading()
     {
-        if (_loadingObject == null)
+        if (_loadingUI != null)
         {
-            return;
+            return true;
         }
 
-        _loadingObject.DestroyGO();
-        _loadingObject = null;
-    }
+        GameObject uiObject = Managers.Resource.Spawn(ResourceKey.Path.OverlayUI + nameof(LoadingUI));
 
-    #endregion ===== Loading =====
+        if (uiObject == null)
+        {
+            CPrint.Error("LoadingUI를 생성하지 못했습니다.");
+            return false;
+        }
+
+        uiObject.transform.SetParent(PersistentRoot.transform, false);
+
+        _loadingUI = uiObject.GetOrAddComponent<LoadingUI>();
+
+        SetupCanvas(_loadingUI);
+
+        return true;
+    }
+    
+    /// <summary> 현재 열려 있는 Overlay UI를 닫는다. </summary>
+    private void CloseAllOverlay()
+    {
+        CloseToastMessage();
+        CloseHitEffect();
+        CloseLoadingUI();
+    }
+    
+    #endregion ===== Overlay =====
 
     #region ===== 정리 =====
 
-    /// <summary> 현재 Screen과 모든 Popup을 닫는다. </summary>
+    /// <summary> 현재 Screen과 모든 Popup 그리고 Overlay를 닫는다. </summary>
     public void CloseAll()
     {
         CloseAllPopupUI();
         CloseCurrentScreen();
+        CloseAllOverlay();
     }
 
     /// <summary> 현재 씬에서 사용한 UI 상태를 초기화한다. </summary>

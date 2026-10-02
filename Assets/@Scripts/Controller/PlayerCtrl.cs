@@ -549,7 +549,15 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             _canUseStamina = false;
         }
 
-        return _sp >= requiredSp && _canUseStamina;
+        bool hasEnoughSp = _canUseStamina && _sp >= requiredSp;
+
+        if (hasEnoughSp)
+        {
+            return true;
+        }
+        
+        Managers.UI.OpenToastMessage("스태미너가 부족합니다.");
+        return false;
     }
 
     /// <summary> SP를 변경하고 현재 스태미너 사용 가능 상태를 갱신한다. </summary>

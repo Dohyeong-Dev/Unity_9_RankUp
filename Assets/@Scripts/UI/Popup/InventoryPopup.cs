@@ -1,4 +1,4 @@
-public class TitleScene : BaseScene
+public class InventoryPopup : BasePopup
 {
     protected override void OnAwake()
     {
@@ -6,12 +6,13 @@ public class TitleScene : BaseScene
 
     protected override void OnStart()
     {
-        Managers.Table.Load();
-        
-        Managers.Scene.LoadSceneWithLoading(SceneType.GameScene);
     }
 
     protected override void OnUpdate()
+    {
+    }
+
+    protected override void DestroyOverride()
     {
     }
 }

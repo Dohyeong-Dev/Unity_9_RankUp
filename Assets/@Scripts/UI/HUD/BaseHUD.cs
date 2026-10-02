@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary> 화면에 지속적으로 표시되는 HUD UI의 기본 기능을 제공하는 추상 클래스다. </summary>
+[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
 public abstract class BaseHUD : BaseUI
 {
     public override int SortingOrder => 0;

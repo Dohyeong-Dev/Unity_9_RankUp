@@ -29,12 +29,6 @@ public abstract class ResourceKey
     public static class Name
     {
         public const string Event = "EventSystem";
-
-        #region ===== UI =====
-        
-        public const string LoaindgUI = "LoadingUI";
-        
-        #endregion ===== UI =====
         
         #region ===== 사운드 =====
         
