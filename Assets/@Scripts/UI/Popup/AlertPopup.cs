@@ -50,7 +50,7 @@ public class AlertPopup : BasePopup
         {
             return;
         }
-        
+
         if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();
@@ -81,6 +81,7 @@ public class AlertPopup : BasePopup
                 {
                     scene.HUD.SetSideIconActive(GameHUD.SideBar.Save, false);
                 }
+
                 break;
         }
     }
@@ -93,35 +94,40 @@ public class AlertPopup : BasePopup
         Get<TMP_Text>(Texts.ContentText).text = content;
         Get<Button>(Buttons.NoButton).gameObject.SetActive(showCancelButton);
     }
-    
+
     /// <summary> 팝업의 내용과 선택 시 실행할 동작을 설정한다. </summary>
-    public void Set(ContentsType contentsType, bool showCancelButton = false, Action yesAction = null)
+    public void Set(ContentsType contentsType)
     {
         _contentsType = contentsType;
-        SetContentsAction();
 
-        Get<TMP_Text>(Texts.ContentText).text = GetContentsText();
+        SetContentsAction();
+        SetContentsText();
+        
         Get<Button>(Buttons.NoButton).gameObject.SetActive(true);
     }
 
+    /// <summary> ContentsType에 따른 YesAction 설정 </summary>
     private void SetContentsAction()
     {
         _yesAction = _contentsType switch
         {
-            ContentsType.Save => () =>  Managers.UI.OpenToastMessage("저장이 완료되었습니다."),
+            ContentsType.Save => () =>
+            {
+                Managers.UI.OpenToastMessage("저장이 완료되었습니다.");
+                Managers.Data.Save();
+            },
             _ => null
         };
     }
-    
-    private string GetContentsText()
+
+    /// <summary> ContentsType에 따른 ContentsText 설정 </summary>
+    private void SetContentsText()
     {
-        switch (_contentsType)
+        Get<TMP_Text>(Texts.ContentText).text = _contentsType switch
         {
-            case ContentsType.Save:
-                return "저장하시겠습니까?";
-        }
-        
-        return string.Empty;
+            ContentsType.Save => "저장하시겠습니까?",
+            _ => string.Empty
+        };
     }
 
     /// <summary> Yes 버튼을 선택했을 때 팝업을 닫고 지정된 동작을 실행한다. </summary>

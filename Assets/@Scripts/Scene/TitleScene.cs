@@ -8,6 +8,9 @@ public class TitleScene : BaseScene
     {
         Managers.Table.Load();
         
+        Managers.Data.Load();
+        CPrint.Log($"[현재골드] : {Managers.Data.Gold}");
+        
         Managers.Scene.LoadSceneWithLoading(SceneType.GameScene);
     }
 

@@ -10,6 +10,7 @@ public class Gold : MonoBehaviour, IInteractable
     /// <summary> Gold를 획득하고 오브젝트를 제거한다. </summary>
     public void Interact()
     {
+        Managers.Data.AddGold(_amount);
         Destroy(gameObject);
     }
     
