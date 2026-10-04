@@ -37,7 +37,6 @@ public class AlertPopup : BasePopup
 
     protected override void OnStart()
     {
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeAlert);
     }
 
     protected override void OnUpdate()
@@ -46,11 +45,6 @@ public class AlertPopup : BasePopup
 
     public override void OnInputKey()
     {
-        if (!_graphicRaycaster.isActiveAndEnabled)
-        {
-            return;
-        }
-
         if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();
@@ -74,6 +68,11 @@ public class AlertPopup : BasePopup
     /// <summary> 컨텐츠 타입에 따른 Destroy 후처리 </summary>
     private void HandleContentsDestroyed()
     {
+        if (Managers.Scene == null)
+        {
+            return;
+        }
+        
         switch (_contentsType)
         {
             case ContentsType.Save:

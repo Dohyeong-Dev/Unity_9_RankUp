@@ -78,7 +78,11 @@ public class UIManager
         if (CurrentPopup != null)
         {
             Managers.Input.SetInputEnabled(false);
-            CurrentPopup.OnInputKey();
+            if (CurrentPopup.IsRaycastEnabled)
+            {
+                CurrentPopup.OnInputKey();
+            }
+            
             return;
         }
 

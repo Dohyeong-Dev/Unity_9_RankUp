@@ -111,7 +111,8 @@ public class GameHUD : BaseHUD
         }
         else if (Managers.Input.KeyDown_I)
         {
-            Managers.UI.OpenToastMessage("인벤토리");
+            Managers.UI.OpenPopup<InventoryPopup>();
+            SetSideIconActive(SideBar.Inventory, true);
         }
         else if (Managers.Input.KeyDown_O)
         {

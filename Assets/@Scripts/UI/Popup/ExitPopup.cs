@@ -28,8 +28,6 @@ public class ExitPopup : BasePopup
     {
         UpdateSoundSliderValue();
         SubscribeVolumeEvent();
-        
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimePopup);
     }
     
     protected override void OnUpdate()
@@ -38,11 +36,6 @@ public class ExitPopup : BasePopup
 
     public override void OnInputKey()
     {
-        if (!_graphicRaycaster.isActiveAndEnabled)
-        {
-            return;
-        }
-        
         if (Managers.Input.KeyDown_Enter)
         {
             OnClickYes();

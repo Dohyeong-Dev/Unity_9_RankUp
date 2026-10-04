@@ -8,7 +8,7 @@ public class DataManager
 
     private SaveData _saveData;
 
-    public int Gold => _saveData.Gold;
+    public int Gold => _saveData?.Gold ?? 0;
 
     private string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
 

@@ -11,6 +11,8 @@ public abstract class BasePopup : BaseUI
     protected GraphicRaycaster _graphicRaycaster;
     
     private Action _closeAction;
+
+    public bool IsRaycastEnabled => _graphicRaycaster != null && _graphicRaycaster.isActiveAndEnabled;
     
     #region ===== 애니메이션 =====
     
@@ -56,6 +58,8 @@ public abstract class BasePopup : BaseUI
     
     private void Start()
     {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimePopup);
+        
         OnStart();
     }
 

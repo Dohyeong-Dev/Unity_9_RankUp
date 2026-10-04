@@ -22,7 +22,7 @@ public class PlayerIdle02 : StateMachineBehaviour
 
         _blendShapeController?.SetBlendShape(BlendShapeKey.Player.A.Index, 100);
 
-        if (Managers.UI.CurrentScreen == null && Managers.UI.CurrentPopup == null)
+        if (Managers.UI.CurrentScreen == null)
         {
             Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.PlayerIdle2);
         }
