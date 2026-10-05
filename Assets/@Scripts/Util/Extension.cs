@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 /// <summary> Unity 프로젝트에서 자주 사용하는 기능을 확장 메서드로 제공한다. </summary>
 public static class Extension
@@ -41,6 +43,12 @@ public static class Extension
         return false;
     }
 
+    /// <summary> UI에 이벤트를 구독시킨다. </summary>
+    public static void BindEvent(this GameObject go, GlobalEnum.EventType eventType, Action action)
+    {
+        Utils.BindEvent(go, eventType, action);
+    }
+    
     /// <summary> 지정한 시간 후 GameObject를 제거한다. </summary>
     public static void DestroyGO(this GameObject go, float seconds = 0f)
     {

@@ -116,6 +116,40 @@ public static class Utils
         return Enum.GetValues(enumType).Length;
     }
 
+    /// <summary> UI에 이벤트를 구독시킨다. </summary>
+    public static void BindEvent(GameObject go, GlobalEnum.EventType eventType, Action action)
+    {
+        EventHandler eventHandler = Utils.GetOrAddComponent<EventHandler>(go);
+
+        switch (eventType)
+        {
+            case GlobalEnum.EventType.Click:
+                eventHandler.OnClickHandler -= action;
+                eventHandler.OnClickHandler += action;
+                break;
+            case GlobalEnum.EventType.Pressed:
+                eventHandler.OnPressedHandler -= action;
+                eventHandler.OnPressedHandler += action;
+                break;
+            case GlobalEnum.EventType.PointerDown:
+                eventHandler.OnPointerDownHandler -= action;
+                eventHandler.OnPointerDownHandler += action;
+                break;
+            case GlobalEnum.EventType.PointerUp:
+                eventHandler.OnPointerUpHandler -= action;
+                eventHandler.OnPointerUpHandler += action;
+                break;
+            case GlobalEnum.EventType.PointerEnter:
+                eventHandler.OnPointerEnterHandler -= action;
+                eventHandler.OnPointerEnterHandler += action;
+                break;
+            case GlobalEnum.EventType.PointerExit:
+                eventHandler.OnPointerExitHandler -= action;
+                eventHandler.OnPointerExitHandler += action;
+                break;
+        }
+    }
+    
     /// <summary> 실행 중인 애플리케이션을 종료한다. </summary>
     public static void QuitApp()
     {
