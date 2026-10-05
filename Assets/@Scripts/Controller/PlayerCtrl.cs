@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary> 플레이어의 이동 상태, 행동, 스탯, 피격 및 사망 처리를 관리한다. </summary>
@@ -664,7 +663,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
             hitEffect.rotation = Quaternion.LookRotation(direction);
         }
 
-        hitEffect.GetOrAddComponent<LifetimePoolObject>().SetLifetime(_hitEffectLifeTime);
+        hitEffect.gameObject.GetOrAddComponent<LifetimePoolObject>().SetLifetime(_hitEffectLifeTime);
     }
 
     #endregion ===== 피격 이펙트 ======
