@@ -19,13 +19,13 @@ public class ExitPopup : BasePopup
     {
         Bind<Button>(typeof(Buttons));
         Bind<Slider>(typeof(Sliders));
-        
-        Get<Button>(Buttons.YesButton).onClick.AddListener(OnClickYes);
-        Get<Button>(Buttons.NoButton).onClick.AddListener(OnClickNo);
     }
 
     protected override void OnStart()
     {
+        Get<Button>(Buttons.YesButton).onClick.AddListener(OnClickYes);
+        Get<Button>(Buttons.NoButton).onClick.AddListener(OnClickNo);
+        
         UpdateSoundSliderValue();
         SubscribeVolumeEvent();
     }
@@ -48,6 +48,8 @@ public class ExitPopup : BasePopup
 
     protected override void OnOpened()
     {
+        base.OnOpened();
+        
         Time.timeScale = 0f;
         Managers.Event.RaisePause();
     }

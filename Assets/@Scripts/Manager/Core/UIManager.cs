@@ -417,6 +417,25 @@ public class UIManager
     
     #endregion ===== Overlay =====
 
+    #region ===== Slot =====
+
+    /// <summary> 해당 트랜스폼에 슬롯을 생성한다. </summary>
+    public T MakeSlot<T>(Transform parent) where T : SlotUI
+    {
+        GameObject slotGO = Managers.Resource.Spawn(ResourceKey.Path.SlotUI + typeof(T).Name, parent);
+
+        if (slotGO == null)
+        {
+            return null;
+        }
+        
+        slotGO.transform.localScale = Vector3.one;
+
+        return slotGO.GetOrAddComponent<T>();
+    }
+    
+    #endregion ===== Slot =====
+    
     #region ===== 정리 =====
 
     /// <summary> 현재 Screen과 모든 Popup 그리고 Overlay를 닫는다. </summary>

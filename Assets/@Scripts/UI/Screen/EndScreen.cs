@@ -24,15 +24,15 @@ public class EndScreen : BaseScreen
     {
         Bind<Button>(typeof(Buttons));
         Bind<Image>(typeof(Images));
-
-        Get<Button>(Buttons.RetryBtn).onClick.AddListener(Restart);
-        Get<Image>(Images.Bg).gameObject.SetActive(false);
-        
-        Managers.Sound.StopBgm();
     }
 
     protected override void OnStart()
     {
+        Get<Button>(Buttons.RetryBtn).onClick.AddListener(Restart);
+        Get<Image>(Images.Bg).gameObject.SetActive(false);
+        
+        Managers.Sound.StopBgm();
+        
         Managers.Input.SetCursorLock(false);
     }
 

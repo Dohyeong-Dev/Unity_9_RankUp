@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 495707837161723753}
   - component: {fileID: 4564553355079882647}
   m_Layer: 0
-  m_Name: ContensText
+  m_Name: ContentsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -629,7 +629,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f992638acc4454bdbbd952c0a71812, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentAnimation: 2
-  _contentsUpOffsetY: 10
+  CurrentAnimation: 1
   _bgUpOffsetY: 20
   _bgDownDistance: 0

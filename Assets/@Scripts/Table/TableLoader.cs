@@ -1,11 +1,20 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+public class TableData
+{
+    [CsvField("ID")]
+    public int ID;
+}
+
 /// <summary> CSV 테이블 데이터를 읽어 TData로 파싱한다. (테이블 추가할때마다 해당 클래스를 상속) </summary>
-public abstract class TableLoader<TData> where TData : class, new()
+public abstract class TableLoader<TData> where TData : TableData, new()
 {
     private readonly TableParser<TData> _tableParser = new();
 
+    protected readonly Dictionary<int, TData> DataMap = new();
+    
     protected abstract string TableName { get; }
 
     public void Load()
@@ -54,6 +63,9 @@ public abstract class TableLoader<TData> where TData : class, new()
             AddData(data);
         }
     }
-
-    protected abstract void AddData(TData data);
+    
+    private void AddData(TData data)
+    {
+        DataMap.Add(data.ID, data);
+    }
 }

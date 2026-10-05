@@ -53,7 +53,7 @@ public class PlayerAttack : StateMachineBehaviour
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        TryResolveMeleeAttack(animator);
+        ResolveMeleeAttack(animator);
         ResetState();
 
         PlayAttackSound();
@@ -81,7 +81,7 @@ public class PlayerAttack : StateMachineBehaviour
     #region ===== 초기화 =====
 
     /// <summary> 현재 Animator에서 근접 공격 컴포넌트 참조를 초기화한다. </summary>
-    private void TryResolveMeleeAttack(Animator animator)
+    private void ResolveMeleeAttack(Animator animator)
     {
         if (_meleeAttack != null)
         {

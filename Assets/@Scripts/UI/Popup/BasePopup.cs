@@ -19,17 +19,12 @@ public abstract class BasePopup : BaseUI
     public enum AnimationType
     {
         None,
-        ContentsUp,
         BgUp,
         BgDown,
     }
 
     public AnimationType CurrentAnimation;
 
-    [Header("ContentsUp 애니메이션")]
-    [Tooltip("아래에서 위로 올라가는 거리")]
-    [SerializeField] private float _contentsUpOffsetY = 10f;
-    
     [Header("BgUp 애니메이션")]
     [Tooltip("아래에서 위로 올라가는 거리")]
     [SerializeField] private float _bgUpOffsetY = 10f;
@@ -48,6 +43,7 @@ public abstract class BasePopup : BaseUI
         OnAwake();
         
         _graphicRaycaster = GetComponent<GraphicRaycaster>();
+        _graphicRaycaster.enabled = false;
 
         Managers.UI.SetupCanvas(this);
 
@@ -112,6 +108,7 @@ public abstract class BasePopup : BaseUI
     /// <summary> Popup 열기 애니메이션이 완료된 후 호출한다. </summary>
     protected virtual void OnOpened()
     {
+        _graphicRaycaster.enabled = true;
     }
 
     /// <summary> Popup을 즉시 제거하고 닫기 완료 콜백을 실행한다. </summary>
@@ -134,10 +131,6 @@ public abstract class BasePopup : BaseUI
         {
             case AnimationType.None:
                 PlayDefaultAnimation(isOpen);
-                break;
-
-            case AnimationType.ContentsUp:
-                PlayContentsUpAnimation(isOpen);
                 break;
 
             case AnimationType.BgUp:
@@ -171,46 +164,6 @@ public abstract class BasePopup : BaseUI
         }
     }
 
-    /// <summary> Popup 콘텐츠가 위로 이동하며 표시되는 애니메이션을 재생한다. </summary>
-    private void PlayContentsUpAnimation(bool isOpen)
-    {
-        TMP_Text contentText = gameObject.FindChild<TMP_Text>("ContentTxt", true);
-
-        if (contentText == null)
-        {
-            CPrint.Error("Popup ContentText를 찾을 수 없습니다.");
-            return;
-        }
-
-        if (isOpen)
-        {
-            PlayContentsUpOpenAnimation(contentText);
-            return;
-        }
-
-        PlayContentsUpCloseAnimation(contentText);
-    }
-
-    /// <summary> 콘텐츠가 위로 이동하며 열리는 애니메이션을 재생한다. </summary>
-    private void PlayContentsUpOpenAnimation(TMP_Text contentText)
-    {
-        contentText.transform.DOLocalMove(Vector3.up * _contentsUpOffsetY, 0.5f).SetUpdate(true)
-            .SetRelative(true).From(contentText.transform.localPosition + Vector3.down * _contentsUpOffsetY).OnStart(() =>
-            {
-                contentText.DOFade(1f, 0.5f).From(0f).SetEase(Ease.InOutCirc).SetUpdate(true);
-            }).OnComplete(OnOpened);
-    }
-
-    /// <summary> 콘텐츠가 아래로 이동하며 닫히는 애니메이션을 재생한다. </summary>
-    private void PlayContentsUpCloseAnimation(TMP_Text contentText)
-    {
-        contentText.transform.DOLocalMove(Vector3.down * _contentsUpOffsetY, 0.25f).SetUpdate(true)
-            .SetRelative(true).SetEase(Ease.InOutCirc).OnStart(() =>
-            {
-                contentText.DOFade(0f, 0.25f).SetEase(Ease.InOutCirc).SetUpdate(true);
-            }).OnComplete(CloseImmediately);
-    }
-
     /// <summary> 배경이 아래에서 위로 이동하는 Popup 애니메이션을 재생한다. </summary>
     private void PlayBgUpAnimation(bool isOpen)
     {
@@ -234,7 +187,7 @@ public abstract class BasePopup : BaseUI
     private void PlayBgUpOpenAnimation(Transform backgroundTransform, CanvasGroup backgroundCanvasGroup)
     {
         backgroundTransform.DOLocalMove(Vector3.up * _bgUpOffsetY, 0.2f).SetEase(Ease.Linear).SetUpdate(true)
-            .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * _contentsUpOffsetY)
+            .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * _bgUpOffsetY)
             .OnStart(() =>
             {
                 backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f).SetUpdate(true);
@@ -289,12 +242,12 @@ public abstract class BasePopup : BaseUI
             }).OnComplete(OnOpened);
     }
 
-    /// <summary> 배경이 아래로 이동하며 닫히는 애니메이션을 재생한다. </summary>
+    /// <summary> 배경이 살짝 아래로 갔다가 목표 지점으로 간 후 닫히는 애니메이션을 재생한다. </summary>
     private void PlayBgDownCloseAnimation(Transform backgroundTransform)
     {
-        Vector3 endPosition = backgroundTransform.localPosition + Vector3.down * GetBgDownDistance();
+        Vector3 endPosition = backgroundTransform.localPosition + Vector3.up * GetBgDownDistance();
 
-        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InCubic).SetUpdate(true).OnComplete(CloseImmediately);
+        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InBack).SetUpdate(true).OnComplete(CloseImmediately);
     }
 
     #endregion ===== 애니메이션 =====

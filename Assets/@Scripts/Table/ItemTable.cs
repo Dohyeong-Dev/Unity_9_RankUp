@@ -1,8 +1,7 @@
-public class ItemData
-{
-    [CsvField("ID")]
-    public int ID;
+using System.Collections.Generic;
 
+public class ItemData : TableData
+{
     [CsvField("이름")]
     public string Name;
 
@@ -20,7 +19,15 @@ public class ItemTable : TableLoader<ItemData>
 {
     protected override string TableName => "ItemInfo";
     
-    protected override void AddData(ItemData data)
+    /// <summary> 아이템 ID에 해당하는 타입을 획득한다. </summary>
+    public ItemType GetItemType(int itemID)
     {
+        if (DataMap.ContainsKey(itemID) && Utils.TryParseEnum(DataMap[itemID].Type, out ItemType type))
+        {
+            CPrint.Log(type);
+            return type;
+        }
+        
+        return ItemType.None;
     }
 }

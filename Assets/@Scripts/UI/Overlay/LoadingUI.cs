@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 
 /// <summary> 씬 전환 중 화면을 가리고 페이드 효과를 처리하는 로딩 UI다. </summary>
-public class LoadingUI : BaseUI
+public class LoadingUI : BaseOverlay
 {
     public override int SortingOrder => 999;
     
@@ -12,9 +12,8 @@ public class LoadingUI : BaseUI
         Bg,
     }
 
-    private void Awake()
+    protected override void OnAwake()
     {
-        Managers.UI.SetupCanvas(this);
         Bind<Image>(typeof(Images));
     }
 

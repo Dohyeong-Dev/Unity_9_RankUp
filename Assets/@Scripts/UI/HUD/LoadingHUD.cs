@@ -33,16 +33,14 @@ public class LoadingHUD : BaseHUD
         Bind<Slider>(typeof(Sliders));
         Bind<TMP_Text>(typeof(Texts));
         Bind<Image>(typeof(Images));
-
-        Get<TMP_Text>(Texts.AlertTxt).gameObject.SetActive(false);
-        Get<Image>(Images.GlowImage).gameObject.SetActive(false);
     }
 
     protected override void OnStart()
     {
-        Managers.Scene.TryGetCurrentScene(out _loadingScene);
-
-        if (_loadingScene == null)
+        Get<TMP_Text>(Texts.AlertTxt).gameObject.SetActive(false);
+        Get<Image>(Images.GlowImage).gameObject.SetActive(false);
+        
+        if (!Managers.Scene.TryGetCurrentScene(out _loadingScene))
         {
             CPrint.Error("[LoadingHUD] No Scene");
         }

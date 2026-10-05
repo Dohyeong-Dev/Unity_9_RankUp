@@ -107,7 +107,8 @@ public class GameHUD : BaseHUD
         }
         else if (Managers.Input.KeyDown_P)
         {
-            Managers.UI.OpenToastMessage("상점");
+            Managers.UI.OpenPopup<ShopPopup>();
+            SetSideIconActive(SideBar.Shop, true);
         }
         else if (Managers.Input.KeyDown_I)
         {

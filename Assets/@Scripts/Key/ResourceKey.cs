@@ -4,18 +4,18 @@ public abstract class ResourceKey
     {
         public const string Prefab = "Prefab/";
         public const string Table = "Table/";
+        public const string Sprite = "Sprite/";
             
         public const string Misc = Prefab + "Misc/";
         public const string Item = Prefab + "Item/";
-        
-        #region ===== UI =====
-        
         public const string UI = Prefab + "UI/";
+        
         public const string ScreenUI = UI + "ScreenUI/";
         public const string PopupUI = UI + "PopupUI/";
         public const string OverlayUI = UI + "OverlayUI/";
+        public const string SlotUI = UI + "SlotUI/";
         
-        #endregion ===== UI =====
+        public const string ItemSprite = Sprite + "UI/Item/";
         
         #region ===== 사운드 =====
         
@@ -55,7 +55,6 @@ public abstract class ResourceKey
             EnemyDissolve,
             EnemyHit,
             EnemyAppearVoice,
-            ChimeAlert,
             ChimePopup,
             ChimeConfirm,
             ChimeCancel,
@@ -64,7 +63,8 @@ public abstract class ResourceKey
             SparkProjectile,
             GameOver,
             GameClear,
-            PickUpItem
+            PickUpItem,
+            Button
         }
         
         #endregion ===== 사운드 =====

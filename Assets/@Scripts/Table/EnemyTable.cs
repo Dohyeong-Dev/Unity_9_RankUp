@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 
 [Serializable]
-public class EnemyData
+public class EnemyData : TableData
 {
-    [CsvField("ID")]
-    public int ID;
-
     [CsvField("이름")]
     public string Name;
 
@@ -28,17 +25,10 @@ public class EnemyData
 
 public class EnemyTable : TableLoader<EnemyData>
 {
-    private readonly Dictionary<int, EnemyData> _tableDatas = new();
-
     protected override string TableName => "EnemyInfo";
-
-    protected override void AddData(EnemyData data)
-    {
-        _tableDatas.Add(data.ID, data);
-    }
 
     public EnemyData GetMonsterInfo(int monsterID)
     {
-        return _tableDatas.GetValueOrDefault(monsterID);
+        return DataMap.GetValueOrDefault(monsterID);
     }
 }

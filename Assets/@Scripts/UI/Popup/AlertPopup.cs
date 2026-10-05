@@ -13,7 +13,7 @@ public class AlertPopup : BasePopup
 
     private enum Texts
     {
-        ContentText,
+        ContentsText,
     }
 
     public enum ContentsType
@@ -30,13 +30,12 @@ public class AlertPopup : BasePopup
     {
         Bind<Button>(typeof(Buttons));
         Bind<TMP_Text>(typeof(Texts));
-
-        Get<Button>(Buttons.YesButton).onClick.AddListener(OnClickYes);
-        Get<Button>(Buttons.NoButton).onClick.AddListener(OnClickNo);
     }
 
     protected override void OnStart()
     {
+        Get<Button>(Buttons.YesButton).onClick.AddListener(OnClickYes);
+        Get<Button>(Buttons.NoButton).onClick.AddListener(OnClickNo);
     }
 
     protected override void OnUpdate()
@@ -49,7 +48,8 @@ public class AlertPopup : BasePopup
         {
             OnClickYes();
         }
-        else if (Managers.Input.KeyDown_Esc)
+        else if (Managers.Input.KeyDown_Esc ||
+                 (_contentsType == ContentsType.Save && Managers.Input.KeyDown_O))
         {
             OnClickNo();
         }
@@ -72,7 +72,7 @@ public class AlertPopup : BasePopup
         {
             return;
         }
-        
+
         switch (_contentsType)
         {
             case ContentsType.Save:
@@ -90,7 +90,7 @@ public class AlertPopup : BasePopup
     {
         _yesAction = yesAction;
 
-        Get<TMP_Text>(Texts.ContentText).text = content;
+        Get<TMP_Text>(Texts.ContentsText).text = content;
         Get<Button>(Buttons.NoButton).gameObject.SetActive(showCancelButton);
     }
 
@@ -101,7 +101,7 @@ public class AlertPopup : BasePopup
 
         SetContentsAction();
         SetContentsText();
-        
+
         Get<Button>(Buttons.NoButton).gameObject.SetActive(true);
     }
 
@@ -122,7 +122,7 @@ public class AlertPopup : BasePopup
     /// <summary> ContentsType에 따른 ContentsText 설정 </summary>
     private void SetContentsText()
     {
-        Get<TMP_Text>(Texts.ContentText).text = _contentsType switch
+        Get<TMP_Text>(Texts.ContentsText).text = _contentsType switch
         {
             ContentsType.Save => "저장하시겠습니까?",
             _ => string.Empty

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary> 최대 3개의 토스트를 표시하며 동일한 메시지의 중복 표시를 방지한다. </summary>
-public class ToastMessage : BaseUI
+public class ToastMessage : BaseOverlay
 {
     public override int SortingOrder => 997;
 
@@ -67,7 +67,7 @@ public class ToastMessage : BaseUI
 
     #endregion ===== 토스트 아이템 =====
 
-    private void Awake()
+    protected override void OnAwake()
     {
         Bind<CanvasGroup>(typeof(CanvasGroups));
         Bind<TMP_Text>(typeof(Texts));

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary> 플레이어 피격 시 화면에 짧은 페이드 효과를 표시하는 UI다. </summary>
-public class HitEffectUI : BaseUI
+public class HitEffectUI : BaseOverlay
 {
     public override int SortingOrder => 998;
     
@@ -25,7 +25,7 @@ public class HitEffectUI : BaseUI
 
     #endregion ===== 설정 =====
 
-    private void Awake()
+    protected override void OnAwake()
     {
         Bind<Image>(typeof(Images));
 
