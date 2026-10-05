@@ -15,7 +15,7 @@ public abstract class ResourceKey
         public const string OverlayUI = UI + "OverlayUI/";
         public const string SlotUI = UI + "SlotUI/";
         
-        public const string ItemSprite = Sprite + "UI/Item/";
+        public const string ItemSprite = Sprite + "Item/";
         
         #region ===== 사운드 =====
         

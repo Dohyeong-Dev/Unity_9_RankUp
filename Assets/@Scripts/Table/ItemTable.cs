@@ -10,7 +10,7 @@ public class ItemData : TableData
     
     [CsvField("리소스이름")]
     public string ResourceName;
-
+    
     [CsvField("타입")]
     public string Type;
 }
@@ -18,6 +18,11 @@ public class ItemData : TableData
 public class ItemTable : TableLoader<ItemData>
 {
     protected override string TableName => "ItemInfo";
+    
+    public ItemData GetItemData(int itemID)
+    {
+        return DataMap.TryGetValue(itemID, out var data) ? data : null;
+    }
     
     /// <summary> 아이템 ID에 해당하는 타입을 획득한다. </summary>
     public ItemType GetItemType(int itemID)

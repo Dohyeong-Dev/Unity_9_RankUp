@@ -105,7 +105,9 @@ public class ShopPopup : BasePopup
         {
             for (int i = 0; i < sellingEquipItemList.Length; i++)
             {
-                Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.EquipmentScroll).content);
+                ShopSlot shopSlot = Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.EquipmentScroll).content);
+                shopSlot.SetData(sellingEquipItemList[i]);
+                shopSlot.UpdateUI();
             }
         }
 
@@ -116,7 +118,9 @@ public class ShopPopup : BasePopup
         {
             for (int i = 0; i < sellingConsumableItemList.Length; i++)
             {
-                Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.ConsumableScroll).content);
+                ShopSlot shopSlot = Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.ConsumableScroll).content);
+                shopSlot.SetData(sellingConsumableItemList[i]);
+                shopSlot.UpdateUI();
             }
         }
     }
