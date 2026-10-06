@@ -19,7 +19,7 @@ public class AlertPopup : BasePopup
     public enum ContentsType
     {
         None,
-        Save
+        Save,
     }
 
     private ContentsType _contentsType;
@@ -80,7 +80,6 @@ public class AlertPopup : BasePopup
                 {
                     scene.HUD.SetSideIconActive(GameHUD.SideBar.Save, false);
                 }
-
                 break;
         }
     }

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ShopPopup : BasePopup
@@ -27,6 +29,8 @@ public class ShopPopup : BasePopup
     }
 
     private Toggles _currentToggle;
+    
+    private ItemDescription _itemDescription;
 
     protected override void OnAwake()
     {
@@ -34,14 +38,20 @@ public class ShopPopup : BasePopup
         Bind<TMP_Text>(typeof(Texts));
         Bind<Toggle>(typeof(Toggles));
         Bind<ScrollRect>(typeof(Scrolls));
+        
+        _itemDescription = GetComponentInChildren<ItemDescription>();
+        if (_itemDescription == null)
+        {
+            CPrint.Warning("[ShopPopup] no item description found.");
+        }
     }
 
     protected override void OnStart()
     {
         Get<Button>(Buttons.ExitButton).onClick.AddListener(ClickExit);
 
-        InitializeToggle();
         InitializeScroll();
+        InitializeToggle();
         
         UpdateGoldText();
     }
@@ -71,11 +81,9 @@ public class ShopPopup : BasePopup
     /// <summary> 시작 시 토글 관련 이벤트를 체인 및 세팅한다. </summary>
     private void InitializeToggle()
     {
-        Toggles initToggle = Toggles.ConsumableToggle;
-        Get<Toggle>(initToggle).isOn = true;
-        UpdateToggleScroll(initToggle);
-        _currentToggle = initToggle;
-
+        UpdateToggleScroll(Toggles.ConsumableToggle);
+        Get<Toggle>(_currentToggle).isOn = true;
+        
         Get<Toggle>(Toggles.EquipmentToggle).onValueChanged.AddListener((isOn) =>
         {
             if (isOn)
@@ -99,27 +107,31 @@ public class ShopPopup : BasePopup
     private void InitializeScroll()
     {
         // 장비
-        ShopData[] sellingEquipItemList = Managers.Table.Shop.GetSellingItemList(ItemType.Equipment);
+        var sellingEquipItemIdList = Managers.Table.Shop.GetSellingItemIdList(ItemType.Equipment);
 
-        if (sellingEquipItemList != null)
+        if (sellingEquipItemIdList != null)
         {
-            for (int i = 0; i < sellingEquipItemList.Length; i++)
+            foreach (var itemID in sellingEquipItemIdList)
             {
                 ShopSlot shopSlot = Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.EquipmentScroll).content);
-                shopSlot.SetData(sellingEquipItemList[i]);
+                shopSlot.gameObject.BindEvent(GlobalEnum.EventType.PointerEnter, () => ShowItemDescription(shopSlot));
+                shopSlot.gameObject.BindEvent(GlobalEnum.EventType.PointerExit, HideItemDescription);
+                shopSlot.SetData(itemID);
                 shopSlot.UpdateUI();
             }
         }
 
         // 소비
-        ShopData[] sellingConsumableItemList = Managers.Table.Shop.GetSellingItemList(ItemType.Consumable);
+        var sellingConsumableItemIdList = Managers.Table.Shop.GetSellingItemIdList(ItemType.Consumable);
 
-        if (sellingConsumableItemList != null)
+        if (sellingConsumableItemIdList != null)
         {
-            for (int i = 0; i < sellingConsumableItemList.Length; i++)
+            foreach (var itemID in sellingConsumableItemIdList)
             {
                 ShopSlot shopSlot = Managers.UI.MakeSlot<ShopSlot>(Get<ScrollRect>(Scrolls.ConsumableScroll).content);
-                shopSlot.SetData(sellingConsumableItemList[i]);
+                shopSlot.gameObject.BindEvent(GlobalEnum.EventType.PointerEnter, () => ShowItemDescription(shopSlot));
+                shopSlot.gameObject.BindEvent(GlobalEnum.EventType.PointerExit, HideItemDescription);
+                shopSlot.SetData(itemID);
                 shopSlot.UpdateUI();
             }
         }
@@ -127,6 +139,20 @@ public class ShopPopup : BasePopup
 
     #endregion ===== 초기화 =====
 
+    #region ===== 아이템 설명창 =====
+    
+    private void ShowItemDescription(ShopSlot slot)
+    {
+        _itemDescription?.Show(slot);
+    }
+
+    private void HideItemDescription()
+    {
+        _itemDescription?.Hide();
+    }
+    
+    #endregion ===== 아이템 설명창 =====
+    
     /// <summary> 토글 변경에 따라 관련 스크롤을 갱신한다. </summary>
     private void UpdateToggleScroll(Toggles toggle)
     {
@@ -142,12 +168,8 @@ public class ShopPopup : BasePopup
 
         ScrollRect scroll = Get<ScrollRect>(_currentToggle);
         scroll.gameObject.SetActive(true);
-
-        if (scroll.content.childCount == 0)
-        {
-            Get<TMP_Text>(Texts.PreparingText).gameObject.SetActive(true);
-        }
-        Get<TMP_Text>(Texts.PreparingText).gameObject.SetActive(false);
+        
+        Get<TMP_Text>(Texts.PreparingText).gameObject.SetActive(scroll.content.childCount == 0);
     }
 
     /// <summary> 현재 보유 Gold를 UI에 표시한다. </summary>
@@ -155,7 +177,7 @@ public class ShopPopup : BasePopup
     {
         Get<TMP_Text>(Texts.GoldText).text = Managers.Data.Gold.ToString("N0");
     }
-
+    
     /// <summary> Exit 했을 때 종료소리 재생 및 팝업을 끈다. </summary>
     private void ClickExit()
     {
