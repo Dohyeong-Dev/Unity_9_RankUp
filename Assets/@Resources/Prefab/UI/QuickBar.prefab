@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4034951717733818770}
   - component: {fileID: 3164818378673038882}
   m_Layer: 5
-  m_Name: Text (TMP)SubTitle
+  m_Name: QuickItemCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 4422269134246825291}
   - component: {fileID: 2099686626921369157}
   m_Layer: 5
-  m_Name: Text (TMP)SubTitle
+  m_Name: QuickItemCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -565,7 +565,7 @@ GameObject:
   - component: {fileID: 4429538675669602700}
   - component: {fileID: 1974221634045996895}
   m_Layer: 5
-  m_Name: BadgeHolder
+  m_Name: QuickItemBadge1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -993,6 +993,7 @@ GameObject:
   - component: {fileID: 2171098857562289867}
   - component: {fileID: 3493484892566668698}
   - component: {fileID: 3874007502325031633}
+  - component: {fileID: 6184164393884556774}
   m_Layer: 5
   m_Name: QuickBar
   m_TagString: Untagged
@@ -1055,6 +1056,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!114 &6184164393884556774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4841450391492749895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e9e6408827254953a77a869a5bf8a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4873688354964666442
 GameObject:
   m_ObjectHideFlags: 0
@@ -1221,7 +1234,7 @@ GameObject:
   - component: {fileID: 6516481851719142680}
   - component: {fileID: 1818061197134771960}
   m_Layer: 5
-  m_Name: ItemImage
+  m_Name: QuickItemImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1372,7 +1385,7 @@ GameObject:
   - component: {fileID: 4814368814039186373}
   - component: {fileID: 3702057827010795325}
   m_Layer: 5
-  m_Name: ItemImage
+  m_Name: QuickItemImage1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1581,7 +1594,7 @@ GameObject:
   - component: {fileID: 4515914697910346837}
   - component: {fileID: 4163809417906372871}
   m_Layer: 5
-  m_Name: BadgeHolder
+  m_Name: QuickItemBadge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

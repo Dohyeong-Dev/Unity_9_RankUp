@@ -60,6 +60,12 @@ public abstract class BasePopup : BaseUI
     }
 
     protected abstract void OnStart();
+
+    /// <summary> Popup 열기 애니메이션이 완료된 후 호출한다. </summary>
+    protected virtual void OnOpened()
+    {
+        _graphicRaycaster.enabled = true;
+    }
     
     private void Update()
     {
@@ -103,12 +109,6 @@ public abstract class BasePopup : BaseUI
 
         CPrint.Error("Popup Background를 찾을 수 없습니다.");
         return false;
-    }
-
-    /// <summary> Popup 열기 애니메이션이 완료된 후 호출한다. </summary>
-    protected virtual void OnOpened()
-    {
-        _graphicRaycaster.enabled = true;
     }
 
     /// <summary> Popup을 즉시 제거하고 닫기 완료 콜백을 실행한다. </summary>

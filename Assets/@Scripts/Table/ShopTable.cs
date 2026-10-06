@@ -5,9 +5,6 @@ public class ShopData : TableData
     [CsvField("아이템ID")]
     public int ItemID;
 
-    [CsvField("구매가격")]
-    public int BuyPrice;
-
     [CsvField("판매가격")]
     public int SellPrice;
 

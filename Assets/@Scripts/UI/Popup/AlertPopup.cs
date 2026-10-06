@@ -48,8 +48,7 @@ public class AlertPopup : BasePopup
         {
             OnClickYes();
         }
-        else if (Managers.Input.KeyDown_Esc ||
-                 (_contentsType == ContentsType.Save && Managers.Input.KeyDown_O))
+        else if (Managers.Input.KeyDown_Esc || (_contentsType == ContentsType.Save && Managers.Input.KeyDown_O))
         {
             OnClickNo();
         }
@@ -80,6 +79,7 @@ public class AlertPopup : BasePopup
                 {
                     scene.HUD.SetSideIconActive(GameHUD.SideBar.Save, false);
                 }
+
                 break;
         }
     }
