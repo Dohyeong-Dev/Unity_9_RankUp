@@ -68,4 +68,15 @@ public class ItemTable : TableLoader<ItemData>
         
         return string.Empty;
     }
+    
+    /// <summary> 아이템 ID에 해당하는 최대 보유 가능 개수를 반환한다. </summary>
+    public int GetItemLimitCount(int itemID)
+    {
+        if (DataMap.ContainsKey(itemID))
+        {
+            return DataMap[itemID].LimitCount;
+        }
+
+        return 0;
+    }
 }

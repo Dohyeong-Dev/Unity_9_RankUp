@@ -41,7 +41,7 @@ public class ShopTable : TableLoader<ShopData>
     }
     
     /// <summary> 아이템 타입에 해당하는 현재 판매 중인 아이템 목록을 가져온다. </summary>
-    public List<int> GetSellingItemIdList(ItemType itemType)
+    public IReadOnlyList<int> GetSellingItemIdList(ItemType itemType)
     {
         if (_sellingItemIdList.Count == 0)
         {
@@ -56,12 +56,23 @@ public class ShopTable : TableLoader<ShopData>
         return null;
     }
 
-    /// <summary> 아이템ID에 해당하는 판매가격을 [판매가격 : ?]구조로 획득한다.  </summary>
-    public string GetItemSellPrice(int itemID)
+    /// <summary> 아이템ID에 해당하는 판매가격을 획득한다.  </summary>
+    public int GetItemSellPrice(int itemID)
     {
         if (DataMap.ContainsKey(itemID))
         {
-            return $"<br><color=yellow>판매가격 : {DataMap[itemID].SellPrice:N0}</color>";
+            return DataMap[itemID].SellPrice;
+        }
+
+        return 0;
+    }
+    
+    /// <summary> 아이템ID에 해당하는 판매가격을 [판매가격 : ?]구조로 획득한다.  </summary>
+    public string GetItemSellPriceStr(int itemID)
+    {
+        if (DataMap.ContainsKey(itemID))
+        {
+            return $"<br><color=yellow>판매가격 : {GetItemSellPrice(itemID):N0}</color>";
         }
 
         return string.Empty;

@@ -117,39 +117,57 @@ public static class Utils
     }
 
     /// <summary> UI에 이벤트를 구독시킨다. </summary>
-    public static void BindEvent(GameObject go, GlobalEnum.EventType eventType, Action action)
+    public static void BindEvent(GameObject go, UIEventType eventType, Action action)
     {
-        EventHandler eventHandler = Utils.GetOrAddComponent<EventHandler>(go);
+        EventHandler eventHandler = GetOrAddComponent<EventHandler>(go);
 
         switch (eventType)
         {
-            case GlobalEnum.EventType.Click:
+            case UIEventType.Click:
                 eventHandler.OnClickHandler -= action;
                 eventHandler.OnClickHandler += action;
                 break;
-            case GlobalEnum.EventType.Pressed:
+            case UIEventType.Pressed:
                 eventHandler.OnPressedHandler -= action;
                 eventHandler.OnPressedHandler += action;
                 break;
-            case GlobalEnum.EventType.PointerDown:
+            case UIEventType.PointerDown:
                 eventHandler.OnPointerDownHandler -= action;
                 eventHandler.OnPointerDownHandler += action;
                 break;
-            case GlobalEnum.EventType.PointerUp:
+            case UIEventType.PointerUp:
                 eventHandler.OnPointerUpHandler -= action;
                 eventHandler.OnPointerUpHandler += action;
                 break;
-            case GlobalEnum.EventType.PointerEnter:
+            case UIEventType.PointerEnter:
                 eventHandler.OnPointerEnterHandler -= action;
                 eventHandler.OnPointerEnterHandler += action;
                 break;
-            case GlobalEnum.EventType.PointerExit:
+            case UIEventType.PointerExit:
                 eventHandler.OnPointerExitHandler -= action;
                 eventHandler.OnPointerExitHandler += action;
                 break;
         }
     }
-    
+
+    /// <summary> UI에 등록된 모든 이벤트를 초기화한다. </summary>
+    public static void ClearEvent(GameObject go)
+    {
+        if (go == null)
+        {
+            return;
+        }
+
+        EventHandler eventHandler = go.GetComponent<EventHandler>();
+
+        if (eventHandler == null)
+        {
+            return;
+        }
+
+        eventHandler.ClearAllEvents();
+    }
+
     /// <summary> 실행 중인 애플리케이션을 종료한다. </summary>
     public static void QuitApp()
     {

@@ -44,9 +44,15 @@ public static class Extension
     }
 
     /// <summary> UI에 이벤트를 구독시킨다. </summary>
-    public static void BindEvent(this GameObject go, GlobalEnum.EventType eventType, Action action)
+    public static void BindEvent(this GameObject go, UIEventType eventType, Action action)
     {
         Utils.BindEvent(go, eventType, action);
+    }
+    
+    /// <summary> UI의 모든 이벤트를 구독해제시킨다. </summary>
+    public static void ClearEvent(this GameObject go)
+    {
+        Utils.ClearEvent(go);
     }
     
     /// <summary> 지정한 시간 후 GameObject를 제거한다. </summary>

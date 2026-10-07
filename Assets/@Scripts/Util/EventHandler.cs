@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary> UI 오브젝트에서 발생하는 포인터 이벤트를 받아 외부에 전달한다. </summary>
-public class EventHandler : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, 
+public class EventHandler : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler,
     IPointerEnterHandler, IPointerExitHandler
 {
     #region ===== 이벤트 =====
@@ -26,7 +26,18 @@ public class EventHandler : MonoBehaviour, IPointerClickHandler, IPointerDownHan
             OnPressedHandler?.Invoke();
         }
     }
-    
+
+    /// <summary> 등록된 모든 UI 이벤트를 초기화한다. </summary>
+    public void ClearAllEvents()
+    {
+        OnClickHandler = null;
+        OnPressedHandler = null;
+        OnPointerDownHandler = null;
+        OnPointerUpHandler = null;
+        OnPointerEnterHandler = null;
+        OnPointerExitHandler = null;
+    }
+
     /// <summary> UI 오브젝트를 클릭했을 때 호출된다. </summary>
     public void OnPointerClick(PointerEventData eventData)
     {

@@ -55,13 +55,24 @@ public class ItemDescription : MonoBehaviour
     {
         _itemNameText.text = Managers.Table.Item.GetItemName(shopSlot.ItemID);
         _itemDescText.text = Managers.Table.Item.GetItemDescription(shopSlot.ItemID) + "\n";
-        _itemDescText.text += "\n"+ Managers.Table.Shop.GetItemSellPrice(shopSlot.ItemID);
+        _itemDescText.text += "\n"+ Managers.Table.Shop.GetItemSellPriceStr(shopSlot.ItemID);
 
         UpdatePosition(shopSlot.transform);
 
         gameObject.SetActive(true);
     }
 
+    /// <summary> 인벤의 아이템 설명을 표시한다. </summary>
+    public void Show(InvenSlot invenSlot)
+    {
+        _itemNameText.text = Managers.Table.Item.GetItemName(invenSlot.ItemID);
+        _itemDescText.text = Managers.Table.Item.GetItemDescription(invenSlot.ItemID);
+
+        UpdatePosition(invenSlot.transform);
+
+        gameObject.SetActive(true);
+    }
+    
     /// <summary> 아이템 설명을 숨긴다. </summary>
     public void Hide()
     {
