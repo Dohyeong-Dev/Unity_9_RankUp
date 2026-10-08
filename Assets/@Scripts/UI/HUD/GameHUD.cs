@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary> 플레이어의 HP/SP, 보스 HP 상태를 화면에 표시하는 게임 HUD다. </summary>
+/// <summary> 플레이어의 HP/SP, 보스 HP 상태등을 화면에 표시하는 게임 HUD다. </summary>
 public class GameHUD : BaseHUD
 {
     private enum Sliders
@@ -18,6 +18,7 @@ public class GameHUD : BaseHUD
     {
         HpText,
         SpText,
+        
         PickUpText
     }
 
@@ -25,7 +26,7 @@ public class GameHUD : BaseHUD
     {
         HpSliderCover,
         SpSliderCover,
-        
+
         SettingIconFrame,
         SettingIcon,
         ShopIconFrame,
@@ -34,7 +35,7 @@ public class GameHUD : BaseHUD
         InventoryIcon,
         SaveIconFrame,
         SaveIcon,
-        
+
         PickUp
     }
 
@@ -50,8 +51,11 @@ public class GameHUD : BaseHUD
 
     #region ===== 참조 =====
 
+    private GameScene _gameScene;
+    
     private PlayerCtrl _player;
-    private EnemyCtrl _boss;
+    private BossCtrl _boss;
+    private QuickBar _quickBar;
 
     #endregion ===== 참조 =====
 
@@ -72,21 +76,23 @@ public class GameHUD : BaseHUD
         Bind<TMP_Text>(typeof(Texts));
         Bind<Image>(typeof(Images));
 
+        ResolveGameScene();
+        ResolveQuickBar();
+        ResolvePlayer();
+        
         InitializeCoverColors();
 
         SetBossHpSliderActive(false);
         SetPickUpActive(false);
     }
-
+    
     protected override void OnStart()
     {
-        if (!TryResolvePlayer())
-        {
-            return;
-        }
-
         SubscribePlayerEvents();
+        SubscribeQuickBarEvents();
+
         UpdatePlayerStatus();
+        UpdateQuickBar();
     }
 
     protected override void OnUpdate()
@@ -95,11 +101,11 @@ public class GameHUD : BaseHUD
 
     public override void OnInputKey()
     {
-        if (_player.IsDead)
+        if (_player != null && _player.IsDead)
         {
             return;
         }
-        
+
         if (Managers.Input.KeyDown_Esc)
         {
             Managers.UI.OpenPopup<ExitPopup>();
@@ -133,11 +139,45 @@ public class GameHUD : BaseHUD
         }
 
         UnsubscribePlayerEvents();
+        UnsubscribeQuickBarEvents();
         UnsubscribeBossEvents();
     }
 
     #region ===== 초기화 =====
 
+    /// <summary> GameScene을 찾아 참조한다. </summary>
+    private void ResolveGameScene()
+    {
+        _gameScene = gameObject.FindParent<GameScene>();
+
+        if (_gameScene == null)
+        {
+            CPrint.Warning("[GamdHUD] GameScene을 찾을 수 없습니다.");
+        }
+    }
+    
+    /// <summary> QuickBar를 찾아 참조한다. </summary>
+    private void ResolveQuickBar()
+    {
+        _quickBar = GetComponentInChildren<QuickBar>();
+
+        if (_quickBar == null)
+        {
+            CPrint.Warning("[GamdHUD] QuickBar를 찾을 수 없습니다.");
+        }
+    }
+    
+    /// <summary> Player를 찾아 참조한다. </summary>
+    private void ResolvePlayer()
+    {
+        _player = _gameScene.Player;
+
+        if (_player == null)
+        {
+            CPrint.Warning("[GamdHUD] Player를 찾을 수 없습니다.");
+        }
+    }
+    
     /// <summary> HP와 SP 게이지 커버의 기본 색상을 저장한다. </summary>
     private void InitializeCoverColors()
     {
@@ -162,34 +202,16 @@ public class GameHUD : BaseHUD
 
     #endregion ===== 활성/비활성화 =====
 
-    #region ===== 참조 확인 =====
-
-    /// <summary> 플레이어 참조를 반환하고 없으면 현재 씬에서 찾는다. </summary>
-    private bool TryResolvePlayer()
-    {
-        if (_player != null)
-        {
-            return true;
-        }
-
-        _player = FindFirstObjectByType<PlayerCtrl>();
-
-        if (_player != null)
-        {
-            return true;
-        }
-
-        CPrint.Warning("Player를 찾을 수 없습니다.");
-        return false;
-    }
-
-    #endregion ===== 참조 확인 =====
-
     #region ===== 플레이어 =====
 
     /// <summary> 플레이어의 현재 HP와 SP를 HUD에 반영한다. </summary>
     private void UpdatePlayerStatus()
     {
+        if (_player == null)
+        {
+            return;
+        }
+        
         UpdateHpSlider(_player.HP, _player.MaxHP);
         UpdateSpSlider(_player.SP, _player.MaxSP);
     }
@@ -205,7 +227,6 @@ public class GameHUD : BaseHUD
         }
 
         float sliderValue = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
-
         hpSlider.value = sliderValue;
         Get<TMP_Text>(Texts.HpText).text = $"{sliderValue * 100f:F0}%";
 
@@ -214,7 +235,6 @@ public class GameHUD : BaseHUD
             PlayHpEmptyWarning();
             return;
         }
-
         StopHpEmptyWarning();
     }
 
@@ -229,7 +249,6 @@ public class GameHUD : BaseHUD
         }
 
         float sliderValue = maxSp > 0f ? Mathf.Clamp01(currentSp / maxSp) : 0f;
-
         spSlider.value = sliderValue;
         Get<TMP_Text>(Texts.SpText).text = $"{sliderValue * 100f:F0}%";
 
@@ -238,7 +257,6 @@ public class GameHUD : BaseHUD
             StopSpEmptyWarning();
             return;
         }
-
         PlaySpEmptyWarning();
     }
 
@@ -255,7 +273,6 @@ public class GameHUD : BaseHUD
             SetBossHpSliderActive(true);
 
             bossHpSlider.transform.localScale = Vector3.zero;
-
             _bossHpShowTween = bossHpSlider.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
         }
 
@@ -304,6 +321,16 @@ public class GameHUD : BaseHUD
 
     #endregion ===== 사이드바 =====
 
+    #region ===== QuickBar =====
+
+    /// <summary> 저장된 QuickSlot 데이터를 GameHUD의 QuickBar에 반영한다. </summary>
+    private void UpdateQuickBar()
+    {
+        _quickBar?.UpdateUI();
+    }
+
+    #endregion ===== QuickBar =====
+
     #region ===== 이펙트 =====
 
     /// <summary> HP가 낮을 때 HP 게이지의 경고 효과를 재생한다. </summary>
@@ -315,9 +342,7 @@ public class GameHUD : BaseHUD
         }
 
         Image hpCover = Get<Image>(Images.HpSliderCover);
-
-        _hpEmptyCoverTween = hpCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo)
-            .SetEase(Ease.InOutSine);
+        _hpEmptyCoverTween = hpCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
     }
 
     /// <summary> HP 게이지의 경고 효과를 중지하고 기본 색상으로 복원한다. </summary>
@@ -338,9 +363,7 @@ public class GameHUD : BaseHUD
         }
 
         Image spCover = Get<Image>(Images.SpSliderCover);
-
-        _spEmptyCoverTween = spCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo)
-            .SetEase(Ease.InOutSine);
+        _spEmptyCoverTween = spCover.DOColor(Color.red, 0.25f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
     }
 
     /// <summary> SP 게이지의 경고 효과를 중지하고 기본 색상으로 복원한다. </summary>
@@ -356,21 +379,8 @@ public class GameHUD : BaseHUD
 
     #region ===== 이벤트 =====
 
-    /// <summary> 플레이어 이벤트를 등록하고 현재 스탯을 HUD에 반영한다. </summary>
-    private void SubscribePlayerEvents()
-    {
-        _player.OnHpChanged += UpdateHpSlider;
-        _player.OnSpChanged += UpdateSpSlider;
-    }
-
-    /// <summary> 플레이어 이벤트를 해제한다. </summary>
-    private void UnsubscribePlayerEvents()
-    {
-        _player.OnHpChanged -= UpdateHpSlider;
-        _player.OnSpChanged -= UpdateSpSlider;
-    }
-
-    public void SubscribeBossEvents(EnemyCtrl boss)
+    /// <summary> 컷씬의 보스 이벤트를 등록한다. </summary>
+    public void SubscribeBossEvents(BossCtrl boss)
     {
         if (_boss == null)
         {
@@ -380,6 +390,7 @@ public class GameHUD : BaseHUD
         _boss.OnHpChanged += UpdateBossHpSlider;
     }
 
+    /// <summary> 컷씬의 보스 이벤트를 해제한다. </summary>
     private void UnsubscribeBossEvents()
     {
         if (_boss == null)
@@ -388,6 +399,52 @@ public class GameHUD : BaseHUD
         }
 
         _boss.OnHpChanged -= UpdateBossHpSlider;
+    }
+    
+    /// <summary> 플레이어 이벤트를 등록한다. </summary>
+    private void SubscribePlayerEvents()
+    {
+        if (_player == null)
+        {
+            return;
+        }
+        
+        _player.OnHpChanged += UpdateHpSlider;
+        _player.OnSpChanged += UpdateSpSlider;
+    }
+
+    /// <summary> 플레이어 이벤트를 해제한다. </summary>
+    private void UnsubscribePlayerEvents()
+    {
+        if (_player == null)
+        {
+            return;
+        }
+        
+        _player.OnHpChanged -= UpdateHpSlider;
+        _player.OnSpChanged -= UpdateSpSlider;
+    }
+
+    /// <summary> 퀵바의 이벤트를 등록한다. </summary>
+    private void SubscribeQuickBarEvents()
+    {
+        if (Managers.Data == null)
+        {
+            return;
+        }
+        
+        Managers.Data.OnQuickSlotChanged += UpdateQuickBar;
+    }
+    
+    /// <summary> 퀵바의 이벤트를 해제한다. </summary>
+    private void UnsubscribeQuickBarEvents()
+    {
+        if (Managers.Data == null)
+        {
+            return;
+        }
+        
+        Managers.Data.OnQuickSlotChanged -= UpdateQuickBar;
     }
 
     #endregion ===== 이벤트 =====

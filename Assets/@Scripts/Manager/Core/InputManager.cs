@@ -12,6 +12,8 @@ public class InputManager
     public bool MouseDown_Left => Input.GetMouseButtonDown(0);
     public bool MouseDown_Right => Input.GetMouseButtonDown(1);
 
+    public Vector3 MousePosition => Input.mousePosition;
+    
     #endregion ===== 마우스 =====
 
     #region ===== 키보드 =====

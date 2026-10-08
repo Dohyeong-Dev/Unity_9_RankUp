@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary> 인벤토리의 아이템 목록과 카테고리 전환을 관리하는 Popup UI다. </summary>
+/// <summary> 인벤토리의 아이템 목록과 카테고리 전환 및 아이템 선택을 관리하는 Popup UI다. </summary>
 public class InvenPopup : BasePopup
 {
     public enum Buttons
@@ -30,28 +28,22 @@ public class InvenPopup : BasePopup
         ConsumableScroll
     }
 
-    #region ===== 설정 =====
-
-    [Header("설정")]
-    [SerializeField, Min(1)]
-    private int _equipmentSlotCount = 20;
-
-    [SerializeField, Min(1)]
-    private int _consumableSlotCount = 20;
-
-    #endregion ===== 설정 =====
-
     #region ===== 상태 =====
 
     private InvenSlot[] _equipmentSlots;
     private InvenSlot[] _consumableSlots;
 
-    #endregion ===== 설정 =====
+    private InvenSlot _selectedSlot;
+    private InvenSlot _hoveredSlot;
+
+    private Image _selectedTempImage;
+
+    #endregion ===== 상태 =====
 
     #region ===== 참조 =====
 
     private ItemDescription _itemDescription;
-    private GameObject _quickBar;
+    private QuickBar _quickBar;
 
     #endregion ===== 참조 =====
 
@@ -68,15 +60,27 @@ public class InvenPopup : BasePopup
 
     protected override void OnStart()
     {
-        InitializeExitButton();
         CreateInvenSlots();
-        InitializeCategoryToggles();
+        CreateSelectedTempImage();
+        
+        InitializeExitButton();
+        InitializeCategory();
 
+        // 퀵바의 슬롯 클릭 이벤트 연결
+        if (_quickBar != null)
+        {
+            _quickBar.SetSlotClickHandler(OnClickQuickSlot);
+        }
+
+        // 인벤토리 팝업 클릭 이벤트 연결
+        gameObject.BindEvent(UIEventType.Click, OnPointerClick);
+        
         UpdateInvenUI();
     }
 
     protected override void OnUpdate()
     {
+        UpdateSelectedTempImagePos();
     }
 
     public override void OnInputKey()
@@ -96,44 +100,56 @@ public class InvenPopup : BasePopup
 
     protected override void DestroyOverride()
     {
+        CancelSelectedItem();
+
+        SetQuickBarActive(false);
+
         if (Managers.Scene != null && Managers.Scene.TryGetCurrentScene(out GameScene scene))
         {
             scene.HUD.SetSideIconActive(GameHUD.SideBar.Inventory, false);
         }
     }
-    
+
     #region ===== 초기화 =====
-    
-    /// <summary> 아이템 설명창을 찾아 참조한다. </summary>
+
+    /// <summary> ItemDescription을 찾아 참조한다. </summary>
     private void ResolveItemDescription()
     {
         _itemDescription = GetComponentInChildren<ItemDescription>();
 
         if (_itemDescription == null)
         {
-            CPrint.Warning("[InventoryPopup] ItemDescription을 찾을 수 없습니다.");
+            CPrint.Warning("[InvenPopup] ItemDescription을 찾을 수 없습니다.");
         }
     }
-    
+
     /// <summary> QuickBar를 찾아 참조한다. </summary>
     private void ResolveQuickBar()
     {
-        HorizontalLayoutGroup quickBar = gameObject.FindChild<HorizontalLayoutGroup>("QuickBar");
+        _quickBar = gameObject.FindChild<QuickBar>("QuickBar");
 
-        if (quickBar == null)
+        if (_quickBar == null)
         {
-            CPrint.Warning("[InventoryPopup] QuickBar를 찾을 수 없습니다.");
+            CPrint.Warning("[InvenPopup] QuickBar를 찾을 수 없습니다.");
             return;
         }
 
-        _quickBar = quickBar.gameObject;
         SetQuickBarActive(false);
     }
-    
-    /// <summary> Exit 버튼 이벤트를 초기화한다. </summary>
-    private void InitializeExitButton()
+
+    /// <summary> 마우스를 따라다닐 선택된 아이템 임시 이미지를 생성한다. </summary>
+    private void CreateSelectedTempImage()
     {
-        Get<Button>(Buttons.ExitButton).onClick.AddListener(OnClickExit);
+        GameObject imageObject = new GameObject("SelectedTempImage");
+        imageObject.transform.SetParent(transform, false);
+        imageObject.transform.SetAsLastSibling();
+
+        _selectedTempImage = imageObject.AddComponent<Image>();
+
+        _selectedTempImage.raycastTarget = false;
+        _selectedTempImage.preserveAspect = true;
+
+        HideSelectedTempImage();
     }
 
     /// <summary> 인벤토리 슬롯들을 생성한다. </summary>
@@ -143,13 +159,13 @@ public class InvenPopup : BasePopup
         CreateInvenSlotsByType(ItemType.Consumable, Get<ScrollRect>(Scrolls.ConsumableScroll));
     }
 
-    /// <summary> 아이템 타입에 따라 지정된 개수만큼 인벤토리 슬롯 배열을 생성한다. </summary>
+    /// <summary> 지정된 타입의 인벤토리 슬롯들을 생성한다. </summary>
     private void CreateInvenSlotsByType(ItemType itemType, ScrollRect scroll)
     {
         InvenSlot[] slotList = itemType switch
         {
-            ItemType.Equipment => _equipmentSlots = new InvenSlot[_equipmentSlotCount],
-            ItemType.Consumable => _consumableSlots = new InvenSlot[_consumableSlotCount],
+            ItemType.Equipment => _equipmentSlots = new InvenSlot[Managers.Data.GetInventorySlotCount(itemType)],
+            ItemType.Consumable => _consumableSlots = new InvenSlot[Managers.Data.GetInventorySlotCount(itemType)],
             _ => null
         };
 
@@ -160,76 +176,102 @@ public class InvenPopup : BasePopup
 
         for (int i = 0; i < slotList.Length; i++)
         {
+            int slotIndex = i;
+            
             InvenSlot slot = Managers.UI.MakeSlot<InvenSlot>(scroll.content);
 
             if (slot == null)
             {
-                CPrint.Error($"[InventoryPopup] InvenSlot 생성 실패. Index: {i}");
+                CPrint.Error($"[InvenPopup] InvenSlot 생성 실패. Index: {slotIndex}");
                 continue;
             }
 
             slotList[i] = slot;
+            slotList[i].SetSlotInfo(itemType, slotIndex);
         }
     }
 
-    /// <summary> 인벤토리 카테고리 토글 이벤트와 초기 상태를 설정한다. </summary>
-    private void InitializeCategoryToggles()
+    /// <summary> Exit 버튼 이벤트를 초기화한다. </summary>
+    private void InitializeExitButton()
+    {
+        Get<Button>(Buttons.ExitButton).onClick.AddListener(OnClickExit);
+    }
+
+    /// <summary> 인벤토리 카테고리의 초기 상태를 설정한다. </summary>
+    private void InitializeCategory()
     {
         Get<Toggle>(Toggles.EquipmentToggle).onValueChanged.AddListener(isOn =>
-            OnCategoryToggleChanged(Toggles.EquipmentToggle, isOn));
+            OnCategoryChanged(Toggles.EquipmentToggle, isOn));
 
         Get<Toggle>(Toggles.ConsumableToggle).onValueChanged.AddListener(isOn =>
-            OnCategoryToggleChanged(Toggles.ConsumableToggle, isOn));
+            OnCategoryChanged(Toggles.ConsumableToggle, isOn));
 
-        SetCategoryActive(Toggles.EquipmentToggle);
+        ActivateScroll(Toggles.EquipmentToggle);
     }
 
     #endregion ===== 초기화 =====
 
     #region ===== 갱신 =====
 
-    /// <summary> 인벤토리 슬롯과 Gold UI를 갱신한다. </summary>
+    /// <summary> 인벤토리와 QuickBar를 갱신한다. </summary>
     public void UpdateInvenUI()
     {
         UpdateInvenSlots(ItemType.Equipment);
         UpdateInvenSlots(ItemType.Consumable);
 
         UpdateGoldText();
+        UpdateQuickBar();
+
+        RefreshItemDescription();
     }
 
-    /// <summary> 지정된 타입의 아이템을 인벤토리 슬롯에 배치한다. </summary>
+    /// <summary> 지정된 타입의 인벤토리 슬롯을 갱신한다. </summary>
     private void UpdateInvenSlots(ItemType itemType)
     {
-        InvenSlot[] slotList = itemType switch
-        {
-            ItemType.Equipment => _equipmentSlots,
-            ItemType.Consumable => _consumableSlots,
-            _ => null
-        };
+        InvenSlot[] slotList = GetSlotList(itemType);
 
         if (slotList == null)
         {
             return;
         }
-        
+
         List<InventoryItemData> inventoryItems = GetInventoryItems(itemType);
 
+        ClearInvenSlots(slotList);
+
+        foreach (InventoryItemData itemData in inventoryItems)
+        {
+            int slotIndex = itemData.InvenSlotIndex;
+
+            if (slotIndex < 0 || slotIndex >= slotList.Length)
+            {
+                continue;
+            }
+
+            InvenSlot slot = slotList[slotIndex];
+
+            slot.SetData(itemData.ItemID, itemData.Count);
+
+            BindInvenSlotEvents(slot);
+
+            slot.UpdateUI();
+        }
+    }
+
+    /// <summary> 지정된 타입의 모든 인벤토리 슬롯을 초기화한다. </summary>
+    private void ClearInvenSlots(InvenSlot[] slotList)
+    {
         for (int i = 0; i < slotList.Length; i++)
         {
             InvenSlot slot = slotList[i];
 
-            if (i < inventoryItems.Count)
+            if (slot == null)
             {
-                InventoryItemData itemData = inventoryItems[i];
+                continue;
+            }
 
-                slot.SetData(itemData.ItemID, itemData.Count);
-                BindInvenSlotEvents(slot);
-            }
-            else
-            {
-                slot.ClearData();
-                ClearInvenSlotEvents(slot);
-            }
+            slot.ClearData();
+            BindInvenSlotEvents(slot);
 
             slot.UpdateUI();
         }
@@ -238,22 +280,69 @@ public class InvenPopup : BasePopup
     /// <summary> 현재 보유 Gold를 UI에 표시한다. </summary>
     private void UpdateGoldText()
     {
-        Get<TMP_Text>(Texts.GoldText).text = Managers.Data.Gold.ToString("N0");
+        Get<TMP_Text>(Texts.GoldText).text = Managers.Data.GetCurrentGold().ToString("N0");
+    }
+
+    /// <summary> 저장된 QuickSlot 데이터를 InvenPopup의 QuickBar에 반영한다. </summary>
+    private void UpdateQuickBar()
+    {
+        _quickBar?.UpdateUI();
+    }
+
+    /// <summary> 선택된 아이템 임시 이미지의 위치를 마우스 위치로 갱신한다. </summary>
+    private void UpdateSelectedTempImagePos()
+    {
+        if (_selectedSlot == null || _selectedTempImage == null)
+        {
+            return;
+        }
+
+        _selectedTempImage.transform.position = Input.mousePosition;
     }
 
     #endregion ===== 갱신 =====
 
     #region ===== 활성화/비활성화 =====
 
-    /// <summary> 지정된 인벤토리 카테고리를 활성화한다. </summary>
-    private void SetCategoryActive(Toggles toggle)
+    /// <summary> 선택된 아이템 임시 이미지를 숨긴다. </summary>
+    private void HideSelectedTempImage()
+    {
+        if (_selectedTempImage == null)
+        {
+            return;
+        }
+
+        _selectedTempImage.sprite = null;
+        _selectedTempImage.gameObject.SetActive(false);
+    }
+
+    /// <summary> QuickBar의 활성화 상태를 설정한다. </summary>
+    private void SetQuickBarActive(bool isActive)
+    {
+        if (_quickBar == null)
+        {
+            return;
+        }
+
+        _quickBar.gameObject.SetActive(isActive);
+    }
+
+    /// <summary> 지정된 인벤토리 카테고리의 스크롤을 활성화한다. </summary>
+    private void ActivateScroll(Toggles toggle)
     {
         HideAllInventoryScrolls();
 
-        ScrollRect scroll = Get<ScrollRect>(toggle);
-        scroll.gameObject.SetActive(true);
+        Scrolls scrollType = toggle switch
+        {
+            Toggles.EquipmentToggle => Scrolls.EquipmentScroll,
+            Toggles.ConsumableToggle => Scrolls.ConsumableScroll,
+            _ => Scrolls.EquipmentScroll
+        };
+
+        Get<ScrollRect>(scrollType).gameObject.SetActive(true);
 
         Toggle categoryToggle = Get<Toggle>(toggle);
+
         if (!categoryToggle.isOn)
         {
             categoryToggle.isOn = true;
@@ -266,25 +355,92 @@ public class InvenPopup : BasePopup
         Get<ScrollRect>(Scrolls.EquipmentScroll).gameObject.SetActive(false);
         Get<ScrollRect>(Scrolls.ConsumableScroll).gameObject.SetActive(false);
     }
-    
-    /// <summary> QuickBar의 활성화 상태를 설정한다. </summary>
-    private void SetQuickBarActive(bool isActive)
+
+    #endregion ===== 활성화/비활성화 =====
+
+    #region ===== 아이템 선택 =====
+
+    /// <summary> 마우스를 따라다니는 임시 이미지를 선택한 아이템의 이미지로 바꾼다. </summary>
+    private void ChangeSelectedTempImage()
     {
-        if (_quickBar == null)
+        Image selectedItemImage = _selectedSlot.GetItemImage(); 
+        
+        _selectedTempImage.sprite = selectedItemImage.sprite;
+
+        RectTransform sourceRect = selectedItemImage.rectTransform;
+        RectTransform tempRect = _selectedTempImage.rectTransform;
+
+        tempRect.sizeDelta = sourceRect.rect.size;
+        tempRect.pivot = sourceRect.pivot;
+
+        _selectedTempImage.gameObject.SetActive(true);
+
+        UpdateSelectedTempImagePos();
+    }
+    
+    /// <summary> 선택된 아이템을 지정된 인벤토리 슬롯으로 이동한다. </summary>
+    private void PlaceSelectedItem(InvenSlot targetSlot)
+    {
+        if (_selectedSlot == null || targetSlot == null)
         {
             return;
         }
 
-        _quickBar.SetActive(isActive);
+        // 슬롯 타입이 다른 경우
+        if (_selectedSlot.Type != targetSlot.Type)
+        {
+            return;
+        }
+
+        if (Managers.Data.TryMoveInvenIndex(_selectedSlot.ItemID, _selectedSlot.Type, targetSlot.Index))
+        {
+            UpdateInvenUI();
+        }
+        
+        CancelSelectedItem();
     }
+
+    /// <summary> 선택된 아이템을 지정된 QuickBar 슬롯에 배치한다. </summary>
+    private void PlaceSelectedItemInQuickSlot(int quickSlotIndex)
+    {
+        if (_selectedSlot == null)
+        {
+            return;
+        }
+
+        if (_selectedSlot.Type != ItemType.Consumable)
+        {
+            return;
+        }
+
+        if (Managers.Data.TrySetQuickSlot(_selectedSlot.ItemID, quickSlotIndex))
+        {
+            CancelSelectedItem();
+            UpdateInvenUI();
+        }
+    }
+
+    /// <summary> 현재 선택된 아이템을 취소한다. </summary>
+    private void CancelSelectedItem()
+    {
+        _selectedSlot = null;
+
+        HideSelectedTempImage();
+    }
+
+    #endregion ===== 아이템 선택 =====
+
+    #region ===== 아이템 설명 =====
 
     /// <summary> 지정된 슬롯의 아이템 설명을 표시한다. </summary>
     private void ShowItemDescription(InvenSlot slot)
     {
-        if (_itemDescription == null)
+        if (_itemDescription == null || slot == null || !slot.HasItem)
         {
             return;
         }
+
+        _hoveredSlot = slot;
 
         _itemDescription.Show(slot);
     }
@@ -297,14 +453,140 @@ public class InvenPopup : BasePopup
             return;
         }
 
+        _hoveredSlot = null;
+        
         _itemDescription.Hide();
     }
-    
-    #endregion ===== 활성화/비활성화 =====
 
-    #region ===== Get =====
+    /// <summary> 현재 선택된 슬롯의 아이템 설명을 갱신한다. </summary>
+    private void RefreshItemDescription()
+    {
+        if (_hoveredSlot == null)
+        {
+            return;
+        }
 
-    /// <summary> 지정된 타입에 해당하는 보유 아이템 목록을 반환한다. </summary>
+        if (!_hoveredSlot.HasItem)
+        {
+            HideItemDescription();
+            return;
+        }
+
+        _itemDescription.Show(_hoveredSlot);
+    }
+
+    #endregion ===== 아이템 설명 =====
+
+    #region ===== 이벤트 =====
+
+    /// <summary> Popup의 슬롯 외 영역 클릭을 처리한다. </summary>
+    public void OnPointerClick()
+    {
+        if (_selectedSlot == null)
+        {
+            return;
+        }
+
+        CancelSelectedItem();
+    }
+
+    /// <summary> 해당 카테고리가 활성화됐을 때 호출된다. </summary>
+    private void OnCategoryChanged(Toggles toggle, bool isOn)
+    {
+        if (!isOn)
+        {
+            return;
+        }
+
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.Button);
+
+        CancelSelectedItem();
+        ActivateScroll(toggle);
+    }
+
+    /// <summary> 인벤토리 슬롯의 마우스 오버 및 클릭 이벤트를 연결한다. </summary>
+    private void BindInvenSlotEvents(InvenSlot slot)
+    {
+        if (slot == null)
+        {
+            return;
+        }
+
+        slot.gameObject.ClearEvent();
+        slot.gameObject.BindEvent(UIEventType.PointerEnter, () => ShowItemDescription(slot));
+        slot.gameObject.BindEvent(UIEventType.PointerExit, HideItemDescription);
+        slot.gameObject.BindEvent(UIEventType.Click, () => OnClickInvenSlot(slot));
+    }
+
+    /// <summary> 인벤토리 슬롯 클릭을 처리한다. </summary>
+    private void OnClickInvenSlot(InvenSlot slot)
+    {
+        if (slot == null)
+        {
+            return;
+        }
+
+        if (_selectedSlot == null) // 첫 클릭
+        {
+            if (!slot.HasItem)
+            {
+                return;
+            }
+
+            _selectedSlot = slot;
+            ChangeSelectedTempImage();
+        }
+        else // 아이템 임시 이미지 생성 상태
+        {
+            if (_selectedSlot == slot) // 선택한 슬롯을 다시 클릭한 경우
+            {
+                CancelSelectedItem();
+            }
+            else // 선택한 슬롯외의 슬롯을 클릭한 경우
+            {
+                PlaceSelectedItem(slot);
+            }
+        }
+    }
+
+    /// <summary> QuickBar 슬롯 클릭을 처리한다. </summary>
+    private void OnClickQuickSlot(int slotIndex)
+    {
+        if (_selectedSlot == null)
+        {
+            return;
+        }
+
+        PlaceSelectedItemInQuickSlot(slotIndex);
+    }
+
+    /// <summary> Exit 버튼을 눌렀을 때 Popup을 닫는다. </summary>
+    private void OnClickExit()
+    {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
+
+        CancelSelectedItem();
+        SetQuickBarActive(false);
+
+        Close();
+    }
+
+    #endregion ===== 이벤트 =====
+
+    #region ===== Get/Set =====
+
+    /// <summary> 지정된 타입의 인벤토리 슬롯 배열을 반환한다. </summary>
+    private InvenSlot[] GetSlotList(ItemType itemType)
+    {
+        return itemType switch
+        {
+            ItemType.Equipment => _equipmentSlots,
+            ItemType.Consumable => _consumableSlots,
+            _ => null
+        };
+    }
+
+    /// <summary> 지정된 타입의 보유 아이템 목록을 반환한다. </summary>
     private List<InventoryItemData> GetInventoryItems(ItemType itemType)
     {
         List<InventoryItemData> inventoryItems = new();
@@ -324,45 +606,5 @@ public class InvenPopup : BasePopup
         return inventoryItems;
     }
 
-    #endregion ===== Get =====
-
-    #region ===== 이벤트 =====
-
-    /// <summary> 카테고리 토글이 활성화 됐을때 호출되는 콜백 </summary>
-    private void OnCategoryToggleChanged(Toggles toggle, bool isOn)
-    {
-        if (!isOn)
-        {
-            return;
-        }
-
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.Button);
-
-        SetCategoryActive(toggle);
-    }
-    
-    /// <summary> InvenSlot의 마우스 오버 이벤트를 연결한다. </summary>
-    private void BindInvenSlotEvents(InvenSlot slot)
-    {
-        slot.gameObject.BindEvent(UIEventType.PointerEnter, () => ShowItemDescription(slot));
-        slot.gameObject.BindEvent(UIEventType.PointerExit, HideItemDescription);
-    }
-    
-    /// <summary> InvenSlot의 모든 이벤트 구독을 해제시킨다. </summary>
-    private void ClearInvenSlotEvents(InvenSlot slot)
-    {
-        slot.gameObject.ClearEvent();
-    }
-    
-    /// <summary> Exit 버튼을 눌렀을 때 Popup을 닫는다. </summary>
-    private void OnClickExit()
-    {
-        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimeCancel);
-
-        SetQuickBarActive(false);
-
-        Close();
-    }
-
-    #endregion ===== 이벤트 =====
+    #endregion ===== Get/Set =====
 }

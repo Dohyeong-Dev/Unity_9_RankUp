@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -6,23 +7,23 @@ using UnityEngine;
 public class DataManager
 {
     private const string SaveFileName = "SaveData.json";
+    private string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
 
     private SaveData _saveData;
 
-    public int Gold => _saveData?.Gold ?? 0;
-
-    private string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
-
-    /// <summary> 현재 세이브 데이터를 JSON 파일로 저장한다. </summary>
+    public event Action OnQuickSlotChanged;
+    
+    /// <summary> 현재 게임 데이터를 로컬 파일에 저장한다. </summary>
     public void Save()
     {
         string json = JsonUtility.ToJson(_saveData, true);
-        CPrint.Log($"Save : {json}");
-        
+
+        CPrint.Log($"[DataManager] Save\n{json}");
+
         File.WriteAllText(SaveFilePath, json);
     }
 
-    /// <summary> 저장된 세이브 데이터를 불러온다. </summary>
+    /// <summary> 로컬 파일에서 게임 데이터를 불러온다. </summary>
     public void Load()
     {
         if (!File.Exists(SaveFilePath))
@@ -31,9 +32,9 @@ public class DataManager
             return;
         }
 
-        // 파일 로드
         string json = File.ReadAllText(SaveFilePath);
-        CPrint.Log($"Load : {json}");
+
+        CPrint.Log($"[DataManager] Load\n{json}");
 
         if (string.IsNullOrEmpty(json))
         {
@@ -41,18 +42,76 @@ public class DataManager
             return;
         }
 
-        // 파싱
         _saveData = JsonUtility.FromJson<SaveData>(json);
 
         if (_saveData == null)
         {
             _saveData = new SaveData();
         }
+
+        InitializeInvenSlotIndex(ItemType.Equipment);
+        InitializeInvenSlotIndex(ItemType.Consumable);
     }
 
+    #region ===== 초기화 =====
+   
+    /// <summary> SaveData에 저장된 InvenSlotIndex가 믿을 만한 상태인지 검사하고 잘못된 슬롯 번호나 중복 슬롯이 있으면 빈 슬롯에 다시 배치한다. </summary>
+    private void InitializeInvenSlotIndex(ItemType itemType)
+    {
+        List<InventoryItemData> itemList = GetInventoryItems(itemType);
+
+        int slotCount = GetInventorySlotCount(itemType);
+
+        bool[] occupiedSlots = new bool[slotCount];
+
+        foreach (InventoryItemData itemData in itemList)
+        {
+            int slotIndex = itemData.InvenSlotIndex;
+
+            // 잘못된 슬롯 인덱스 또는 슬롯 인덱스가 슬롯의 개수를 넘는 경우
+            if (slotIndex < 0 || slotIndex >= slotCount)
+            {
+                itemData.InvenSlotIndex = -1;
+                continue;
+            }
+
+            // 슬롯 인덱스가 중복된 경우
+            if (occupiedSlots[slotIndex])
+            {
+                itemData.InvenSlotIndex = -1;
+                continue;
+            }
+
+            occupiedSlots[slotIndex] = true;
+        }
+
+        foreach (InventoryItemData itemData in itemList)
+        {
+            if (itemData.InvenSlotIndex >= 0)
+            {
+                continue;
+            }
+
+            // 잘못된 슬롯 인덱스들은 빈공간에 새로 배치한다.
+            for (int i = 0; i < slotCount; i++)
+            {
+                if (occupiedSlots[i])
+                {
+                    continue;
+                }
+
+                itemData.InvenSlotIndex = i;
+                occupiedSlots[i] = true;
+                break;
+            }
+        }
+    }
+
+    #endregion ===== 초기화 =====
+    
     #region ===== 골드 =====
 
-    /// <summary> Gold를 지정된 수량만큼 증가시킨다. </summary>
+    /// <summary> 골드를 추가한다. </summary>
     public void AddGold(int amount)
     {
         if (amount <= 0)
@@ -61,25 +120,322 @@ public class DataManager
         }
 
         _saveData.Gold += amount;
+
+        Save();
     }
 
-    /// <summary> Gold를 지정된 수량만큼 감소시킨다. </summary>
-    public bool TrySpendGold(int amount)
+    /// <summary> 골드를 차감할 수 있는지 확인하고 차감한다. </summary>
+    private bool TrySpendGold(int amount)
     {
-        if (amount <= 0 || _saveData.Gold < amount)
+        if (amount < 0)
+        {
+            return false;
+        }
+
+        if (_saveData.Gold < amount)
         {
             return false;
         }
 
         _saveData.Gold -= amount;
+
         return true;
     }
 
+    /// <summary> 현재 소지금을 가져온다. </summary>
+    public int GetCurrentGold()
+    {
+        return _saveData?.Gold ?? 0;
+    }
+    
     #endregion ===== 골드 =====
 
     #region ===== 인벤토리 =====
 
-    /// <summary> 아이템을 구매하고 Gold와 인벤토리를 갱신한다. </summary>
+    /// <summary> 아이템을 인벤토리에 추가한다. </summary>
+    private bool TryAddItem(int itemID, int count)
+    {
+        if (!CanAddItem(itemID, count))
+        {
+            return false;
+        }
+
+        InventoryItemData inventoryItem = FindInventoryItem(itemID);
+
+        // 이미 소지 중인 경우 수량을 추가한다.
+        if (inventoryItem != null)
+        {
+            inventoryItem.Count += count;
+
+            Save();
+
+            return true;
+        }
+
+        // 새로운 아이템인 경우 빈 슬롯에 추가한다.
+        ItemType itemType = Managers.Table.Item.GetItemType(itemID);
+        int emptySlotIndex = GetEmptyInventorySlotIndex(itemType);
+
+        inventoryItem = new InventoryItemData
+        {
+            ItemID = itemID,
+            Count = count,
+            InvenSlotIndex = emptySlotIndex,
+            QuickSlotIndex = -1
+        };
+
+        _saveData.Inventory.Add(inventoryItem);
+
+        Save();
+
+        return true;
+    }
+
+    /// <summary> 아이템을 인벤토리에 추가할 수 있는지 확인한다. </summary>
+    private bool CanAddItem(int itemID, int count)
+    {
+        if (count <= 0)
+        {
+            return false;
+        }
+
+        int limitCount = Managers.Table.Item.GetItemLimitCount(itemID);
+
+        if (limitCount <= 0)
+        {
+            return false;
+        }
+
+        InventoryItemData inventoryItem = FindInventoryItem(itemID);
+
+        if (inventoryItem != null)
+        {
+            return inventoryItem.Count + count <= limitCount;
+        }
+
+        ItemType itemType = Managers.Table.Item.GetItemType(itemID);
+
+        return GetEmptyInventorySlotIndex(itemType) >= 0;
+    }
+
+    /// <summary> 지정된 아이템을 인벤토리의 다른 슬롯으로 이동한다. </summary>
+    public bool TryMoveInvenIndex(int itemID, ItemType itemType, int targetSlotIndex)
+    {
+        if (itemID <= 0)
+        {
+            return false;
+        }
+
+        if (targetSlotIndex < 0)
+        {
+            return false;
+        }
+
+        InventoryItemData sourceItem = FindInventoryItem(itemID);
+
+        if (sourceItem == null)
+        {
+            return false;
+        }
+
+        if (Managers.Table.Item.GetItemType(sourceItem.ItemID) != itemType)
+        {
+            return false;
+        }
+
+        InventoryItemData targetItem = FindInventoryItem(itemType, targetSlotIndex);
+
+        // 같은 슬롯을 다시 클릭한 경우
+        if (sourceItem == targetItem)
+        {
+            return false;
+        }
+
+        // 대상 슬롯에 아이템이 있으면 두 아이템의 위치를 교환한다.
+        if (targetItem != null)
+        {
+            (sourceItem.InvenSlotIndex, targetItem.InvenSlotIndex) = (targetItem.InvenSlotIndex, sourceItem.InvenSlotIndex);
+        }
+        // 대상 슬롯이 비어 있으면 선택한 아이템만 이동한다.
+        else
+        {
+            sourceItem.InvenSlotIndex = targetSlotIndex;
+        }
+
+        Save();
+
+        return true;
+    }
+
+    /// <summary> 지정된 아이템을 QuickSlot에 등록하거나 기존 아이템과 교환한다. </summary>
+    public bool TrySetQuickSlot(int itemID, int quickSlotIndex)
+    {
+        if (itemID <= 0 || quickSlotIndex < 0)
+        {
+            return false;
+        }
+
+        InventoryItemData sourceItem = FindInventoryItem(itemID);
+
+        if (sourceItem == null)
+        {
+            return false;
+        }
+
+        ItemType itemType = Managers.Table.Item.GetItemType(itemID);
+
+        if (itemType != ItemType.Consumable)
+        {
+            return false;
+        }
+
+        InventoryItemData targetItem = FindQuickSlotItem(quickSlotIndex);
+
+        // 같은 QuickSlot을 다시 클릭한 경우
+        if (sourceItem == targetItem)
+        {
+            return true;
+        }
+
+        // 이미 아이템이 있으면 두 QuickSlot 위치를 교환한다.
+        if (targetItem != null)
+        {
+            (sourceItem.QuickSlotIndex, targetItem.QuickSlotIndex) = (targetItem.QuickSlotIndex, sourceItem.QuickSlotIndex);
+        }
+        else // 빈 QuickSlot이면 해당 위치에 등록한다.
+        {
+            sourceItem.QuickSlotIndex = quickSlotIndex;
+        }
+
+        Save();
+        OnQuickSlotChanged?.Invoke();
+
+        return true;
+    }
+
+    /// <summary> 지정된 타입의 인벤토리 아이템 목록을 반환한다. </summary>
+    public List<InventoryItemData> GetInventoryItems(ItemType itemType)
+    {
+        List<InventoryItemData> itemList = new();
+
+        foreach (InventoryItemData itemData in _saveData.Inventory)
+        {
+            if (Managers.Table.Item.GetItemType(itemData.ItemID) != itemType)
+            {
+                continue;
+            }
+
+            itemList.Add(itemData);
+        }
+
+        return itemList;
+    }
+
+    /// <summary> 현재 인벤토리의 전체 아이템 목록을 반환한다. </summary>
+    public IReadOnlyList<InventoryItemData> GetInventoryItemList()
+    {
+        return _saveData.Inventory;
+    }
+    
+    /// <summary> 아이템 타입에 따른 인벤토리 슬롯 개수를 반환한다. </summary>
+    public int GetInventorySlotCount(ItemType itemType)
+    {
+        return itemType switch
+        {
+            ItemType.Equipment => 20,
+            ItemType.Consumable => 32,
+            _ => 0
+        };
+    }
+
+    /// <summary> 지정된 타입의 비어있는 인벤토리 슬롯을 반환한다. </summary>
+    private int GetEmptyInventorySlotIndex(ItemType itemType)
+    {
+        int slotCount = GetInventorySlotCount(itemType);
+
+        if (slotCount <= 0)
+        {
+            return -1;
+        }
+
+        List<InventoryItemData> itemList = GetInventoryItems(itemType);
+
+        for (int i = 0; i < slotCount; i++)
+        {
+            bool isOccupied = false;
+
+            foreach (InventoryItemData itemData in itemList)
+            {
+                if (itemData.InvenSlotIndex != i)
+                {
+                    continue;
+                }
+
+                isOccupied = true;
+                break;
+            }
+
+            if (!isOccupied)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary> 아이템 ID에 해당하는 인벤토리 데이터를 반환한다. </summary>
+    private InventoryItemData FindInventoryItem(int itemID)
+    {
+        foreach (InventoryItemData itemData in _saveData.Inventory)
+        {
+            if (itemData.ItemID == itemID)
+            {
+                return itemData;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary> 타입과 슬롯 인덱스가 일치하는 인벤토리 데이터를 반환한다. </summary>
+    private InventoryItemData FindInventoryItem(ItemType itemType, int slotIndex)
+    {
+        foreach (InventoryItemData itemData in _saveData.Inventory)
+        {
+            if (Managers.Table.Item.GetItemType(itemData.ItemID) != itemType)
+            {
+                continue;
+            }
+
+            if (itemData.InvenSlotIndex == slotIndex)
+            {
+                return itemData;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary> 지정된 QuickSlot에 등록된 아이템을 반환한다. </summary>
+    private InventoryItemData FindQuickSlotItem(int quickSlotIndex)
+    {
+        foreach (InventoryItemData itemData in _saveData.Inventory)
+        {
+            if (itemData.QuickSlotIndex == quickSlotIndex)
+            {
+                return itemData;
+            }
+        }
+
+        return null;
+    }
+
+    #endregion ===== 인벤토리 =====
+
+    #region ===== 상점 =====
+
+    /// <summary> 아이템 구매를 시도하고 결과를 반환한다. </summary>
     public PurchaseResult TryPurchaseItem(int itemID)
     {
         int price = Managers.Table.Shop.GetItemSellPrice(itemID);
@@ -99,80 +455,15 @@ public class DataManager
             return PurchaseResult.NotEnoughGold;
         }
 
-        TryAddItem(itemID, 1);
+        if (!TryAddItem(itemID, 1))
+        {
+            return PurchaseResult.InventoryFull;
+        }
+
         Save();
 
         return PurchaseResult.Success;
     }
-    
-    /// <summary> 아이템의 현재 보유 개수를 반환한다. </summary>
-    public int GetItemCount(int itemID)
-    {
-        InventoryItemData itemData = FindInventoryItem(itemID);
 
-        return itemData?.Count ?? 0;
-    }
-    
-    /// <summary> 인벤토리에서 아이템을 찾는다. </summary>
-    private InventoryItemData FindInventoryItem(int itemID)
-    {
-        return _saveData.Inventory.Find(item => item.ItemID == itemID);
-    }
-    
-    /// <summary> 지정된 개수의 아이템을 인벤토리에 추가할 수 있는지 확인한다. </summary>
-    private bool CanAddItem(int itemID, int count)
-    {
-        if (count <= 0)
-        {
-            return false;
-        }
-
-        InventoryItemData inventoryItem = FindInventoryItem(itemID);
-
-        if (inventoryItem == null)
-        {
-            return count <= Managers.Table.Item.GetItemLimitCount(itemID);
-        }
-
-        return inventoryItem.Count + count <= Managers.Table.Item.GetItemLimitCount(itemID);
-    }
-    
-    /// <summary> 아이템을 지정된 개수만큼 추가한다. </summary>
-    private bool TryAddItem(int itemID, int count)
-    {
-        if (count <= 0)
-        {
-            return false;
-        }
-
-        InventoryItemData inventoryItem = FindInventoryItem(itemID);
-
-        if (inventoryItem == null)
-        {
-            _saveData.Inventory.Add(new InventoryItemData
-            {
-                ItemID = itemID,
-                Count = count
-            });
-
-            return true;
-        }
-
-        if (inventoryItem.Count + count > Managers.Table.Item.GetItemLimitCount(itemID))
-        {
-            return false;
-        }
-
-        inventoryItem.Count += count;
-
-        return true;
-    }
-    
-    /// <summary> 현재 보유 중인 아이템 목록을 반환한다. </summary>
-    public IReadOnlyList<InventoryItemData> GetInventoryItemList()
-    {
-        return _saveData.Inventory;
-    }
-    
-    #endregion ===== 인벤토리 =====
+    #endregion ===== 상점 =====
 }

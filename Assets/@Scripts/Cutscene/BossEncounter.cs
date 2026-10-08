@@ -275,7 +275,7 @@ public class BossEncounter : MonoBehaviour
 
         if (Managers.Scene.TryGetCurrentScene(out GameScene scene))
         {
-            scene.HUD.SubscribeBossEvents(enemy);
+            scene.HUD.SubscribeBossEvents(enemy as BossCtrl);
         }
     }
     

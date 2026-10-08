@@ -212,7 +212,7 @@ public class ShopPopup : BasePopup
     /// <summary> 현재 보유 Gold를 UI에 표시한다. </summary>
     private void UpdateGoldText()
     {
-        Get<TMP_Text>(Texts.GoldText).text = Managers.Data.Gold.ToString("N0");
+        Get<TMP_Text>(Texts.GoldText).text = Managers.Data.GetCurrentGold().ToString("N0");
     }
 
     #endregion ===== 갱신 =====

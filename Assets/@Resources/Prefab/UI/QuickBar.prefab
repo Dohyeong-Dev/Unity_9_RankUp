@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4034951717733818770}
   - component: {fileID: 3164818378673038882}
   m_Layer: 5
-  m_Name: QuickItemCount
+  m_Name: ItemCountText1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 4422269134246825291}
   - component: {fileID: 2099686626921369157}
   m_Layer: 5
-  m_Name: QuickItemCount
+  m_Name: ItemCountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -565,7 +565,7 @@ GameObject:
   - component: {fileID: 4429538675669602700}
   - component: {fileID: 1974221634045996895}
   m_Layer: 5
-  m_Name: QuickItemBadge1
+  m_Name: Badge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -638,7 +638,7 @@ GameObject:
   - component: {fileID: 837769146200073451}
   - component: {fileID: 6722483711784558646}
   m_Layer: 5
-  m_Name: Badge
+  m_Name: BadgeImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -816,7 +816,7 @@ GameObject:
   - component: {fileID: 8854000175504473135}
   - component: {fileID: 6570418337423488106}
   m_Layer: 5
-  m_Name: Badge
+  m_Name: BadgeImage1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1080,7 +1080,7 @@ GameObject:
   - component: {fileID: 746953332485778736}
   - component: {fileID: 707203439101146046}
   m_Layer: 5
-  m_Name: Frame
+  m_Name: QuickFrame1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1157,7 +1157,7 @@ GameObject:
   - component: {fileID: 6428795088719977014}
   - component: {fileID: 8817787790408810242}
   m_Layer: 5
-  m_Name: Frame
+  m_Name: QuickFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1234,7 +1234,7 @@ GameObject:
   - component: {fileID: 6516481851719142680}
   - component: {fileID: 1818061197134771960}
   m_Layer: 5
-  m_Name: QuickItemImage
+  m_Name: ItemImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1385,7 +1385,7 @@ GameObject:
   - component: {fileID: 4814368814039186373}
   - component: {fileID: 3702057827010795325}
   m_Layer: 5
-  m_Name: QuickItemImage1
+  m_Name: ItemImage1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1594,7 +1594,7 @@ GameObject:
   - component: {fileID: 4515914697910346837}
   - component: {fileID: 4163809417906372871}
   m_Layer: 5
-  m_Name: QuickItemBadge
+  m_Name: Badge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
