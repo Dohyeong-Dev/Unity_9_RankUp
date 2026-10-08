@@ -173,11 +173,6 @@ public class GameHUD : BaseHUD
         _hpEmptyCoverTween?.Kill();
         _spEmptyCoverTween?.Kill();
 
-        if (_player == null)
-        {
-            return;
-        }
-
         UnsubscribePlayerEvents();
         UnsubscribeQuickBarEvents();
         UnsubscribeBossEvents();
