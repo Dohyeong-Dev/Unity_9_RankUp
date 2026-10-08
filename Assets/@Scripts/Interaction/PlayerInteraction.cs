@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class PlayerInteraction : MonoBehaviour
 
     private readonly List<IInteractable> _interactables = new();
 
+    private bool _isPlayerDead;
+    
     private void Start()
     {
         if (Managers.Scene.TryGetCurrentScene(out GameScene scene))
@@ -18,10 +21,17 @@ public class PlayerInteraction : MonoBehaviour
         {
             CPrint.Error("[PlayerInteraction] no game hud found");
         }
+
+        Managers.Event.OnPlayerDead += OnPlayerDead;
     }
 
     private void Update()
     {
+        if (_isPlayerDead)
+        {
+            return;
+        }
+        
         if (Managers.Input.KeyDown_F)
         {
             Interact();
@@ -55,6 +65,18 @@ public class PlayerInteraction : MonoBehaviour
         _interactables.Remove(interactable);
 
         UpdateInteractionUI();
+    }
+
+    private void OnDestroy()
+    {
+        Managers.Event.OnPlayerDead -= OnPlayerDead;
+    }
+    
+    private void OnPlayerDead()
+    {
+        _isPlayerDead = true;
+        
+        _gameHud.SetInteractionTextActive(false);
     }
 
     /// <summary> 현재 상호작용 가능한 대상과 상호작용한다. </summary>
