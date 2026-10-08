@@ -35,6 +35,7 @@ public class InvenPopup : BasePopup
 
     private InvenSlot _selectedSlot;
     private InvenSlot _hoveredSlot;
+    private int _selectedQuickSlotIndex = -1;
 
     private Image _selectedTempImage;
 
@@ -62,7 +63,7 @@ public class InvenPopup : BasePopup
     {
         CreateInvenSlots();
         CreateSelectedTempImage();
-        
+
         InitializeExitButton();
         InitializeCategory();
 
@@ -74,7 +75,7 @@ public class InvenPopup : BasePopup
 
         // 인벤토리 팝업 클릭 이벤트 연결
         gameObject.BindEvent(UIEventType.Click, OnPointerClick);
-        
+
         UpdateInvenUI();
     }
 
@@ -164,8 +165,8 @@ public class InvenPopup : BasePopup
     {
         InvenSlot[] slotList = itemType switch
         {
-            ItemType.Equipment => _equipmentSlots = new InvenSlot[Managers.Data.GetInventorySlotCount(itemType)],
-            ItemType.Consumable => _consumableSlots = new InvenSlot[Managers.Data.GetInventorySlotCount(itemType)],
+            ItemType.Equipment => _equipmentSlots = new InvenSlot[Managers.Data.GetInvenSlotCount(itemType)],
+            ItemType.Consumable => _consumableSlots = new InvenSlot[Managers.Data.GetInvenSlotCount(itemType)],
             _ => null
         };
 
@@ -177,7 +178,7 @@ public class InvenPopup : BasePopup
         for (int i = 0; i < slotList.Length; i++)
         {
             int slotIndex = i;
-            
+
             InvenSlot slot = Managers.UI.MakeSlot<InvenSlot>(scroll.content);
 
             if (slot == null)
@@ -292,7 +293,7 @@ public class InvenPopup : BasePopup
     /// <summary> 선택된 아이템 임시 이미지의 위치를 마우스 위치로 갱신한다. </summary>
     private void UpdateSelectedTempImagePos()
     {
-        if (_selectedSlot == null || _selectedTempImage == null)
+        if (_selectedTempImage.sprite == null || !_selectedTempImage.gameObject.activeSelf)
         {
             return;
         }
@@ -360,11 +361,9 @@ public class InvenPopup : BasePopup
 
     #region ===== 아이템 선택 =====
 
-    /// <summary> 마우스를 따라다니는 임시 이미지를 선택한 아이템의 이미지로 바꾼다. </summary>
-    private void ChangeSelectedTempImage()
+    /// <summary> 마우스를 따라다니는 임시 이미지를 선택한 아이템의 이미지로 바꾼 후 활성화시킨다. </summary>
+    private void ChangeSelectedTempImage(Image selectedItemImage)
     {
-        Image selectedItemImage = _selectedSlot.GetItemImage(); 
-        
         _selectedTempImage.sprite = selectedItemImage.sprite;
 
         RectTransform sourceRect = selectedItemImage.rectTransform;
@@ -377,7 +376,7 @@ public class InvenPopup : BasePopup
 
         UpdateSelectedTempImagePos();
     }
-    
+
     /// <summary> 선택된 아이템을 지정된 인벤토리 슬롯으로 이동한다. </summary>
     private void PlaceSelectedItem(InvenSlot targetSlot)
     {
@@ -396,7 +395,7 @@ public class InvenPopup : BasePopup
         {
             UpdateInvenUI();
         }
-        
+
         CancelSelectedItem();
     }
 
@@ -424,7 +423,8 @@ public class InvenPopup : BasePopup
     private void CancelSelectedItem()
     {
         _selectedSlot = null;
-
+        SetSelectedQuickSlotIndex(-1);
+        
         HideSelectedTempImage();
     }
 
@@ -454,7 +454,7 @@ public class InvenPopup : BasePopup
         }
 
         _hoveredSlot = null;
-        
+
         _itemDescription.Hide();
     }
 
@@ -477,17 +477,89 @@ public class InvenPopup : BasePopup
 
     #endregion ===== 아이템 설명 =====
 
+    #region ===== 퀵바 =====
+    
+    /// <summary> QuickBar의 아이템을 선택하고 마우스 이동용 이미지로 설정한다. </summary>
+    private void SelectQuickSlot(int slotIndex)
+    {
+        int itemID = _quickBar.GetItemID(slotIndex);
+
+        if (itemID < 0)
+        {
+            return;
+        }
+
+        SetSelectedQuickSlotIndex(slotIndex);
+
+        Image image = _quickBar.GetQuickSlot(slotIndex).ItemImage;
+
+        if (image == null)
+        {
+            CancelSelectedItem();
+            return;
+        }
+
+        ChangeSelectedTempImage(image);
+    }
+    
+    /// <summary> 선택한 QuickSlot 아이템을 지정된 QuickSlot으로 이동한다. </summary>
+    private void MoveSelectedQuickSlot(int targetSlotIndex)
+    {
+        if (_selectedQuickSlotIndex == targetSlotIndex)
+        {
+            CancelSelectedItem();
+            return;
+        }
+
+        int itemID = _quickBar.GetItemID(_selectedQuickSlotIndex);
+
+        if (itemID < 0)
+        {
+            CancelSelectedItem();
+            return;
+        }
+
+        if (Managers.Data.TrySetQuickSlot(itemID, targetSlotIndex))
+        {
+            CancelSelectedItem();
+            UpdateInvenUI();
+        }
+    }
+
+    private void SetSelectedQuickSlotIndex(int slotIndex)
+    {
+        _selectedQuickSlotIndex = slotIndex;
+    }
+    
+    /// <summary> 선택된 QuickSlot 아이템을 QuickBar에서 해제한다. </summary>
+    private void RemoveSelectedQuickSlot()
+    {
+        if (_selectedQuickSlotIndex < 0)
+        {
+            return;
+        }
+
+        Managers.Data.ClearQuickSlot(_selectedQuickSlotIndex);
+        UpdateQuickBar();
+        
+        CancelSelectedItem();
+    }
+
+    #endregion ===== 퀵바 =====
+    
     #region ===== 이벤트 =====
 
     /// <summary> Popup의 슬롯 외 영역 클릭을 처리한다. </summary>
     public void OnPointerClick()
     {
-        if (_selectedSlot == null)
+        if (_selectedQuickSlotIndex < 0)
         {
-            return;
+            CancelSelectedItem();
         }
-
-        CancelSelectedItem();
+        else // 퀵슬롯을 선택한상태로 퀵슬롯영역이 아닌 곳에 클릭한 경우 해제한다.
+        {
+            RemoveSelectedQuickSlot();
+        }
     }
 
     /// <summary> 해당 카테고리가 활성화됐을 때 호출된다. </summary>
@@ -515,7 +587,11 @@ public class InvenPopup : BasePopup
         slot.gameObject.ClearEvent();
         slot.gameObject.BindEvent(UIEventType.PointerEnter, () => ShowItemDescription(slot));
         slot.gameObject.BindEvent(UIEventType.PointerExit, HideItemDescription);
-        slot.gameObject.BindEvent(UIEventType.Click, () => OnClickInvenSlot(slot));
+        slot.gameObject.BindEvent(UIEventType.Click, () =>
+        {
+            RemoveSelectedQuickSlot();
+            OnClickInvenSlot(slot);
+        });
     }
 
     /// <summary> 인벤토리 슬롯 클릭을 처리한다. </summary>
@@ -534,7 +610,7 @@ public class InvenPopup : BasePopup
             }
 
             _selectedSlot = slot;
-            ChangeSelectedTempImage();
+            ChangeSelectedTempImage(_selectedSlot.GetItemImage());
         }
         else // 아이템 임시 이미지 생성 상태
         {
@@ -552,12 +628,21 @@ public class InvenPopup : BasePopup
     /// <summary> QuickBar 슬롯 클릭을 처리한다. </summary>
     private void OnClickQuickSlot(int slotIndex)
     {
-        if (_selectedSlot == null)
+        // 인벤토리 아이템을 선택한 상태라면 QuickBar에 배치한다.
+        if (_selectedSlot != null)
         {
+            PlaceSelectedItemInQuickSlot(slotIndex);
             return;
         }
 
-        PlaceSelectedItemInQuickSlot(slotIndex);
+        // 이미 QuickBar 아이템을 선택한 상태라면 QuickSlot끼리 위치를 교환한다.
+        if (_selectedQuickSlotIndex >= 0)
+        {
+            MoveSelectedQuickSlot(slotIndex);
+            return;
+        }
+
+        SelectQuickSlot(slotIndex);
     }
 
     /// <summary> Exit 버튼을 눌렀을 때 Popup을 닫는다. </summary>
@@ -573,7 +658,7 @@ public class InvenPopup : BasePopup
 
     #endregion ===== 이벤트 =====
 
-    #region ===== Get/Set =====
+    #region ===== Get =====
 
     /// <summary> 지정된 타입의 인벤토리 슬롯 배열을 반환한다. </summary>
     private InvenSlot[] GetSlotList(ItemType itemType)
@@ -591,7 +676,7 @@ public class InvenPopup : BasePopup
     {
         List<InventoryItemData> inventoryItems = new();
 
-        IReadOnlyList<InventoryItemData> inventoryItemList = Managers.Data.GetInventoryItemList();
+        IReadOnlyList<InventoryItemData> inventoryItemList = Managers.Data.GetInvenItemList();
 
         foreach (InventoryItemData inventoryItem in inventoryItemList)
         {
@@ -606,5 +691,5 @@ public class InvenPopup : BasePopup
         return inventoryItems;
     }
 
-    #endregion ===== Get/Set =====
+    #endregion ===== Get =====
 }

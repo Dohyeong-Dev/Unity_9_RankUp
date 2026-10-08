@@ -7,16 +7,17 @@ using UnityEngine.UI;
 /// <summary> QuickBar의 개별 슬롯에 표시되는 아이템 UI를 관리한다. </summary>
 public class QuickSlot
 {
-    private readonly Image _frameImage;
+    private readonly Image _clickImage;
     private readonly Image _itemImage;
+    public Image ItemImage => _itemImage;
     private readonly Image _badgeImage;
     private readonly TMP_Text _itemCountText;
 
-    public GameObject ClickObject => _frameImage.gameObject;
+    public GameObject ClickObject => _clickImage.gameObject;
 
-    public QuickSlot(Image frameImage, Image itemImage, Image badgeImage, TMP_Text itemCountText)
+    public QuickSlot(Image clickImage, Image itemImage, Image badgeImage, TMP_Text itemCountText)
     {
-        _frameImage = frameImage;
+        _clickImage = clickImage;
         _itemImage = itemImage;
         _badgeImage = badgeImage;
         _itemCountText = itemCountText;
@@ -65,8 +66,8 @@ public class QuickBar : BaseUI
 {
     public enum Images
     {
-        QuickFrame,
-        QuickFrame1,
+        ClickImage,
+        ClickImage1,
         ItemImage,
         ItemImage1,
         BadgeImage,
@@ -113,17 +114,52 @@ public class QuickBar : BaseUI
     {
         _quickSlots = new QuickSlot[QuickSlotCount];
 
-        _quickSlots[0] = new QuickSlot(Get<Image>(Images.QuickFrame),
+        _quickSlots[0] = new QuickSlot(Get<Image>(Images.ClickImage),
             Get<Image>(Images.ItemImage), Get<Image>(Images.BadgeImage),
             Get<TMP_Text>(Texts.ItemCountText));
 
-        _quickSlots[1] = new QuickSlot(Get<Image>(Images.QuickFrame1),
+        _quickSlots[1] = new QuickSlot(Get<Image>(Images.ClickImage1),
             Get<Image>(Images.ItemImage1), Get<Image>(Images.BadgeImage1),
             Get<TMP_Text>(Texts.ItemCountText1));
     }
 
     #endregion ===== 초기화 =====
 
+    /// <summary> 지정된 QuickSlot에 설정된 아이템 ID를 반환한다. </summary>
+    public int GetItemID(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= QuickSlotCount)
+        {
+            return -1;
+        }
+
+        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
+
+        foreach (InventoryItemData itemData in inventoryItems)
+        {
+            if (itemData.QuickSlotIndex != slotIndex)
+            {
+                continue;
+            }
+
+            return itemData.ItemID;
+        }
+
+        return -1;
+    }
+
+    //
+    public QuickSlot GetQuickSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= QuickSlotCount)
+        {
+            return null;
+            
+        }
+        
+        return _quickSlots[slotIndex];
+    }
+    
     /// <summary> QuickSlot 클릭 이벤트를 등록한다. </summary>
     public void SetSlotClickHandler(Action<int> handler)
     {
@@ -156,7 +192,7 @@ public class QuickBar : BaseUI
 
         ClearAllSlots();
 
-        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInventoryItemList();
+        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
 
         foreach (InventoryItemData itemData in inventoryItems)
         {

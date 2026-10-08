@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine.UI;
 
 /// <summary> 게임 종료 또는 게임 클리어 결과를 표시하고 게임 재시작을 처리하는 Screen UI다. </summary>
@@ -29,7 +28,6 @@ public class EndScreen : BaseScreen
     protected override void OnStart()
     {
         Get<Button>(Buttons.RetryBtn).onClick.AddListener(Restart);
-        Get<Image>(Images.Bg).gameObject.SetActive(false);
         
         Managers.Sound.StopBgm();
         

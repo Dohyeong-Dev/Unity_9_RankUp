@@ -58,9 +58,9 @@ public class DataManager
     /// <summary> SaveData에 저장된 InvenSlotIndex가 믿을 만한 상태인지 검사하고 잘못된 슬롯 번호나 중복 슬롯이 있으면 빈 슬롯에 다시 배치한다. </summary>
     private void InitializeInvenSlotIndex(ItemType itemType)
     {
-        List<InventoryItemData> itemList = GetInventoryItems(itemType);
+        List<InventoryItemData> itemList = GetInvenItems(itemType);
 
-        int slotCount = GetInventorySlotCount(itemType);
+        int slotCount = GetInvenSlotCount(itemType);
 
         bool[] occupiedSlots = new bool[slotCount];
 
@@ -160,7 +160,7 @@ public class DataManager
             return false;
         }
 
-        InventoryItemData inventoryItem = FindInventoryItem(itemID);
+        InventoryItemData inventoryItem = GetInventoryItem(itemID);
 
         // 이미 소지 중인 경우 수량을 추가한다.
         if (inventoryItem != null)
@@ -174,7 +174,7 @@ public class DataManager
 
         // 새로운 아이템인 경우 빈 슬롯에 추가한다.
         ItemType itemType = Managers.Table.Item.GetItemType(itemID);
-        int emptySlotIndex = GetEmptyInventorySlotIndex(itemType);
+        int emptySlotIndex = GetEmptyInvenSlotIndex(itemType);
 
         inventoryItem = new InventoryItemData
         {
@@ -206,7 +206,7 @@ public class DataManager
             return false;
         }
 
-        InventoryItemData inventoryItem = FindInventoryItem(itemID);
+        InventoryItemData inventoryItem = GetInventoryItem(itemID);
 
         if (inventoryItem != null)
         {
@@ -215,7 +215,7 @@ public class DataManager
 
         ItemType itemType = Managers.Table.Item.GetItemType(itemID);
 
-        return GetEmptyInventorySlotIndex(itemType) >= 0;
+        return GetEmptyInvenSlotIndex(itemType) >= 0;
     }
 
     /// <summary> 지정된 아이템을 인벤토리의 다른 슬롯으로 이동한다. </summary>
@@ -231,7 +231,7 @@ public class DataManager
             return false;
         }
 
-        InventoryItemData sourceItem = FindInventoryItem(itemID);
+        InventoryItemData sourceItem = GetInventoryItem(itemID);
 
         if (sourceItem == null)
         {
@@ -243,7 +243,7 @@ public class DataManager
             return false;
         }
 
-        InventoryItemData targetItem = FindInventoryItem(itemType, targetSlotIndex);
+        InventoryItemData targetItem = GetInventoryItem(itemType, targetSlotIndex);
 
         // 같은 슬롯을 다시 클릭한 경우
         if (sourceItem == targetItem)
@@ -267,30 +267,27 @@ public class DataManager
         return true;
     }
 
-    /// <summary> 지정된 아이템을 QuickSlot에 등록하거나 기존 아이템과 교환한다. </summary>
-    public bool TrySetQuickSlot(int itemID, int quickSlotIndex)
+    /// <summary> 지정된 아이템을 QuickSlot에 등록한다. </summary>
+    public bool TrySetQuickSlot(int itemID, int targetQuickSlotIndex)
     {
-        if (itemID <= 0 || quickSlotIndex < 0)
+        if (itemID <= 0 || targetQuickSlotIndex < 0)
         {
             return false;
         }
 
-        InventoryItemData sourceItem = FindInventoryItem(itemID);
-
+        InventoryItemData sourceItem = GetInventoryItem(itemID);
         if (sourceItem == null)
         {
             return false;
         }
 
         ItemType itemType = Managers.Table.Item.GetItemType(itemID);
-
         if (itemType != ItemType.Consumable)
         {
             return false;
         }
 
-        InventoryItemData targetItem = FindQuickSlotItem(quickSlotIndex);
-
+        InventoryItemData targetItem = GetQuickSlotItem(targetQuickSlotIndex);
         // 같은 QuickSlot을 다시 클릭한 경우
         if (sourceItem == targetItem)
         {
@@ -304,7 +301,7 @@ public class DataManager
         }
         else // 빈 QuickSlot이면 해당 위치에 등록한다.
         {
-            sourceItem.QuickSlotIndex = quickSlotIndex;
+            sourceItem.QuickSlotIndex = targetQuickSlotIndex;
         }
 
         Save();
@@ -313,8 +310,25 @@ public class DataManager
         return true;
     }
 
+    public void ClearQuickSlot(int quickSlotIndex)
+    {
+        if (quickSlotIndex < 0)
+        {
+            return;
+        }
+        
+        InventoryItemData item = GetQuickSlotItem(quickSlotIndex);
+        if (item != null)
+        {
+            item.QuickSlotIndex = -1;
+            
+            Save();
+            OnQuickSlotChanged?.Invoke();
+        }
+    }
+
     /// <summary> 지정된 타입의 인벤토리 아이템 목록을 반환한다. </summary>
-    public List<InventoryItemData> GetInventoryItems(ItemType itemType)
+    public List<InventoryItemData> GetInvenItems(ItemType itemType)
     {
         List<InventoryItemData> itemList = new();
 
@@ -332,13 +346,13 @@ public class DataManager
     }
 
     /// <summary> 현재 인벤토리의 전체 아이템 목록을 반환한다. </summary>
-    public IReadOnlyList<InventoryItemData> GetInventoryItemList()
+    public IReadOnlyList<InventoryItemData> GetInvenItemList()
     {
         return _saveData.Inventory;
     }
     
     /// <summary> 아이템 타입에 따른 인벤토리 슬롯 개수를 반환한다. </summary>
-    public int GetInventorySlotCount(ItemType itemType)
+    public int GetInvenSlotCount(ItemType itemType)
     {
         return itemType switch
         {
@@ -349,16 +363,16 @@ public class DataManager
     }
 
     /// <summary> 지정된 타입의 비어있는 인벤토리 슬롯을 반환한다. </summary>
-    private int GetEmptyInventorySlotIndex(ItemType itemType)
+    private int GetEmptyInvenSlotIndex(ItemType itemType)
     {
-        int slotCount = GetInventorySlotCount(itemType);
+        int slotCount = GetInvenSlotCount(itemType);
 
         if (slotCount <= 0)
         {
             return -1;
         }
 
-        List<InventoryItemData> itemList = GetInventoryItems(itemType);
+        List<InventoryItemData> itemList = GetInvenItems(itemType);
 
         for (int i = 0; i < slotCount; i++)
         {
@@ -385,7 +399,7 @@ public class DataManager
     }
 
     /// <summary> 아이템 ID에 해당하는 인벤토리 데이터를 반환한다. </summary>
-    private InventoryItemData FindInventoryItem(int itemID)
+    private InventoryItemData GetInventoryItem(int itemID)
     {
         foreach (InventoryItemData itemData in _saveData.Inventory)
         {
@@ -399,7 +413,7 @@ public class DataManager
     }
 
     /// <summary> 타입과 슬롯 인덱스가 일치하는 인벤토리 데이터를 반환한다. </summary>
-    private InventoryItemData FindInventoryItem(ItemType itemType, int slotIndex)
+    private InventoryItemData GetInventoryItem(ItemType itemType, int slotIndex)
     {
         foreach (InventoryItemData itemData in _saveData.Inventory)
         {
@@ -418,7 +432,7 @@ public class DataManager
     }
 
     /// <summary> 지정된 QuickSlot에 등록된 아이템을 반환한다. </summary>
-    private InventoryItemData FindQuickSlotItem(int quickSlotIndex)
+    private InventoryItemData GetQuickSlotItem(int quickSlotIndex)
     {
         foreach (InventoryItemData itemData in _saveData.Inventory)
         {
@@ -430,7 +444,7 @@ public class DataManager
 
         return null;
     }
-
+    
     #endregion ===== 인벤토리 =====
 
     #region ===== 상점 =====
