@@ -126,6 +126,46 @@ public class GameHUD : BaseHUD
             Managers.UI.OpenPopup<AlertPopup>().Set(AlertPopup.ContentsType.Save);
             SetSideIconActive(SideBar.Save, true);
         }
+
+        OnInputQuickBar();
+    }
+
+    private void OnInputQuickBar()
+    {
+        if (_quickBar == null || _player == null)
+        {
+            return;
+        }
+
+        if (Managers.Input.KeyDown_1)
+        {
+            UseQuickSlotItem(0);
+        }
+        else if (Managers.Input.KeyDown_2)
+        {
+            UseQuickSlotItem(1);
+        }
+    }
+
+    /// <summary> 지정된 QuickSlot에 등록된 아이템을 사용한다. </summary>
+    private void UseQuickSlotItem(int quickSlotIndex)
+    {
+        int itemID = _quickBar.GetItemID(quickSlotIndex);
+
+        if (itemID <= 0)
+        {
+            return;
+        }
+
+        if (!Managers.Data.TryUseItem(itemID))
+        {
+            return;
+        }
+
+        BuffType buffType = Managers.Table.Item.GetBuffType(itemID);
+        int buffValue = Managers.Table.Item.GetBuffValue(itemID);
+
+        _player.Recovery(buffType, buffValue);
     }
 
     private void OnDestroy()

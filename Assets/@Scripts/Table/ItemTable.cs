@@ -6,8 +6,11 @@ public class ItemData : TableData
     [CsvField("설명")]
     public string Description;
 
+    [CsvField("버프타입")]
+    public string BuffType;
+    
     [CsvField("버프값")]
-    public string BuffValue;
+    public int BuffValue;
 
     [CsvField("리소스이름")]
     public string ResourceName;
@@ -39,14 +42,36 @@ public class ItemTable : TableLoader<ItemData>
 
         return string.Format(data.Description, data.BuffValue);
     }
-
+    
     /// <summary> 아이템 ID에 해당하는 리소스이름을 가져온다. </summary>
     public string GetItemResourceName(int itemID)
     {
         return DataMap.TryGetValue(itemID, out ItemData data) ? data.ResourceName : string.Empty;
     }
 
-    /// <summary> 아이템 ID에 해당하는 타입을 획득한다. </summary>
+    /// <summary> 아이템 ID에 해당하는 버프 타입을 획득한다. </summary>
+    public BuffType GetBuffType(int itemID)
+    {
+        if (DataMap.TryGetValue(itemID, out ItemData data) && Utils.TryParseEnum(data.BuffType, out BuffType type))
+        {
+            return type;
+        }
+
+        return BuffType.None;
+    }
+    
+    /// <summary> 아이템 ID에 해당하는 버프 밸류 값을 획득한다. </summary>
+    public int GetBuffValue(int itemID)
+    {
+        if (DataMap.TryGetValue(itemID, out ItemData data))
+        {
+            return data.BuffValue;
+        }
+
+        return 0;
+    }
+    
+    /// <summary> 아이템 ID에 해당하는 아이템 타입을 획득한다. </summary>
     public ItemType GetItemType(int itemID)
     {
         if (DataMap.TryGetValue(itemID, out ItemData data) && Utils.TryParseEnum(data.Type, out ItemType type))

@@ -5,6 +5,13 @@ public enum ItemType
     Consumable,
 }
 
+public enum BuffType
+{
+    None,
+    HP,
+    SP,
+}
+
 public class Item
 {
     

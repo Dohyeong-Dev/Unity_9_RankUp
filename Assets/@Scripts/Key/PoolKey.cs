@@ -24,5 +24,7 @@ public abstract class PoolKey
         public const string EnemyBoss = RootPath + "Enemy/EnemyBoss";
 
         public const string PlayerHitEffect = RootPath + "Effect/PlayerHitEffect";
+        public const string HpUp = RootPath + "Effect/HpUp";
+        public const string SpUp = RootPath + "Effect/SpUp";
     }
 }

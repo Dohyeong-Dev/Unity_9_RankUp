@@ -15,6 +15,8 @@ public class QuickSlot
 
     public GameObject ClickObject => _clickImage.gameObject;
 
+    private InventoryItemData _itemData;
+    
     public QuickSlot(Image clickImage, Image itemImage, Image badgeImage, TMP_Text itemCountText)
     {
         _clickImage = clickImage;
@@ -26,25 +28,31 @@ public class QuickSlot
     }
 
     /// <summary> QuickSlot에 아이템 정보를 표시한다. </summary>
-    public void SetItem(Sprite sprite, int count)
+    public void SetItem(InventoryItemData itemData)
     {
-        if (sprite == null)
+        if (itemData == null)
         {
             Clear();
             return;
         }
+        
+        _itemData = itemData;
 
+        // 아이템 이미지
+        string resourceName = Managers.Table.Item.GetItemResourceName(_itemData.ItemID);
+        Sprite sprite = Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + resourceName);
+        
         _itemImage.sprite = sprite;
         _itemImage.gameObject.SetActive(true);
 
-        bool hasCount = count > 0;
+        // 아이템 개수
+        bool hasCount = _itemData.Count > 0;
 
         _badgeImage.gameObject.SetActive(hasCount);
         _itemCountText.gameObject.SetActive(hasCount);
-
         if (hasCount)
         {
-            _itemCountText.text = count.ToString("N0");
+            _itemCountText.text = _itemData.Count.ToString("N0");
         }
     }
 
@@ -123,14 +131,56 @@ public class QuickBar : BaseUI
             Get<TMP_Text>(Texts.ItemCountText1));
     }
 
+    /// <summary> 모든 QuickSlot을 비운다. </summary>
+    private void ClearAllSlots()
+    {
+        if (_quickSlots == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _quickSlots.Length; i++)
+        {
+            if (_quickSlots[i] == null)
+            {
+                continue;
+            }
+
+            _quickSlots[i].Clear();
+        }
+    }
+    
     #endregion ===== 초기화 =====
 
+    /// <summary> 저장된 QuickSlot 데이터를 UI에 반영한다. </summary>
+    public void UpdateUI()
+    {
+        if (_quickSlots == null)
+        {
+            Initialize();
+        }
+
+        ClearAllSlots();
+
+        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
+
+        foreach (InventoryItemData itemData in inventoryItems)
+        {
+            if (!IsValidSlotIndex(itemData.QuickSlotIndex))
+            {
+                continue;
+            }
+
+            _quickSlots[itemData.QuickSlotIndex].SetItem(itemData);
+        }
+    }
+    
     /// <summary> 지정된 QuickSlot에 설정된 아이템 ID를 반환한다. </summary>
     public int GetItemID(int slotIndex)
     {
-        if (slotIndex < 0 || slotIndex >= QuickSlotCount)
+        if (!IsValidSlotIndex(slotIndex))
         {
-            return -1;
+            return 0;
         }
 
         IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
@@ -145,16 +195,15 @@ public class QuickBar : BaseUI
             return itemData.ItemID;
         }
 
-        return -1;
+        return 0;
     }
 
-    //
+    /// <summary> 인덱스에 해당하는 퀵슬롯을 반환한다. </summary>
     public QuickSlot GetQuickSlot(int slotIndex)
     {
-        if (slotIndex < 0 || slotIndex >= QuickSlotCount)
+        if (!IsValidSlotIndex(slotIndex))
         {
             return null;
-            
         }
         
         return _quickSlots[slotIndex];
@@ -182,61 +231,9 @@ public class QuickBar : BaseUI
         }
     }
 
-    /// <summary> 저장된 QuickSlot 데이터를 UI에 반영한다. </summary>
-    public void UpdateUI()
-    {
-        if (_quickSlots == null)
-        {
-            Initialize();
-        }
-
-        ClearAllSlots();
-
-        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
-
-        foreach (InventoryItemData itemData in inventoryItems)
-        {
-            if (!IsValidSlotIndex(itemData.QuickSlotIndex))
-            {
-                continue;
-            }
-
-            Sprite sprite = GetItemSprite(itemData.ItemID);
-
-            _quickSlots[itemData.QuickSlotIndex].SetItem(sprite, itemData.Count);
-        }
-    }
-
     /// <summary> QuickSlot 인덱스가 유효한지 확인한다. </summary>
     private bool IsValidSlotIndex(int slotIndex)
     {
         return _quickSlots != null && slotIndex >= 0 && slotIndex < _quickSlots.Length && _quickSlots[slotIndex] != null;
-    }
-
-    /// <summary> 모든 QuickSlot을 비운다. </summary>
-    private void ClearAllSlots()
-    {
-        if (_quickSlots == null)
-        {
-            return;
-        }
-
-        for (int i = 0; i < _quickSlots.Length; i++)
-        {
-            if (_quickSlots[i] == null)
-            {
-                continue;
-            }
-
-            _quickSlots[i].Clear();
-        }
-    }
-
-    /// <summary> 아이템 ID에 해당하는 Sprite를 반환한다. </summary>
-    private Sprite GetItemSprite(int itemID)
-    {
-        string resourceName = Managers.Table.Item.GetItemResourceName(itemID);
-
-        return Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + resourceName);
     }
 }

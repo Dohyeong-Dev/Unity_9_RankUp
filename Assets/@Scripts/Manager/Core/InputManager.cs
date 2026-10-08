@@ -32,6 +32,9 @@ public class InputManager
     public bool KeyDown_Esc => Input.GetKeyDown(KeyCode.Escape);
     public bool KeyDown_Enter => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
+    public bool KeyDown_1 => Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
+    public bool KeyDown_2 => Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2);
+    
     public bool KeyDown_O => Input.GetKeyDown(KeyCode.O);
     public bool KeyDown_P => Input.GetKeyDown(KeyCode.P);
     public bool KeyDown_I => Input.GetKeyDown(KeyCode.I);

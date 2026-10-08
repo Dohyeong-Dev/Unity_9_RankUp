@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary> 플레이어의 이동 상태, 행동, 스탯, 피격 및 사망 처리를 관리한다. </summary>
@@ -117,7 +118,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
     [SerializeField] private float _spActionResumeThreshold = 10f;
 
     [Tooltip("초당 SP 회복량")]
-    [SerializeField] private float _spRecoveryRate = 30f;
+    [SerializeField] private float _spRecoveryAutoRate = 30f;
 
     private float _sp;
 
@@ -148,7 +149,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         UpdateGroundAndFallState();
 
         CheckDie();
-        RecoverSp();
+        RecoverSpAuto();
     }
 
     private void FixedUpdate()
@@ -548,6 +549,27 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
 
     #region ===== 스탯 =====
 
+    /// <summary> 회복시킨다. </summary>
+    public void Recovery(BuffType buffType, int value)
+    {
+        Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.Recovery);
+        
+        if (buffType == BuffType.HP)
+        {
+            PoolObj poolObj = Managers.Pool.Get(PoolKey.Path.HpUp);
+            poolObj.AttachTo(transform);
+            poolObj.GetOrAddComponent<LifetimePoolObject>().SetLifetime(1);
+            SetHp(value);
+        }
+        else if (buffType == BuffType.SP)
+        {
+            PoolObj poolObj = Managers.Pool.Get(PoolKey.Path.SpUp);
+            poolObj.AttachTo(transform);
+            poolObj.GetOrAddComponent<LifetimePoolObject>().SetLifetime(1);
+            SetSp(value);
+        }
+    }
+    
     /// <summary> HP를 변경하고 값이 달라졌으면 HP 변경 이벤트를 호출한다. </summary>
     public void SetHp(float value)
     {
@@ -596,8 +618,8 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         OnSpChanged?.Invoke(_sp, _maxSp);
     }
 
-    /// <summary> 현재 상태에 따라 SP를 회복한다. </summary>
-    private void RecoverSp()
+    /// <summary> 현재 상태에 따라 SP를 자동 회복한다. </summary>
+    private void RecoverSpAuto()
     {
         if (_sp >= _maxSp)
         {
@@ -610,7 +632,7 @@ public class PlayerCtrl : MonoBehaviour, IDamageable
         }
 
         float recoveryMultiplier = IsMoving ? 0.5f : 1f;
-        SetSp(_spRecoveryRate * recoveryMultiplier * Time.deltaTime);
+        SetSp(_spRecoveryAutoRate * recoveryMultiplier * Time.deltaTime);
     }
 
     #endregion ===== 스탯 =====

@@ -167,6 +167,7 @@ public class DataManager
         {
             inventoryItem.Count += count;
 
+            OnQuickSlotChanged?.Invoke();
             Save();
 
             return true;
@@ -186,11 +187,46 @@ public class DataManager
 
         _saveData.Inventory.Add(inventoryItem);
 
+        OnQuickSlotChanged?.Invoke();
         Save();
 
         return true;
     }
 
+    /// <summary> 지정된 아이템을 사용할 수 있는지 확인하고 수량을 차감한다. </summary>
+    public bool TryUseItem(int itemID)
+    {
+        if (itemID <= 0)
+        {
+            return false;
+        }
+
+        InventoryItemData item = GetInventoryItem(itemID);
+
+        if (item == null || item.Count <= 0)
+        {
+            return false;
+        }
+
+        if (Managers.Table.Item.GetItemType(itemID) != ItemType.Consumable)
+        {
+            return false;
+        }
+
+        item.Count--;
+
+        // 모두 사용한 경우 인벤토리에서 제거한다.
+        if (item.Count <= 0)
+        {
+            _saveData.Inventory.Remove(item);
+        }
+        
+        OnQuickSlotChanged?.Invoke();
+        Save();
+
+        return true;
+    }
+    
     /// <summary> 아이템을 인벤토리에 추가할 수 있는지 확인한다. </summary>
     private bool CanAddItem(int itemID, int count)
     {

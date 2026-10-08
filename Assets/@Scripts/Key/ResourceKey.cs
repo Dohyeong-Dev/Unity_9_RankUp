@@ -64,7 +64,8 @@ public abstract class ResourceKey
             GameOver,
             GameClear,
             PickUpItem,
-            Button
+            Button,
+            Recovery
         }
         
         #endregion ===== 사운드 =====

@@ -93,6 +93,8 @@ public class GameScene : BaseScene
         Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.Iceball), 10);
         Managers.Pool.CreatePool(PoolKey.Path.GetProjectilePath(PoolKey.ProjectileType.SparkSpear), 5);
         Managers.Pool.CreatePool(PoolKey.Path.PlayerHitEffect, 3);
+        Managers.Pool.CreatePool(PoolKey.Path.HpUp, 3);
+        Managers.Pool.CreatePool(PoolKey.Path.SpUp, 3);
     }
     
     #endregion ===== 초기화 =====
