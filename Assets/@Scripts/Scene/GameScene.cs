@@ -45,6 +45,7 @@ public class GameScene : BaseScene
 
         Managers.Event.RaisePhaseUpdated();
 
+        Managers.Event.OnPlayerDead += Managers.UI.CloseAll;
         Managers.Event.OnBossClear += OpenClearScreen;
         
         Managers.Sound.PlayBgm(ResourceKey.Name.BgmType.GlobalResonance, fadeTime: 3f);
@@ -58,6 +59,7 @@ public class GameScene : BaseScene
     {
         if (Managers.Event != null)
         {
+            Managers.Event.OnPlayerDead -= Managers.UI.CloseAll;
             Managers.Event.OnBossClear -= OpenClearScreen;
         }
     }

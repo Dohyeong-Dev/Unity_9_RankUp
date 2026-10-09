@@ -32,11 +32,11 @@ public abstract class BaseLocomotionBehaviour : MonoBehaviour
     {
         OnUpdateBeforeInput();
 
-        if (!Managers.Input.CanReceivePlayer)
+        if (!Managers.Input.CanReceivePlayer || Player.IsDead)
         {
             return;
         }
-
+        
         OnUpdateAfterInput();
     }
 
