@@ -7,14 +7,15 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Canvas), typeof(CanvasScaler))]
 public abstract class BasePopup : BaseUI
 {
+    private Image _background;
     protected GraphicRaycaster _graphicRaycaster;
-    
+    public bool IsRaycastEnabled => _graphicRaycaster != null && _graphicRaycaster.isActiveAndEnabled;
+
     private Action _closeAction;
 
-    public bool IsRaycastEnabled => _graphicRaycaster != null && _graphicRaycaster.isActiveAndEnabled;
-    
+
     #region ===== 애니메이션 =====
-    
+
     public enum AnimationType
     {
         None,
@@ -27,7 +28,7 @@ public abstract class BasePopup : BaseUI
     [Header("BgUp 애니메이션")]
     [Tooltip("아래에서 위로 올라가는 거리")]
     [SerializeField] private float _bgUpOffsetY = 10f;
-    
+
     [Header("BgDown 애니메이션")]
     [Tooltip("Bg가 위에서 내려오는 거리, 0이면 [DefaultBgDownDistance]을 사용")]
     [Min(0f)]
@@ -41,16 +42,16 @@ public abstract class BasePopup : BaseUI
     {
         OnAwake();
 
-        Image bg = gameObject.FindChild<Image>("Bg");
-        if (bg == null)
+        _background = gameObject.FindChild<Image>("Bg");
+
+        if (_background == null)
         {
             CPrint.Error("[BasePopup] Bg이 존재하지 않습니다.");
+            return;
         }
-        else
-        {
-            _graphicRaycaster = bg.gameObject.GetOrAddComponent<GraphicRaycaster>();
-            _graphicRaycaster.enabled = false;
-        }
+
+        _graphicRaycaster = gameObject.GetOrAddComponent<GraphicRaycaster>();
+        _graphicRaycaster.enabled = false;
 
         Managers.UI.SetupCanvas(this);
 
@@ -58,11 +59,11 @@ public abstract class BasePopup : BaseUI
     }
 
     protected abstract void OnAwake();
-    
+
     private void Start()
     {
         Managers.Sound.PlaySfx(ResourceKey.Name.SfxType.ChimePopup);
-        
+
         OnStart();
     }
 
@@ -71,9 +72,14 @@ public abstract class BasePopup : BaseUI
     /// <summary> Popup 열기 애니메이션이 완료된 후 호출한다. </summary>
     protected virtual void OnOpened()
     {
+        if (_graphicRaycaster == null)
+        {
+            return;
+        }
+
         _graphicRaycaster.enabled = true;
     }
-    
+
     private void Update()
     {
         OnUpdate();
@@ -97,25 +103,14 @@ public abstract class BasePopup : BaseUI
     /// <summary> Popup을 닫고 닫기 완료 후 전달받은 콜백을 실행한다. </summary>
     public virtual void Close(Action closeAction = null)
     {
-        _graphicRaycaster.enabled = false;
-            
+        if (_graphicRaycaster != null)
+        {
+            _graphicRaycaster.enabled = false;
+        }
+
         _closeAction = closeAction;
 
         PlayAnimation(false);
-    }
-
-    /// <summary> Popup의 배경 Transform을 찾는다. </summary>
-    private bool TryGetBackground(out Transform backgroundTransform)
-    {
-        backgroundTransform = gameObject.FindChild<Transform>("Bg");
-
-        if (backgroundTransform != null)
-        {
-            return true;
-        }
-
-        CPrint.Error("Popup Background를 찾을 수 없습니다.");
-        return false;
     }
 
     /// <summary> Popup을 즉시 제거하고 닫기 완료 콜백을 실행한다. </summary>
@@ -128,9 +123,9 @@ public abstract class BasePopup : BaseUI
 
         closeAction?.Invoke();
     }
-    
+
     #region ===== 애니메이션 =====
-    
+
     /// <summary> Popup 열기 또는 닫기 애니메이션을 재생한다. </summary>
     protected virtual void PlayAnimation(bool isOpen)
     {
@@ -174,11 +169,12 @@ public abstract class BasePopup : BaseUI
     /// <summary> 배경이 아래에서 위로 이동하는 Popup 애니메이션을 재생한다. </summary>
     private void PlayBgUpAnimation(bool isOpen)
     {
-        if (!TryGetBackground(out Transform backgroundTransform))
+        if (_background == null)
         {
             return;
         }
 
+        Transform backgroundTransform = _background.transform;
         CanvasGroup backgroundCanvasGroup = backgroundTransform.gameObject.GetOrAddComponent<CanvasGroup>();
 
         if (isOpen)
@@ -195,10 +191,8 @@ public abstract class BasePopup : BaseUI
     {
         backgroundTransform.DOLocalMove(Vector3.up * _bgUpOffsetY, 0.2f).SetEase(Ease.Linear).SetUpdate(true)
             .SetRelative(true).From(backgroundTransform.localPosition + Vector3.down * _bgUpOffsetY)
-            .OnStart(() =>
-            {
-                backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f).SetUpdate(true);
-            }).OnComplete(OnOpened);
+            .OnStart(() => { backgroundCanvasGroup.DOFade(0.98f, 0.13f).From(0f).SetUpdate(true); })
+            .OnComplete(OnOpened);
     }
 
     /// <summary> 배경이 아래로 이동하며 닫히는 애니메이션을 재생한다. </summary>
@@ -214,11 +208,12 @@ public abstract class BasePopup : BaseUI
     /// <summary> 배경이 위에서 아래로 이동하는 Popup 애니메이션을 재생한다. </summary>
     private void PlayBgDownAnimation(bool isOpen)
     {
-        if (!TryGetBackground(out Transform backgroundTransform))
+        if (_background == null)
         {
             return;
         }
 
+        Transform backgroundTransform = _background.transform;
         CanvasGroup backgroundCanvasGroup = backgroundTransform.gameObject.GetOrAddComponent<CanvasGroup>();
 
         if (isOpen)
@@ -235,7 +230,7 @@ public abstract class BasePopup : BaseUI
     {
         return Mathf.Approximately(_bgDownDistance, 0f) ? DefaultBgDownDistance : _bgDownDistance;
     }
-    
+
     /// <summary> 배경이 위에서 내려오며 열리는 애니메이션을 재생한다. </summary>
     private void PlayBgDownOpenAnimation(Transform backgroundTransform, CanvasGroup backgroundCanvasGroup)
     {
@@ -243,10 +238,8 @@ public abstract class BasePopup : BaseUI
         Vector3 startPosition = targetPosition + Vector3.up * GetBgDownDistance();
 
         backgroundTransform.DOLocalMove(targetPosition, 0.35f).SetEase(Ease.OutCubic).From(startPosition)
-            .SetUpdate(true).OnStart(() =>
-            {
-                backgroundCanvasGroup.DOFade(0.98f, 0.2f).From(0f).SetUpdate(true);
-            }).OnComplete(OnOpened);
+            .SetUpdate(true).OnStart(() => { backgroundCanvasGroup.DOFade(0.98f, 0.2f).From(0f).SetUpdate(true); })
+            .OnComplete(OnOpened);
     }
 
     /// <summary> 배경이 살짝 아래로 갔다가 목표 지점으로 간 후 닫히는 애니메이션을 재생한다. </summary>
@@ -254,7 +247,8 @@ public abstract class BasePopup : BaseUI
     {
         Vector3 endPosition = backgroundTransform.localPosition + Vector3.up * GetBgDownDistance();
 
-        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InBack).SetUpdate(true).OnComplete(CloseImmediately);
+        backgroundTransform.DOLocalMove(endPosition, 0.3f).SetEase(Ease.InBack).SetUpdate(true)
+            .OnComplete(CloseImmediately);
     }
 
     #endregion ===== 애니메이션 =====
