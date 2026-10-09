@@ -85,15 +85,15 @@ public class ShopSlot : SlotUI
         {
             case PurchaseResult.Success:
                 _shopPopup.UpdateShopUI();
-                Managers.UI.OpenToastMessage("구매 완료");
+                Managers.UI.OpenToastMessage("구매 완료", true);
                 break;
 
             case PurchaseResult.InventoryFull:
-                Managers.UI.OpenToastMessage("더 이상 구매하실 수 없습니다.");
+                Managers.UI.OpenToastMessage("더 이상 구매하실 수 없습니다.", true);
                 break;
 
             case PurchaseResult.NotEnoughGold:
-                Managers.UI.OpenToastMessage("소지금이 부족합니다.");
+                Managers.UI.OpenToastMessage("소지금이 부족합니다.", true);
                 break;
         }
     }

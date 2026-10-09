@@ -265,15 +265,15 @@ public class UIManager
 
     #region ===== Overlay =====
 
-    /// <summary> 토스트 메세지를 활성화시킨다. </summary>
-    public void OpenToastMessage(string message)
+    /// <summary> 토스트 메시지를 활성화한다. </summary>
+    public void OpenToastMessage(string message, bool allowDuplicate = false)
     {
         if (!TryCreateToastMessage())
         {
             return;
         }
 
-        _toastMessage.ActiveMessage(message);
+        _toastMessage.ActiveMessage(message, allowDuplicate);
     }
     
     /// <summary> 활성화된 토스트 메세지를 비활성화시킨다. </summary>

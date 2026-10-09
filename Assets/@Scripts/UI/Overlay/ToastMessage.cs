@@ -204,19 +204,21 @@ public class ToastMessage : BaseOverlay
 
     #region ===== 메시지 =====
 
-    /// <summary> 토스트 메시지를 표시한다. </summary>
-    public void ActiveMessage(string message)
+    /// <summary> 토스트 메시지를 표시한다. 필요에 따라 중복 표시를 허용한다. </summary>
+    public void ActiveMessage(string message, bool allowDuplicate = false)
     {
-        // 같은 메시지가 이미 표시 중이면 무시
-        if (IsSameMessageAppeared(message))
+        if (string.IsNullOrEmpty(message))
         {
             return;
         }
 
-        // 대기 중인 동일한 메시지가 있으면 무시
-        if (IsSameMessageQueued(message))
+        // 중복 표시를 허용하지 않는 경우에만 중복 검사
+        if (!allowDuplicate)
         {
-            return;
+            if (IsSameMessageAppeared(message) || IsSameMessageQueued(message))
+            {
+                return;
+            }
         }
 
         int itemIndex = GetUsableItemIndex();
