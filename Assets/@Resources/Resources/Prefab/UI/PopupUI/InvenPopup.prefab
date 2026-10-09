@@ -2972,8 +2972,6 @@ MonoBehaviour:
   CurrentAnimation: 2
   _bgUpOffsetY: 10
   _bgDownDistance: 0
-  _equipmentSlotCount: 20
-  _consumableSlotCount: 20
 --- !u!1 &8644364393153407961
 GameObject:
   m_ObjectHideFlags: 0
