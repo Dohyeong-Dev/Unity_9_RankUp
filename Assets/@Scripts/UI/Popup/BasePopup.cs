@@ -43,7 +43,6 @@ public abstract class BasePopup : BaseUI
         OnAwake();
         
         _graphicRaycaster = GetComponent<GraphicRaycaster>();
-        _graphicRaycaster.enabled = false;
 
         Managers.UI.SetupCanvas(this);
 
