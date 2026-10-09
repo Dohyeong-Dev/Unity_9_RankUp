@@ -53,8 +53,15 @@ public class ItemDescription : MonoBehaviour
     /// <summary> 상점의 아이템 설명을 표시한다. </summary>
     public void Show(ShopSlot shopSlot)
     {
-        _itemNameText.text = Managers.Table.Item.GetItemName(shopSlot.ItemID);
-        _itemDescText.text = Managers.Table.Item.GetItemDescription(shopSlot.ItemID) + "\n";
+        Item item = Managers.Table.Item.GetItem(shopSlot.ItemID);
+
+        if (item == null)
+        {
+            return;
+        }
+
+        _itemNameText.text = item.Name;
+        _itemDescText.text = item.Description + "\n";
         _itemDescText.text += "\n"+ Managers.Table.Shop.GetItemSellPriceStr(shopSlot.ItemID);
 
         UpdatePosition(shopSlot.transform);
@@ -65,8 +72,15 @@ public class ItemDescription : MonoBehaviour
     /// <summary> 인벤의 아이템 설명을 표시한다. </summary>
     public void Show(InvenSlot invenSlot)
     {
-        _itemNameText.text = Managers.Table.Item.GetItemName(invenSlot.ItemID);
-        _itemDescText.text = Managers.Table.Item.GetItemDescription(invenSlot.ItemID);
+        Item item = Managers.Table.Item.GetItem(invenSlot.ItemID);
+
+        if (item == null)
+        {
+            return;
+        }
+
+        _itemNameText.text = item.Name;
+        _itemDescText.text = item.Description;
 
         UpdatePosition(invenSlot.transform);
 

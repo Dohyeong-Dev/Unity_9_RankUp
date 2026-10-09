@@ -13,12 +13,14 @@ public abstract class TableLoader<TData> where TData : TableData, new()
 {
     private readonly TableParser<TData> _tableParser = new();
 
-    protected readonly Dictionary<int, TData> DataMap = new();
-    
+    protected readonly Dictionary<int, TData> TableMap = new();
+
     protected abstract string TableName { get; }
 
     public void Load()
     {
+        TableMap.Clear();
+
         TextAsset textAsset = Managers.Resource.Load<TextAsset>(ResourceKey.Path.Table + TableName);
 
         if (textAsset == null)
@@ -27,6 +29,13 @@ public abstract class TableLoader<TData> where TData : TableData, new()
         }
 
         ParseTable(textAsset.text);
+
+        OnLoaded();
+    }
+
+    /// <summary> 테이블 로딩 완료 후 추가 작업을 수행한다. </summary>
+    protected virtual void OnLoaded()
+    {
     }
 
     /// <summary> 로드한 테이블 데이터를 TData로 파싱한다. </summary>
@@ -63,9 +72,9 @@ public abstract class TableLoader<TData> where TData : TableData, new()
             AddData(data);
         }
     }
-    
+
     private void AddData(TData data)
     {
-        DataMap.Add(data.ID, data);
+        TableMap.Add(data.ID, data);
     }
 }

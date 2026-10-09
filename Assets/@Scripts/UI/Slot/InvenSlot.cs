@@ -21,6 +21,7 @@ public class InvenSlot : SlotUI
     // 아이템 정보
     private int _itemID;
     public int ItemID => _itemID;
+    public Item _item;
     public bool HasItem => _itemID > 0 && _count > 0;
     private int _count;
     public int Count => _count;
@@ -52,6 +53,7 @@ public class InvenSlot : SlotUI
     public void SetData(int itemID, int count)
     {
         _itemID = itemID;
+        _item = Managers.Table.Item.GetItem(itemID);
         _count = count;
     }
 
@@ -84,7 +86,7 @@ public class InvenSlot : SlotUI
             return;
         }
 
-        itemImage.sprite = GetSprite();
+        itemImage.sprite = Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + _item.ResourceName);
         itemImage.gameObject.SetActive(true);
         badgeImage.gameObject.SetActive(true);
         itemText.text = Count.ToString("N0");
@@ -96,18 +98,5 @@ public class InvenSlot : SlotUI
         return Get<Image>(Images.ItemImage);
     }
     
-    /// <summary> 현재 아이템의 Sprite를 반환한다. </summary>
-    private Sprite GetSprite()
-    {
-        if (!HasItem)
-        {
-            return null;
-        }
-
-        string resourceName = Managers.Table.Item.GetItemResourceName(_itemID);
-
-        return Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + resourceName);
-    }
-
     #endregion ===== UI =====
 }

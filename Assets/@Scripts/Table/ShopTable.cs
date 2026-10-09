@@ -21,19 +21,24 @@ public class ShopTable : TableLoader<ShopData>
     /// <summary> 현재 판매 중인 아이템을 타입별로 분류하여 초기화한다. </summary>
     private void InitializeSellingItemList()
     {
-        foreach (ShopData data in DataMap.Values)
+        foreach (ShopData data in TableMap.Values)
         {
             if (!data.IsSell)
             {
                 continue;
             }
 
-            ItemType itemType = Managers.Table.Item.GetItemType(data.ItemID);
+            Item item = Managers.Table.Item.GetItem(data.ItemID);
 
-            if (!_sellingItemIdList.TryGetValue(itemType, out List<int> itemIdList))
+            if (item == null)
+            {
+                return;
+            }
+            
+            if (!_sellingItemIdList.TryGetValue(item.Type, out List<int> itemIdList))
             {
                 itemIdList = new List<int>();
-                _sellingItemIdList.Add(itemType, itemIdList);
+                _sellingItemIdList.Add(item.Type, itemIdList);
             }
 
             itemIdList.Add(data.ItemID);
@@ -59,9 +64,9 @@ public class ShopTable : TableLoader<ShopData>
     /// <summary> 아이템ID에 해당하는 판매가격을 획득한다.  </summary>
     public int GetItemSellPrice(int itemID)
     {
-        if (DataMap.ContainsKey(itemID))
+        if (TableMap.ContainsKey(itemID))
         {
-            return DataMap[itemID].SellPrice;
+            return TableMap[itemID].SellPrice;
         }
 
         return 0;
@@ -70,7 +75,7 @@ public class ShopTable : TableLoader<ShopData>
     /// <summary> 아이템ID에 해당하는 판매가격을 [판매가격 : ?]구조로 획득한다.  </summary>
     public string GetItemSellPriceStr(int itemID)
     {
-        if (DataMap.ContainsKey(itemID))
+        if (TableMap.ContainsKey(itemID))
         {
             return $"<br><color=yellow>판매가격 : {GetItemSellPrice(itemID):N0}</color>";
         }

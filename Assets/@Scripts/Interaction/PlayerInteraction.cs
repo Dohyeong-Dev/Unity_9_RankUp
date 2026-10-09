@@ -69,7 +69,10 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnDestroy()
     {
-        Managers.Event.OnPlayerDead -= OnPlayerDead;
+        if (Managers.Event != null)
+        {
+            Managers.Event.OnPlayerDead -= OnPlayerDead;
+        }
     }
     
     private void OnPlayerDead()

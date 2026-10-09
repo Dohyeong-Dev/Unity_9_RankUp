@@ -23,8 +23,6 @@ public class QuickSlot
         _itemImage = itemImage;
         _badgeImage = badgeImage;
         _itemCountText = itemCountText;
-
-        Clear();
     }
 
     /// <summary> QuickSlot에 아이템 정보를 표시한다. </summary>
@@ -39,17 +37,23 @@ public class QuickSlot
         _itemData = itemData;
 
         // 아이템 이미지
-        string resourceName = Managers.Table.Item.GetItemResourceName(_itemData.ItemID);
-        Sprite sprite = Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + resourceName);
-        
+        Item item = Managers.Table.Item.GetItem(_itemData.ItemID);
+
+        if (item == null)
+        {
+            Clear();
+            return;
+        }
+
+        Sprite sprite = Managers.Resource.Load<Sprite>(ResourceKey.Path.ItemSprite + item.ResourceName);
         _itemImage.sprite = sprite;
         _itemImage.gameObject.SetActive(true);
 
         // 아이템 개수
         bool hasCount = _itemData.Count > 0;
-
         _badgeImage.gameObject.SetActive(hasCount);
         _itemCountText.gameObject.SetActive(hasCount);
+        
         if (hasCount)
         {
             _itemCountText.text = _itemData.Count.ToString("N0");
@@ -162,7 +166,7 @@ public class QuickBar : BaseUI
 
         ClearAllSlots();
 
-        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
+        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemDataList();
 
         foreach (InventoryItemData itemData in inventoryItems)
         {
@@ -183,7 +187,7 @@ public class QuickBar : BaseUI
             return 0;
         }
 
-        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemList();
+        IReadOnlyList<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemDataList();
 
         foreach (InventoryItemData itemData in inventoryItems)
         {

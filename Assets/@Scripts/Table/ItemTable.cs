@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class ItemData : TableData
 {
     [CsvField("이름")]
@@ -8,7 +10,7 @@ public class ItemData : TableData
 
     [CsvField("버프타입")]
     public string BuffType;
-    
+
     [CsvField("버프값")]
     public int BuffValue;
 
@@ -22,69 +24,33 @@ public class ItemData : TableData
     public int LimitCount;
 }
 
+/// <summary> 아이템 테이블 데이터를 관리한다. </summary>
 public class ItemTable : TableLoader<ItemData>
 {
+    private readonly Dictionary<int, Item> _itemMap = new();
+
     protected override string TableName => "ItemInfo";
 
-    /// <summary> 아이템 ID에 해당하는 이름을 획득한다. </summary>
-    public string GetItemName(int itemID)
+    /// <summary> CSV 로딩 후 게임에서 사용할 아이템 객체를 생성한다. </summary>
+    protected override void OnLoaded()
     {
-        return DataMap.TryGetValue(itemID, out ItemData data) ? data.Name : string.Empty;
+        _itemMap.Clear();
+
+        foreach (KeyValuePair<int, ItemData> pair in TableMap)
+        {
+            _itemMap.Add(pair.Key, new Item(pair.Key, pair.Value));
+        }
     }
 
-    /// <summary> 아이템 ID에 해당하는 설명에 버프 값을 적용하여 반환한다. </summary>
-    public string GetItemDescription(int itemID)
+    /// <summary> 아이템 ID에 해당하는 아이템을 반환한다. </summary>
+    public Item GetItem(int itemID)
     {
-        if (!DataMap.TryGetValue(itemID, out ItemData data))
+        if (_itemMap.TryGetValue(itemID, out Item item))
         {
-            return string.Empty;
+            return item;
         }
 
-        return string.Format(data.Description, data.BuffValue);
-    }
-    
-    /// <summary> 아이템 ID에 해당하는 리소스이름을 가져온다. </summary>
-    public string GetItemResourceName(int itemID)
-    {
-        return DataMap.TryGetValue(itemID, out ItemData data) ? data.ResourceName : string.Empty;
-    }
-
-    /// <summary> 아이템 ID에 해당하는 버프 타입을 획득한다. </summary>
-    public BuffType GetBuffType(int itemID)
-    {
-        if (DataMap.TryGetValue(itemID, out ItemData data) && Utils.TryParseEnum(data.BuffType, out BuffType type))
-        {
-            return type;
-        }
-
-        return BuffType.None;
-    }
-    
-    /// <summary> 아이템 ID에 해당하는 버프 밸류 값을 획득한다. </summary>
-    public int GetBuffValue(int itemID)
-    {
-        if (DataMap.TryGetValue(itemID, out ItemData data))
-        {
-            return data.BuffValue;
-        }
-
-        return 0;
-    }
-    
-    /// <summary> 아이템 ID에 해당하는 아이템 타입을 획득한다. </summary>
-    public ItemType GetItemType(int itemID)
-    {
-        if (DataMap.TryGetValue(itemID, out ItemData data) && Utils.TryParseEnum(data.Type, out ItemType type))
-        {
-            return type;
-        }
-
-        return ItemType.None;
-    }
-    
-    /// <summary> 아이템 ID에 해당하는 최대 보유 가능 개수를 반환한다. </summary>
-    public int GetItemLimitCount(int itemID)
-    {
-        return DataMap.TryGetValue(itemID, out ItemData data) ? data.LimitCount : 0;
+        CPrint.Warning($"[ItemTable] ID({itemID}) not found!");
+        return null;
     }
 }

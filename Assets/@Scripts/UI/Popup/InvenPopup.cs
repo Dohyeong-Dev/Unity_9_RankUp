@@ -236,7 +236,7 @@ public class InvenPopup : BasePopup
             return;
         }
 
-        List<InventoryItemData> inventoryItems = GetInventoryItems(itemType);
+        List<InventoryItemData> inventoryItems = Managers.Data.GetInvenItemDataList(itemType);
 
         ClearInvenSlots(slotList);
 
@@ -391,7 +391,7 @@ public class InvenPopup : BasePopup
             return;
         }
 
-        if (Managers.Data.TryMoveInvenIndex(_selectedSlot.ItemID, _selectedSlot.Type, targetSlot.Index))
+        if (Managers.Data.TryMoveInvenIndex(_selectedSlot.ItemID, targetSlot.Type, targetSlot.Index))
         {
             UpdateInvenUI();
         }
@@ -539,7 +539,7 @@ public class InvenPopup : BasePopup
             return;
         }
 
-        Managers.Data.ClearQuickSlot(_selectedQuickSlotIndex);
+        Managers.Data.UnassignQuickSlot(_selectedQuickSlotIndex);
         UpdateQuickBar();
         
         CancelSelectedItem();
@@ -669,26 +669,6 @@ public class InvenPopup : BasePopup
             ItemType.Consumable => _consumableSlots,
             _ => null
         };
-    }
-
-    /// <summary> 지정된 타입의 보유 아이템 목록을 반환한다. </summary>
-    private List<InventoryItemData> GetInventoryItems(ItemType itemType)
-    {
-        List<InventoryItemData> inventoryItems = new();
-
-        IReadOnlyList<InventoryItemData> inventoryItemList = Managers.Data.GetInvenItemList();
-
-        foreach (InventoryItemData inventoryItem in inventoryItemList)
-        {
-            if (Managers.Table.Item.GetItemType(inventoryItem.ItemID) != itemType)
-            {
-                continue;
-            }
-
-            inventoryItems.Add(inventoryItem);
-        }
-
-        return inventoryItems;
     }
 
     #endregion ===== Get =====

@@ -17,9 +17,10 @@ public class ShopSlot : SlotUI
     #region ===== 상태 =====
 
     private int _itemID;
-
     public int ItemID => _itemID;
 
+    private Item _item;
+    
     #endregion =====
 
     #region ===== 참조 =====
@@ -50,6 +51,7 @@ public class ShopSlot : SlotUI
     public void SetData(int itemID, ShopPopup shopPopup)
     {
         _itemID = itemID;
+        _item = Managers.Table.Item.GetItem(itemID);
         _shopPopup = shopPopup;
     }
 
@@ -60,10 +62,8 @@ public class ShopSlot : SlotUI
     /// <summary> 아이템 정보를 기반으로 슬롯 UI를 갱신한다. </summary>
     public override void UpdateUI()
     {
-        string resourceName = Managers.Table.Item.GetItemResourceName(_itemID);
-
         Get<Image>(Images.ItemImage).sprite = Managers.Resource.Load<Sprite>(
-            ResourceKey.Path.ItemSprite + resourceName);
+            ResourceKey.Path.ItemSprite + _item?.ResourceName);
     }
 
     #endregion ===== UI 갱신 =====

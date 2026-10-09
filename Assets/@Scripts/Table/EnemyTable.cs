@@ -29,6 +29,6 @@ public class EnemyTable : TableLoader<EnemyData>
 
     public EnemyData GetMonsterInfo(int monsterID)
     {
-        return DataMap.GetValueOrDefault(monsterID);
+        return TableMap.GetValueOrDefault(monsterID);
     }
 }

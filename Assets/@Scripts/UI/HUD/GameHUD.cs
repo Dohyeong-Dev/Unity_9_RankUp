@@ -152,20 +152,14 @@ public class GameHUD : BaseHUD
     {
         int itemID = _quickBar.GetItemID(quickSlotIndex);
 
-        if (itemID <= 0)
+        Item item = Managers.Table.Item.GetItem(itemID);
+
+        if (item == null || !Managers.Data.TryUseItem(item.ID))
         {
             return;
         }
 
-        if (!Managers.Data.TryUseItem(itemID))
-        {
-            return;
-        }
-
-        BuffType buffType = Managers.Table.Item.GetBuffType(itemID);
-        int buffValue = Managers.Table.Item.GetBuffValue(itemID);
-
-        _player.Recovery(buffType, buffValue);
+        _player.Recovery(item.BuffType, item.BuffValue);
     }
 
     private void OnDestroy()
