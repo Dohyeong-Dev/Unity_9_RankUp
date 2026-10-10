@@ -23,12 +23,12 @@ public class UIManager
     #region ===== Overlay =====
 
     private ToastMessage _toastMessage;
-    
+
     private HitEffectUI _hitEffectUI;
 
     private LoadingUI _loadingUI;
     public bool IsLoading => _loadingUI != null && _loadingUI.gameObject.activeSelf;
-    
+
     #endregion ===== Overlay =====
 
     #region ===== Root =====
@@ -222,7 +222,10 @@ public class UIManager
 
         if (_popupStack.Count == 0)
         {
-            Managers.Input.SetCursorLock(true);
+            bool isCursorLock = Managers.Scene.CurrentScene is BaseScene scene
+                                && scene.DefaultCursorLock;
+
+            Managers.Input.SetCursorLock(isCursorLock);
         }
     }
 
@@ -266,13 +269,13 @@ public class UIManager
 
         _toastMessage.ActiveMessage(message, allowDuplicate);
     }
-    
+
     /// <summary> 활성화된 토스트 메세지를 비활성화시킨다. </summary>
     public void CloseToastMessage()
     {
         _toastMessage?.ResetToastMessage();
     }
-    
+
     /// <summary> 토스트 메세지 UI가 없으면 생성하고 참조를 저장한다. </summary>
     private bool TryCreateToastMessage()
     {
@@ -297,7 +300,7 @@ public class UIManager
 
         return true;
     }
-    
+
     /// <summary> 플레이어 피격 효과를 재생한다. </summary>
     public void OpenHitEffect()
     {
@@ -314,7 +317,7 @@ public class UIManager
     {
         _hitEffectUI?.Stop();
     }
-    
+
     /// <summary> 피격 효과 UI가 없으면 생성하고 참조를 저장한다. </summary>
     private bool TryCreateHitEffect()
     {
@@ -339,7 +342,7 @@ public class UIManager
 
         return true;
     }
-    
+
     /// <summary> Loading UI를 열고 지정된 페이드 연출을 재생한다. </summary>
     public void OpenLoadingUI(float fadeTime = 0f, Action openAction = null)
     {
@@ -347,7 +350,7 @@ public class UIManager
         {
             return;
         }
-        
+
         if (!TryCreateLoading())
         {
             return;
@@ -398,14 +401,14 @@ public class UIManager
 
         return true;
     }
-    
+
     /// <summary> 현재 열려 있는 Overlay UI를 닫는다. </summary>
     private void CloseAllOverlay()
     {
         CloseToastMessage();
         CloseHitEffect();
     }
-    
+
     #endregion ===== Overlay =====
 
     #region ===== Slot =====
@@ -419,14 +422,14 @@ public class UIManager
         {
             return null;
         }
-        
+
         slotGO.transform.localScale = Vector3.one;
 
         return slotGO.GetOrAddComponent<T>();
     }
-    
+
     #endregion ===== Slot =====
-    
+
     #region ===== 정리 =====
 
     /// <summary> 현재 Screen과 모든 Popup 그리고 Overlay를 닫는다. </summary>

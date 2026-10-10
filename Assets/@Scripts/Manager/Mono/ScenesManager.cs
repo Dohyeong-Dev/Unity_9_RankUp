@@ -8,6 +8,7 @@ public class ScenesManager : MonoBehaviour
     #region ===== 현재 씬 =====
 
     private BaseScene _currentScene;
+    public BaseScene CurrentScene => _currentScene;
 
     #endregion ===== 현재 씬 =====
 

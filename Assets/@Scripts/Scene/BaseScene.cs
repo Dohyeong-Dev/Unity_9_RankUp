@@ -15,6 +15,9 @@ public abstract class BaseScene : MonoBehaviour
     public SceneType Type { get; private set; }
 
     protected bool IsCursorLock = false;
+    
+    /// <summary> 현재 씬의 기본 커서 잠금 상태 </summary>
+    public bool DefaultCursorLock => IsCursorLock;
 
     private void Awake()
     {
