@@ -222,10 +222,7 @@ public class UIManager
 
         if (_popupStack.Count == 0)
         {
-            bool isCursorLock = Managers.Scene.CurrentScene is BaseScene scene
-                                && scene.DefaultCursorLock;
-
-            Managers.Input.SetCursorLock(isCursorLock);
+            Managers.Input.SetCursorLock(Managers.Scene.CurrentScene.DefaultCursorLock);
         }
     }
 
