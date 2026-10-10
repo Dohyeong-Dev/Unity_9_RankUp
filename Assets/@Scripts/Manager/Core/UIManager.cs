@@ -69,42 +69,33 @@ public class UIManager
     /// <summary> 현재 활성화된 UI에 따라 입력 처리를 수행한다. </summary>
     public void OnUpdate()
     {
-        if (IsLoading)
-        {
-            Managers.Input.SetInputEnabled(false);
-            return;
-        }
-
-        if (CurrentPopup != null)
-        {
-            Managers.Input.SetInputEnabled(false);
-            if (CurrentPopup.IsRaycastEnabled)
-            {
-                CurrentPopup.OnInputKey();
-            }
-            
-            return;
-        }
+        bool isInputBlocked = IsLoading || CurrentPopup != null;
 
         if (CurrentScreen != null)
         {
-            Managers.Input.SetInputEnabled(false);
-            CurrentScreen.OnInputKey();
-            return;
+            isInputBlocked = true;
         }
-
-        if (CurrentHUD == null)
+        else if (CurrentHUD == null || !CurrentHUD.IsVisible)
         {
-            return;
+            isInputBlocked = true;
         }
 
-        if (!CurrentHUD.IsVisible)
+        Managers.Input.SetInputBlocked(this, isInputBlocked);
+
+        if (isInputBlocked)
         {
-            Managers.Input.SetInputEnabled(false);
+            if (CurrentPopup != null && CurrentPopup.IsRaycastEnabled)
+            {
+                CurrentPopup.OnInputKey();
+            }
+            else if (!IsLoading && CurrentScreen != null)
+            {
+                CurrentScreen.OnInputKey();
+            }
+
             return;
         }
 
-        Managers.Input.SetInputEnabled(true);
         CurrentHUD.OnInputKey();
     }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary> 게임에서 사용하는 마우스와 키보드 입력을 관리한다. </summary>
@@ -44,8 +45,11 @@ public class InputManager
 
     #region ===== 상태 =====
 
+    /// <summary> 입력을 차단 중인 외부 요청 목록 </summary>
+    private readonly HashSet<object> _inputBlockers = new();
+    
     /// <summary> 플레이어가 입력을 받을 수 있는 상태인지 나타낸다. </summary>
-    public bool CanReceivePlayer { get; private set; }
+    public bool CanReceivePlayer => _inputBlockers.Count == 0;
 
     #endregion ===== 상태 =====
 
@@ -115,10 +119,22 @@ public class InputManager
 
     #region ===== 입력 제어 =====
 
-    /// <summary> 입력 수신 가능 여부를 설정한다. </summary>
-    public void SetInputEnabled(bool enabled)
+    /// <summary> 지정한 요청자의 입력 차단 상태를 설정한다. </summary>
+    public void SetInputBlocked(object requester, bool isBlocked)
     {
-        CanReceivePlayer = enabled;
+        if (requester == null)
+        {
+            return;
+        }
+
+        if (isBlocked)
+        {
+            _inputBlockers.Add(requester);
+
+            return;
+        }
+
+        _inputBlockers.Remove(requester);
     }
 
     /// <summary> 마우스 커서의 잠금 상태를 설정한다. </summary>

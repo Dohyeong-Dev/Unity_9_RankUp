@@ -106,7 +106,6 @@ public class BossEncounter : MonoBehaviour
 
         CPrint.Log("[BossEncounter] 컷신 시작");
 
-        Managers.Input.SetInputEnabled(false);
         Managers.UI.CurrentHUD?.SetVisible(false);
         Managers.UI.CloseHitEffect();
 
@@ -147,7 +146,6 @@ public class BossEncounter : MonoBehaviour
         SetCutsceneProjectileActive(false);
 
         Managers.UI.CurrentHUD?.SetVisible(true);
-        Managers.Input.SetInputEnabled(true);
         
         Managers.Sound.PlayBgm(ResourceKey.Name.BgmType.Boss);
     }
